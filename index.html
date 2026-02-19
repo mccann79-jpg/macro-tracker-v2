@@ -190,7 +190,6 @@
             padding: 20px;
             margin-bottom: 12px;
             box-shadow: var(--shadow-sm);
-            overflow: hidden;
         }
         .card h2 {
             font-size: 1.1rem;
@@ -984,64 +983,40 @@
         <!-- Add to Day -->
         <div class="card">
             <h2>Add to Today</h2>
-            <div class="toggle-group">
-                <button class="toggle-btn active" id="selectMealTypeBtn" onclick="setDayAddType('meal')">Saved Meals</button>
-                <button class="toggle-btn" id="selectFoodTypeBtn" onclick="setDayAddType('food')">Individual Foods</button>
+            <div style="display:flex; gap:12px; margin-bottom:12px;">
+                <label class="chart-toggle" style="margin:0;"><input type="checkbox" id="filterMeals" checked onchange="filterUnifiedDropdown()"> Meals</label>
+                <label class="chart-toggle" style="margin:0;"><input type="checkbox" id="filterFoods" checked onchange="filterUnifiedDropdown()"> Foods</label>
             </div>
 
-            <div id="mealSelectSection">
-                <div class="form-group" style="position:relative;">
-                    <label for="searchMealForDay">Select Meal</label>
-                    <input type="text" id="searchMealForDay" placeholder="Type to search meals..."
-                        onfocus="showDayMealDropdown()"
-                        onkeyup="filterDayMealDropdownCustom()"
-                        autocomplete="off">
-                    <div id="dayMealDropdown" class="autocomplete-dropdown"></div>
-                    <input type="hidden" id="selectedMealForDay" value="">
-                </div>
-                <div class="form-group">
-                    <label>Amount</label>
-                    <div class="form-row">
-                        <input type="number" id="mealServingsForDay" min="0.1" step="0.1" value="1">
-                        <select id="mealUnitForDay">
-                            <option value="serving">servings</option>
-                            <option value="g">grams</option>
-                            <option value="oz">ounces</option>
-                            <option value="lb">pounds</option>
-                            <option value="cup">cups</option>
-                            <option value="tbsp">tbsp</option>
-                            <option value="tsp">tsp</option>
-                            <option value="piece">pieces</option>
-                        </select>
-                    </div>
-                </div>
-                <button class="btn" id="addMealToDay">Add Meal to Day</button>
+            <div class="form-group" style="position:relative;">
+                <label for="searchItemForDay">Search meals & foods</label>
+                <input type="text" id="searchItemForDay" placeholder="Type to search..."
+                    onfocus="filterUnifiedDropdown()"
+                    onkeyup="filterUnifiedDropdown()"
+                    autocomplete="off">
+                <div id="dayUnifiedDropdown" class="autocomplete-dropdown"></div>
+                <input type="hidden" id="selectedItemName" value="">
+                <input type="hidden" id="selectedItemType" value="">
             </div>
-
-            <div id="foodSelectSection" style="display:none;">
-                <div class="form-group" style="position:relative;">
-                    <label for="searchFoodForDay">Select Food</label>
-                    <input type="text" id="searchFoodForDay" placeholder="Type to search foods..."
-                        onfocus="showDayFoodDropdown()"
-                        onkeyup="filterDayFoodDropdownCustom()"
-                        autocomplete="off">
-                    <div id="dayFoodDropdown" class="autocomplete-dropdown"></div>
-                    <input type="hidden" id="selectedFoodForDay" value="">
+            <div class="form-group">
+                <label>Amount</label>
+                <div class="form-row">
+                    <input type="number" id="itemAmountForDay" min="0.1" step="0.1" value="1">
+                    <select id="itemUnitForDay">
+                        <option value="serving">servings</option>
+                        <option value="g">g</option>
+                        <option value="oz">oz</option>
+                        <option value="lb">lb</option>
+                        <option value="cup">cup</option>
+                        <option value="tbsp">tbsp</option>
+                        <option value="tsp">tsp</option>
+                        <option value="ml">ml</option>
+                        <option value="fl_oz">fl oz</option>
+                        <option value="piece">piece</option>
+                    </select>
                 </div>
-                <div class="form-group">
-                    <label>Amount</label>
-                    <div class="form-row">
-                        <input type="number" id="foodAmountForDay" min="0.1" step="0.1" value="1">
-                        <select id="foodUnitForDay">
-                            <option value="g">g</option><option value="oz">oz</option><option value="lb">lb</option>
-                            <option value="cup">cup</option><option value="tbsp">tbsp</option><option value="tsp">tsp</option>
-                            <option value="ml">ml</option><option value="fl_oz">fl oz</option>
-                            <option value="piece">piece</option><option value="serving">serving</option>
-                        </select>
-                    </div>
-                </div>
-                <button class="btn" id="addFoodToDay">Add Food to Day</button>
             </div>
+            <button class="btn" id="addItemToDay">Add to Day</button>
         </div>
 
         <!-- Today's Meals -->
@@ -1677,8 +1652,7 @@
             document.getElementById('addFoodForm').addEventListener('submit', addFood);
             document.getElementById('addToMealBuilder').addEventListener('click', addFoodToMealBuilder);
             document.getElementById('saveMealBtn').addEventListener('click', saveMeal);
-            document.getElementById('addMealToDay').addEventListener('click', addMealToDay);
-            document.getElementById('addFoodToDay').addEventListener('click', addFoodToDay);
+            document.getElementById('addItemToDay').addEventListener('click', addItemToDay);
             document.getElementById('totalServings').addEventListener('input', calculateMealTotals);
             
             // Update food selector for day page
@@ -1700,14 +1674,8 @@
                 }
                 
                 // Close day meal dropdown
-                if (!e.target.closest('#searchMealForDay') && !e.target.closest('#dayMealDropdown')) {
-                    const dropdown = document.getElementById('dayMealDropdown');
-                    if (dropdown) dropdown.style.display = 'none';
-                }
-                
-                // Close day food dropdown
-                if (!e.target.closest('#searchFoodForDay') && !e.target.closest('#dayFoodDropdown')) {
-                    const dropdown = document.getElementById('dayFoodDropdown');
+                if (!e.target.closest('#searchItemForDay') && !e.target.closest('#dayUnifiedDropdown')) {
+                    const dropdown = document.getElementById('dayUnifiedDropdown');
                     if (dropdown) dropdown.style.display = 'none';
                 }
             });
@@ -2720,18 +2688,175 @@
             }
         }
 
-        function setDayAddType(type) {
-            if (type === 'meal') {
-                document.getElementById('mealSelectSection').style.display = 'block';
-                document.getElementById('foodSelectSection').style.display = 'none';
-                document.getElementById('selectMealTypeBtn').classList.add('active');
-                document.getElementById('selectFoodTypeBtn').classList.remove('active');
-            } else {
-                document.getElementById('mealSelectSection').style.display = 'none';
-                document.getElementById('foodSelectSection').style.display = 'block';
-                document.getElementById('selectMealTypeBtn').classList.remove('active');
-                document.getElementById('selectFoodTypeBtn').classList.add('active');
+        // ===== UNIFIED SEARCH (Meals + Foods) =====
+        function filterUnifiedDropdown() {
+            const searchInput = document.getElementById('searchItemForDay');
+            const dropdown = document.getElementById('dayUnifiedDropdown');
+            if (!searchInput || !dropdown) return;
+
+            const query = searchInput.value.toLowerCase().trim();
+            const showMeals = document.getElementById('filterMeals').checked;
+            const showFoods = document.getElementById('filterFoods').checked;
+
+            // Clear selection when typing
+            document.getElementById('selectedItemName').value = '';
+            document.getElementById('selectedItemType').value = '';
+
+            let results = [];
+
+            // Search meals
+            if (showMeals) {
+                let meals = savedMeals;
+                if (query) meals = meals.filter(m => m.name.toLowerCase().includes(query));
+                meals.sort((a, b) => {
+                    const aS = a.name.toLowerCase().startsWith(query);
+                    const bS = b.name.toLowerCase().startsWith(query);
+                    if (aS && !bS) return -1;
+                    if (!aS && bS) return 1;
+                    return a.name.localeCompare(b.name);
+                });
+                meals.slice(0, 12).forEach(meal => {
+                    const cal = meal.perServing.calories || (meal.perServing.protein * 4 + meal.perServing.carbs * 4 + meal.perServing.fats * 9);
+                    results.push({
+                        type: 'meal',
+                        name: meal.name,
+                        html: `<div class="dropdown-item-name" style="color:var(--accent);">${meal.name}</div>
+                               <div class="dropdown-item-meta">🍽 Meal · ${meal.totalServings} srv · P:${meal.perServing.protein.toFixed(0)}g C:${meal.perServing.carbs.toFixed(0)}g F:${meal.perServing.fats.toFixed(0)}g · ${cal.toFixed(0)} cal</div>`
+                    });
+                });
             }
+
+            // Search foods
+            if (showFoods) {
+                let foods = foodDatabase;
+                if (query) foods = foods.filter(f => f.name.toLowerCase().includes(query));
+                foods.sort((a, b) => {
+                    const aS = a.name.toLowerCase().startsWith(query);
+                    const bS = b.name.toLowerCase().startsWith(query);
+                    if (aS && !bS) return -1;
+                    if (!aS && bS) return 1;
+                    return a.name.localeCompare(b.name);
+                });
+                foods.slice(0, 12).forEach(food => {
+                    const cal = food.calories || (food.protein * 4 + food.carbs * 4 + food.fats * 9);
+                    results.push({
+                        type: 'food',
+                        name: food.name,
+                        html: `<div class="dropdown-item-name">${food.name}</div>
+                               <div class="dropdown-item-meta">🥄 Food · ${food.servingAmount} ${UNIT_LABELS[food.servingUnit]} · P:${food.protein}g C:${food.carbs}g F:${food.fats}g · ${cal.toFixed(0)} cal</div>`
+                    });
+                });
+            }
+
+            // Interleave results: sort by relevance to query
+            if (query) {
+                results.sort((a, b) => {
+                    const aS = a.name.toLowerCase().startsWith(query);
+                    const bS = b.name.toLowerCase().startsWith(query);
+                    if (aS && !bS) return -1;
+                    if (!aS && bS) return 1;
+                    return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+                });
+            }
+
+            results = results.slice(0, 20);
+
+            if (results.length === 0) {
+                dropdown.innerHTML = '<div class="empty-state" style="padding:12px;">No results found</div>';
+                dropdown.style.display = 'block';
+                return;
+            }
+
+            dropdown.innerHTML = results.map(r => `
+                <div onclick="selectUnifiedItem('${r.type}', '${r.name.replace(/'/g, "\\'")}')"
+                     class="dropdown-item">
+                    ${r.html}
+                </div>
+            `).join('');
+            dropdown.style.display = 'block';
+        }
+
+        function selectUnifiedItem(type, name) {
+            document.getElementById('searchItemForDay').value = name;
+            document.getElementById('selectedItemName').value = name;
+            document.getElementById('selectedItemType').value = type;
+            document.getElementById('dayUnifiedDropdown').style.display = 'none';
+        }
+
+        function addItemToDay() {
+            const name = document.getElementById('selectedItemName').value || document.getElementById('searchItemForDay').value.trim();
+            let type = document.getElementById('selectedItemType').value;
+
+            if (!name) {
+                alert('Please select a meal or food first');
+                return;
+            }
+
+            // Auto-detect type if not set (user typed name without selecting from dropdown)
+            if (!type) {
+                if (savedMeals.find(m => m.name === name)) type = 'meal';
+                else if (foodDatabase.find(f => f.name === name)) type = 'food';
+                else {
+                    alert('Item not found. Please select from the dropdown.');
+                    return;
+                }
+            }
+
+            const amount = parseFloat(document.getElementById('itemAmountForDay').value) || 1;
+            const unit = document.getElementById('itemUnitForDay').value;
+
+            if (type === 'meal') {
+                const meal = savedMeals.find(m => m.name === name);
+                if (!meal) { alert('Meal not found'); return; }
+
+                todaysMeals.push({
+                    id: Date.now(),
+                    type: 'meal',
+                    mealId: meal.id,
+                    mealName: meal.name,
+                    amount: amount,
+                    unit: unit,
+                    macros: meal.perServing
+                });
+            } else {
+                const food = foodDatabase.find(f => f.name === name);
+                if (!food) { alert('Food not found'); return; }
+
+                const baseUnits = convertToBaseUnit(amount, unit);
+                const foodBaseUnits = convertToBaseUnit(food.servingAmount, food.servingUnit);
+                const multiplier = baseUnits / foodBaseUnits;
+
+                todaysMeals.push({
+                    id: Date.now(),
+                    type: 'food',
+                    foodName: food.name,
+                    amount: amount,
+                    unit: unit,
+                    macros: {
+                        protein: food.protein * multiplier,
+                        carbs: food.carbs * multiplier,
+                        fats: food.fats * multiplier,
+                        fiber: (food.fiber || 0) * multiplier,
+                        calories: (food.calories !== undefined ? food.calories : (food.protein * 4 + food.carbs * 4 + food.fats * 9)) * multiplier
+                    }
+                });
+            }
+
+            localStorage.setItem('todaysMeals', JSON.stringify(todaysMeals));
+            renderDayMeals();
+            calculateDayTotals();
+            syncToFirebase();
+
+            // Reset
+            document.getElementById('searchItemForDay').value = '';
+            document.getElementById('selectedItemName').value = '';
+            document.getElementById('selectedItemType').value = '';
+            document.getElementById('itemAmountForDay').value = '1';
+            document.getElementById('dayUnifiedDropdown').style.display = 'none';
+        }
+
+        function setDayAddType(type) {
+            // Legacy function — kept for compatibility
         }
 
         function editMeal(id) {

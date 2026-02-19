@@ -10,12 +10,12 @@
     
     <!-- iOS Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Macros">
     
     <!-- Theme Colors -->
-    <meta name="theme-color" content="#0f172a">
-    <meta name="msapplication-TileColor" content="#0f172a">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="msapplication-TileColor" content="#0d9488">
     
     <!-- Favicons -->
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
@@ -32,29 +32,39 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-card: rgba(30, 41, 59, 0.85);
-            --bg-card-solid: #1e293b;
-            --bg-input: rgba(15, 23, 42, 0.6);
-            --border: rgba(148, 163, 184, 0.15);
-            --border-focus: #38bdf8;
-            --text-primary: #f1f5f9;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
-            --accent-blue: #38bdf8;
-            --accent-green: #34d399;
-            --accent-amber: #fbbf24;
-            --accent-red: #f87171;
-            --accent-purple: #a78bfa;
-            --protein: #60a5fa;
-            --carbs: #fbbf24;
-            --fats: #34d399;
-            --calories: #fb923c;
+            --bg-primary: #f5f6f8;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --bg-card-solid: #ffffff;
+            --bg-input: #f7f8fa;
+            --bg-elevated: #f0f1f4;
+            --border: #e2e8f0;
+            --border-strong: #cbd5e1;
+            --border-focus: #0d9488;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --accent: #0d9488;
+            --accent-light: #ccfbf1;
+            --accent-glow: rgba(13,148,136,0.18);
+            --accent-text: #0f766e;
+            --accent-blue: #0d9488;
+            --accent-green: #16a34a;
+            --accent-amber: #d97706;
+            --accent-red: #dc2626;
+            --accent-purple: #7c3aed;
+            --protein: #3b82f6;
+            --carbs: #d97706;
+            --fats: #16a34a;
+            --calories: #ea580c;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+            --shadow: 0 2px 8px rgba(0,0,0,0.08);
+            --radius: 12px;
+            --radius-sm: 8px;
             --safe-top: env(safe-area-inset-top, 0px);
             --safe-bottom: env(safe-area-inset-bottom, 0px);
             --safe-left: env(safe-area-inset-left, 0px);
@@ -84,21 +94,20 @@
         /* ===== SCROLLBAR ===== */
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
 
         /* ===== HEADER ===== */
         .app-header {
             padding: 16px 20px 12px;
             text-align: center;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
         }
         .app-header h1 {
             font-size: 1.5rem;
             font-weight: 700;
             letter-spacing: -0.02em;
-            background: linear-gradient(135deg, var(--accent-blue), var(--accent-green));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--accent);
         }
 
         /* ===== BOTTOM TAB NAVIGATION ===== */
@@ -109,9 +118,7 @@
             right: 0;
             height: calc(var(--nav-height) + var(--safe-bottom));
             padding-bottom: var(--safe-bottom);
-            background: rgba(15, 23, 42, 0.92);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            background: var(--bg-secondary);
             border-top: 1px solid var(--border);
             display: flex;
             z-index: 9000;
@@ -133,15 +140,27 @@
             transition: color 0.2s;
             padding: 8px 4px;
             -webkit-tap-highlight-color: transparent;
+            position: relative;
         }
         .nav-tab svg { width: 22px; height: 22px; transition: all 0.2s; }
-        .nav-tab.active { color: var(--accent-blue); }
+        .nav-tab.active { color: var(--accent); }
+        .nav-tab.active::before { content:''; position:absolute; top:0; left:50%; transform:translateX(-50%); width:20px; height:2px; background:var(--accent); border-radius:1px; }
         .nav-tab.active svg { transform: scale(1.1); }
         .nav-tab:active { opacity: 0.7; }
+        @media (min-width: 860px) {
+            .bottom-nav { 
+                max-width: 480px; 
+                left: 50%; 
+                transform: translateX(-50%); 
+                border-radius: 20px 20px 0 0;
+                border-left: 1px solid var(--border);
+                border-right: 1px solid var(--border);
+            }
+        }
 
         /* ===== PAGE CONTAINER ===== */
         .container {
-            max-width: 600px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 0 16px;
         }
@@ -149,15 +168,28 @@
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* ===== DESKTOP GRID LAYOUTS ===== */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        .chart-cell {
+            min-width: 0;
+        }
+        @media (min-width: 860px) {
+            .container { max-width: 1100px; padding: 0 24px; }
+            .charts-grid { grid-template-columns: 1fr 1fr; }
+        }
+
         /* ===== CARDS ===== */
         .card {
             background: var(--bg-card);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--border);
-            border-radius: 16px;
+            border-radius: var(--radius);
             padding: 20px;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow-sm);
             overflow: hidden;
         }
         .card h2 {
@@ -210,7 +242,7 @@
         input:focus, select:focus {
             outline: none;
             border-color: var(--border-focus);
-            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+            box-shadow: 0 0 0 3px var(--accent-glow);
         }
         input::placeholder { color: var(--text-muted); }
         select { cursor: pointer; }
@@ -219,11 +251,11 @@
 
         /* ===== BUTTONS ===== */
         .btn {
-            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            background: var(--accent);
             color: white;
             border: none;
             padding: 11px 20px;
-            border-radius: 10px;
+            border-radius: var(--radius-sm);
             font-size: 0.9rem;
             font-weight: 600;
             font-family: inherit;
@@ -232,15 +264,20 @@
             width: 100%;
             -webkit-tap-highlight-color: transparent;
         }
+        .btn:hover { opacity: 0.9; }
         .btn:active { transform: scale(0.97); opacity: 0.9; }
         .btn-danger {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            background: #fee2e2;
+            color: var(--accent-red);
+            border: 1px solid #fca5a5;
             padding: 6px 12px;
             font-size: 0.8rem;
             width: auto;
         }
         .btn-success {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
             padding: 7px 14px;
             font-size: 0.82rem;
             width: auto;
@@ -253,17 +290,18 @@
             font-size: 0.82rem;
             width: auto;
         }
-        .btn-ghost:active { background: rgba(255,255,255,0.05); }
+        .btn-ghost:active { background: var(--bg-elevated); }
         .btn-sm { padding: 5px 10px; font-size: 0.75rem; width: auto; border-radius: 6px; }
 
         /* ===== DAILY TOTALS HERO ===== */
         .totals-hero {
-            background: linear-gradient(145deg, rgba(14, 165, 233, 0.12) 0%, rgba(52, 211, 153, 0.08) 100%);
-            border: 1px solid rgba(56, 189, 248, 0.2);
-            border-radius: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
             padding: 24px 20px;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             text-align: center;
+            box-shadow: var(--shadow-sm);
         }
         .totals-hero h2 {
             font-size: 0.85rem;
@@ -287,7 +325,7 @@
             margin-bottom: 6px;
         }
         .total-value {
-            font-family: 'JetBrains Mono', monospace;
+            font-family: 'Space Mono', monospace;
             font-size: 1.6rem;
             font-weight: 700;
         }
@@ -315,7 +353,7 @@
         .progress-bar-container {
             width: 100%;
             height: 4px;
-            background: rgba(255,255,255,0.08);
+            background: var(--bg-elevated);
             border-radius: 2px;
             margin-top: 6px;
             overflow: hidden;
@@ -337,10 +375,17 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 0.82rem;
-            min-width: 580px;
+        }
+        @media (min-width: 860px) {
+            table { font-size: 0.85rem; }
+            .table-wrap { overflow-x: visible; margin: 0; padding: 0; }
+            td, th { white-space: normal; }
+        }
+        @media (max-width: 859px) {
+            table { min-width: 520px; }
         }
         thead tr {
-            background: rgba(56, 189, 248, 0.1);
+            background: var(--bg-elevated);
         }
         th {
             padding: 10px 8px;
@@ -406,7 +451,7 @@
             border-radius: 0 0 10px 10px;
             max-height: 260px;
             overflow-y: auto;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            box-shadow: var(--shadow);
             z-index: 1000;
         }
         .dropdown-item {
@@ -416,17 +461,20 @@
             transition: background 0.1s;
         }
         .dropdown-item:active, .dropdown-item:hover {
-            background: rgba(56, 189, 248, 0.08);
+            background: var(--accent-light);
         }
         .dropdown-item-name { font-weight: 600; font-size: 0.9rem; }
         .dropdown-item-meta { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
 
         /* ===== MEAL BUILDER TABLE ===== */
         .meal-builder-table {
-            min-width: 700px;
+            min-width: 580px;
+        }
+        @media (min-width: 860px) {
+            .meal-builder-table { min-width: 0; }
         }
         .meal-builder-table tfoot tr {
-            border-top: 2px solid var(--accent-blue);
+            border-top: 2px solid var(--accent);
         }
         .meal-builder-table tfoot td {
             font-weight: 700;
@@ -457,8 +505,8 @@
             transition: all 0.2s;
         }
         .toggle-btn.active {
-            background: var(--accent-blue);
-            color: var(--bg-primary);
+            background: var(--accent);
+            color: white;
         }
 
         /* ===== GOALS DISPLAY ===== */
@@ -473,10 +521,10 @@
             font-size: 0.82rem;
             font-weight: 600;
         }
-        .goal-chip-protein { background: rgba(96, 165, 250, 0.12); color: var(--protein); }
-        .goal-chip-calories { background: rgba(251, 146, 60, 0.12); color: var(--calories); }
-        .goal-chip-carbs { background: rgba(251, 191, 36, 0.12); color: var(--carbs); }
-        .goal-chip-fats { background: rgba(52, 211, 153, 0.12); color: var(--fats); }
+        .goal-chip-protein { background: #dbeafe; color: var(--protein); }
+        .goal-chip-calories { background: #ffedd5; color: var(--calories); }
+        .goal-chip-carbs { background: #fef3c7; color: var(--carbs); }
+        .goal-chip-fats { background: #dcfce7; color: var(--fats); }
 
         /* ===== CHART TOGGLES ===== */
         .chart-toggles {
@@ -498,7 +546,7 @@
             font-weight: 600;
             color: var(--text-secondary);
         }
-        .chart-toggle input { margin: 0; accent-color: var(--accent-blue); }
+        .chart-toggle input { margin: 0; accent-color: var(--accent); }
 
         /* ===== WEIGHT PAGE ===== */
         .weight-entry-grid {
@@ -508,10 +556,10 @@
             align-items: end;
         }
         .goal-weight-section {
-            background: linear-gradient(145deg, rgba(139, 92, 246, 0.1) 0%, rgba(56, 189, 248, 0.08) 100%);
-            border: 1px solid rgba(139, 92, 246, 0.2);
+            background: #f5f3ff;
+            border: 1px solid #ddd6fe;
             padding: 18px;
-            border-radius: 14px;
+            border-radius: var(--radius);
             margin-bottom: 18px;
         }
         .projection-box {
@@ -547,8 +595,9 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(10px);
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
             z-index: 9999;
             align-items: center;
             justify-content: center;
@@ -561,6 +610,7 @@
             max-width: 360px;
             width: 90%;
             text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
         }
         .pin-card h2 {
             font-size: 1.3rem;
@@ -578,7 +628,7 @@
             text-align: center;
             letter-spacing: 12px;
             font-weight: 700;
-            font-family: 'JetBrains Mono', monospace;
+            font-family: 'Space Mono', monospace;
             background: var(--bg-input);
             border: 2px solid var(--border-focus);
             border-radius: 12px;
@@ -608,13 +658,14 @@
         canvas {
             max-width: 100%;
             border-radius: 8px;
+            display: block;
         }
 
         /* ===== TOOLTIP ===== */
         .chart-tooltip {
             position: absolute;
             display: none;
-            background: rgba(15, 23, 42, 0.95);
+            background: var(--bg-card-solid);
             color: var(--text-primary);
             padding: 8px 12px;
             border-radius: 8px;
@@ -622,7 +673,7 @@
             pointer-events: none;
             z-index: 1000;
             border: 1px solid var(--border);
-            backdrop-filter: blur(8px);
+            box-shadow: var(--shadow);
         }
 
         /* ===== RESPONSIVE ===== */
@@ -1017,25 +1068,27 @@
                 <label class="chart-toggle"><input type="checkbox" id="showGoalLine" checked onchange="redrawAllCharts()"> 🎯 Goal</label>
             </div>
 
-            <div style="margin-bottom:24px;">
-                <h3 style="color:var(--protein); font-size:0.9rem; margin-bottom:8px;">Protein</h3>
-                <canvas id="proteinChart" width="400" height="200"></canvas>
-                <div id="proteinStats" style="margin-top:8px;"></div>
-            </div>
-            <div style="margin-bottom:24px;">
-                <h3 style="color:var(--calories); font-size:0.9rem; margin-bottom:8px;">Calories</h3>
-                <canvas id="calorieChart" width="400" height="200"></canvas>
-                <div id="calorieStats" style="margin-top:8px;"></div>
-            </div>
-            <div style="margin-bottom:24px;">
-                <h3 style="color:var(--carbs); font-size:0.9rem; margin-bottom:8px;">Carbs</h3>
-                <canvas id="carbsChart" width="400" height="200"></canvas>
-                <div id="carbsStats" style="margin-top:8px;"></div>
-            </div>
-            <div style="margin-bottom:24px;">
-                <h3 style="color:var(--fats); font-size:0.9rem; margin-bottom:8px;">Fats</h3>
-                <canvas id="fatsChart" width="400" height="200"></canvas>
-                <div id="fatsStats" style="margin-top:8px;"></div>
+            <div class="charts-grid">
+                <div class="chart-cell">
+                    <h3 style="color:var(--protein); font-size:0.9rem; margin-bottom:8px;">Protein</h3>
+                    <canvas id="proteinChart" width="400" height="200"></canvas>
+                    <div id="proteinStats" style="margin-top:8px;"></div>
+                </div>
+                <div class="chart-cell">
+                    <h3 style="color:var(--calories); font-size:0.9rem; margin-bottom:8px;">Calories</h3>
+                    <canvas id="calorieChart" width="400" height="200"></canvas>
+                    <div id="calorieStats" style="margin-top:8px;"></div>
+                </div>
+                <div class="chart-cell">
+                    <h3 style="color:var(--carbs); font-size:0.9rem; margin-bottom:8px;">Carbs</h3>
+                    <canvas id="carbsChart" width="400" height="200"></canvas>
+                    <div id="carbsStats" style="margin-top:8px;"></div>
+                </div>
+                <div class="chart-cell">
+                    <h3 style="color:var(--fats); font-size:0.9rem; margin-bottom:8px;">Fats</h3>
+                    <canvas id="fatsChart" width="400" height="200"></canvas>
+                    <div id="fatsStats" style="margin-top:8px;"></div>
+                </div>
             </div>
             <div class="table-wrap">
                 <table>
@@ -1110,14 +1163,16 @@
                 <label class="chart-toggle"><input type="checkbox" id="showTrendLine" checked onchange="drawWeightChart()"> <span style="color:var(--accent-red);">Trend</span></label>
                 <label class="chart-toggle"><input type="checkbox" id="showCalories" onchange="drawWeightChart()"> <span style="color:var(--accent-amber);">Calories</span></label>
             </div>
-            <canvas id="weightChart" width="800" height="400" style="cursor:crosshair;"></canvas>
+            <div class="chart-cell">
+                <canvas id="weightChart" style="cursor:crosshair; width:100%;"></canvas>
+            </div>
             <div id="weightChartTooltip" class="chart-tooltip"></div>
         </div>
 
         <div class="card">
             <h2>Weight Log</h2>
             <div class="table-wrap">
-                <table style="min-width:640px;">
+                <table>
                     <thead>
                         <tr>
                             <th style="text-align:left;">Date</th><th>Weight</th><th>7d Avg</th><th>Change</th><th style="text-align:left;">Notes</th><th></th>
@@ -3704,18 +3759,37 @@
         }
 
         // Draw history chart
+        // High-DPI canvas setup - makes charts crisp on iPhone/retina and responsive to container
+        function setupCanvas(canvasId, desiredHeight) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return null;
+            const container = canvas.parentElement;
+            const dpr = window.devicePixelRatio || 1;
+            const displayWidth = container.clientWidth;
+            const displayHeight = desiredHeight || Math.round(displayWidth * 0.5);
+            canvas.style.width = displayWidth + 'px';
+            canvas.style.height = displayHeight + 'px';
+            canvas.width = Math.round(displayWidth * dpr);
+            canvas.height = Math.round(displayHeight * dpr);
+            const ctx = canvas.getContext('2d');
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);  // Reset + scale in one call
+            ctx.clearRect(0, 0, displayWidth, displayHeight);
+            // Return logical dimensions for drawing
+            return { canvas, ctx, width: displayWidth, height: displayHeight };
+        }
+
         function drawHistoryChart() {
-            // Draw both charts
+            // Draw all four charts
             drawProteinChart();
             drawCalorieChart();
+            drawCarbsChart();
+            drawFatsChart();
         }
 
         function drawProteinChart() {
-            const canvas = document.getElementById('proteinChart');
-            if (!canvas) return;
-            
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const setup = setupCanvas('proteinChart', 200);
+            if (!setup) return;
+            const { canvas, ctx, width: W, height: H } = setup;
 
             // Get toggle states
             const showDailyBars = document.getElementById('showDailyBars')?.checked ?? true;
@@ -3723,10 +3797,10 @@
             const showGoalLine = document.getElementById('showGoalLine')?.checked ?? true;
 
             if (dayHistory.length === 0) {
-                ctx.fillStyle = 'rgba(148,163,184,0.5)';
+                ctx.fillStyle = '#94a3b8';
                 ctx.font = '14px DM Sans, sans-serif';
                 ctx.textAlign = 'center';
-                ctx.fillText('No protein data yet', canvas.width / 2, canvas.height / 2);
+                ctx.fillText('No protein data yet', W / 2, H / 2);
                 document.getElementById('proteinStats').innerHTML = '<div style="text-align: center; color: #999;">Start tracking to see stats</div>';
                 return;
             }
@@ -3741,8 +3815,8 @@
 
             // Chart dimensions
             const padding = 50;
-            const chartWidth = canvas.width - padding * 2;
-            const chartHeight = canvas.height - padding * 2;
+            const chartWidth = W - padding * 2;
+            const chartHeight = H - padding * 2;
 
             // Find max value
             const maxProtein = Math.max(
@@ -3750,7 +3824,7 @@
             ) * 1.1;
 
             // Draw grid lines
-            ctx.strokeStyle = 'rgba(148,163,184,0.12)';
+            ctx.strokeStyle = '#e2e8f0';
             ctx.lineWidth = 1;
             for (let i = 0; i <= 4; i++) {
                 const y = padding + (chartHeight / 4) * i;
@@ -3758,27 +3832,27 @@
                 
                 ctx.beginPath();
                 ctx.moveTo(padding, y);
-                ctx.lineTo(canvas.width - padding, y);
+                ctx.lineTo(W - padding, y);
                 ctx.stroke();
                 
                 // Y-axis labels
-                ctx.fillStyle = 'rgba(148,163,184,0.6)';
+                ctx.fillStyle = '#94a3b8';
                 ctx.font = '11px Arial';
                 ctx.textAlign = 'right';
                 ctx.fillText(Math.round(value) + 'g', padding - 5, y + 4);
             }
 
             // Draw axes
-            ctx.strokeStyle = 'rgba(148,163,184,0.3)';
+            ctx.strokeStyle = '#cbd5e1';
             ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.moveTo(padding, padding);
-            ctx.lineTo(padding, canvas.height - padding);
-            ctx.lineTo(canvas.width - padding, canvas.height - padding);
+            ctx.lineTo(padding, H - padding);
+            ctx.lineTo(W - padding, H - padding);
             ctx.stroke();
 
             const getX = (index) => padding + (chartWidth / (recentData.length - 1)) * index;
-            const getY = (protein) => canvas.height - padding - (protein / maxProtein) * chartHeight;
+            const getY = (protein) => H - padding - (protein / maxProtein) * chartHeight;
 
             // Draw goal line (if enabled)
             const hasProteinGoal = dailyGoals && dailyGoals.protein;
@@ -3789,12 +3863,12 @@
                 ctx.beginPath();
                 const goalY = getY(dailyGoals.protein);
                 ctx.moveTo(padding, goalY);
-                ctx.lineTo(canvas.width - padding, goalY);
+                ctx.lineTo(W - padding, goalY);
                 ctx.stroke();
                 ctx.setLineDash([]);
                 
                 // Goal label
-                ctx.fillStyle = '#60a5fa';
+                ctx.fillStyle = '#3b82f6';
                 ctx.font = 'bold 11px Arial';
                 ctx.textAlign = 'left';
                 ctx.fillText(`Goal: ${dailyGoals.protein}g`, padding + 5, goalY - 5);
@@ -3820,7 +3894,7 @@
                 recentData.forEach((entry, i) => {
                     const x = getX(i);
                     const y = getY(entry.protein);
-                    const height = canvas.height - padding - y;
+                    const height = H - padding - y;
                     
                     ctx.fillStyle = entry.protein >= (entry.proteinGoal || 0) ? '#3b82f6' : '#93c5fd';
                     ctx.fillRect(x - barWidth / 2, y, barWidth, height);
@@ -3840,14 +3914,14 @@
             }
 
             // Date labels (every nth date)
-            ctx.fillStyle = 'rgba(148,163,184,0.6)';
+            ctx.fillStyle = '#94a3b8';
             ctx.font = '10px Arial';
             ctx.textAlign = 'center';
             const labelInterval = Math.max(1, Math.floor(recentData.length / 8));
             recentData.forEach((entry, i) => {
                 if (i % labelInterval === 0 || i === recentData.length - 1) {
                     const dateLabel = new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                    ctx.fillText(dateLabel, getX(i), canvas.height - padding + 20);
+                    ctx.fillText(dateLabel, getX(i), H - padding + 20);
                 }
             });
 
@@ -3856,9 +3930,9 @@
             ctx.textAlign = 'left';
             
             if (showDailyBars) {
-                ctx.fillStyle = '#60a5fa';
+                ctx.fillStyle = '#3b82f6';
                 ctx.fillRect(padding, 10, 15, 10);
-                ctx.fillStyle = 'rgba(241,245,249,0.8)';
+                ctx.fillStyle = '#1e293b';
                 ctx.fillText('Daily', padding + 20, 18);
             }
             
@@ -3869,7 +3943,7 @@
                 ctx.moveTo(padding + 80, 15);
                 ctx.lineTo(padding + 95, 15);
                 ctx.stroke();
-                ctx.fillStyle = 'rgba(241,245,249,0.8)';
+                ctx.fillStyle = '#1e293b';
                 ctx.fillText('7-Day Avg', padding + 100, 18);
             }
 
@@ -3905,11 +3979,9 @@
         }
 
         function drawCalorieChart() {
-            const canvas = document.getElementById('calorieChart');
-            if (!canvas) return;
-            
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const setup = setupCanvas('calorieChart', 200);
+            if (!setup) return;
+            const { canvas, ctx, width: W, height: H } = setup;
 
             // Get toggle states
             const showDailyBars = document.getElementById('showDailyBars')?.checked ?? true;
@@ -3917,10 +3989,10 @@
             const showGoalLine = document.getElementById('showGoalLine')?.checked ?? true;
 
             if (dayHistory.length === 0) {
-                ctx.fillStyle = 'rgba(148,163,184,0.5)';
+                ctx.fillStyle = '#94a3b8';
                 ctx.font = '14px DM Sans, sans-serif';
                 ctx.textAlign = 'center';
-                ctx.fillText('No calorie data yet', canvas.width / 2, canvas.height / 2);
+                ctx.fillText('No calorie data yet', W / 2, H / 2);
                 document.getElementById('calorieStats').innerHTML = '<div style="text-align: center; color: #999;">Start tracking to see stats</div>';
                 return;
             }
@@ -3935,8 +4007,8 @@
 
             // Chart dimensions
             const padding = 50;
-            const chartWidth = canvas.width - padding * 2;
-            const chartHeight = canvas.height - padding * 2;
+            const chartWidth = W - padding * 2;
+            const chartHeight = H - padding * 2;
 
             // Find max value
             const maxCalories = Math.max(
@@ -3944,7 +4016,7 @@
             ) * 1.1;
 
             // Draw grid lines
-            ctx.strokeStyle = 'rgba(148,163,184,0.12)';
+            ctx.strokeStyle = '#e2e8f0';
             ctx.lineWidth = 1;
             for (let i = 0; i <= 4; i++) {
                 const y = padding + (chartHeight / 4) * i;
@@ -3952,27 +4024,27 @@
                 
                 ctx.beginPath();
                 ctx.moveTo(padding, y);
-                ctx.lineTo(canvas.width - padding, y);
+                ctx.lineTo(W - padding, y);
                 ctx.stroke();
                 
                 // Y-axis labels
-                ctx.fillStyle = 'rgba(148,163,184,0.6)';
+                ctx.fillStyle = '#94a3b8';
                 ctx.font = '11px Arial';
                 ctx.textAlign = 'right';
                 ctx.fillText(Math.round(value), padding - 5, y + 4);
             }
 
             // Draw axes
-            ctx.strokeStyle = 'rgba(148,163,184,0.3)';
+            ctx.strokeStyle = '#cbd5e1';
             ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.moveTo(padding, padding);
-            ctx.lineTo(padding, canvas.height - padding);
-            ctx.lineTo(canvas.width - padding, canvas.height - padding);
+            ctx.lineTo(padding, H - padding);
+            ctx.lineTo(W - padding, H - padding);
             ctx.stroke();
 
             const getX = (index) => padding + (chartWidth / (recentData.length - 1)) * index;
-            const getY = (calories) => canvas.height - padding - (calories / maxCalories) * chartHeight;
+            const getY = (calories) => H - padding - (calories / maxCalories) * chartHeight;
 
             // Draw goal line (if enabled)
             const hasCalorieGoal = dailyGoals && dailyGoals.calories;
@@ -3983,12 +4055,12 @@
                 ctx.beginPath();
                 const goalY = getY(dailyGoals.calories);
                 ctx.moveTo(padding, goalY);
-                ctx.lineTo(canvas.width - padding, goalY);
+                ctx.lineTo(W - padding, goalY);
                 ctx.stroke();
                 ctx.setLineDash([]);
                 
                 // Goal label
-                ctx.fillStyle = '#fbbf24';
+                ctx.fillStyle = '#d97706';
                 ctx.font = 'bold 11px Arial';
                 ctx.textAlign = 'left';
                 ctx.fillText(`Goal: ${dailyGoals.calories}`, padding + 5, goalY - 5);
@@ -4014,7 +4086,7 @@
                 recentData.forEach((entry, i) => {
                     const x = getX(i);
                     const y = getY(entry.calories);
-                    const height = canvas.height - padding - y;
+                    const height = H - padding - y;
                     
                     const withinGoal = entry.calorieGoal && Math.abs(entry.calories - entry.calorieGoal) <= entry.calorieGoal * 0.1;
                     ctx.fillStyle = withinGoal ? '#f59e0b' : '#fcd34d';
@@ -4035,14 +4107,14 @@
             }
 
             // Date labels (every nth date)
-            ctx.fillStyle = 'rgba(148,163,184,0.6)';
+            ctx.fillStyle = '#94a3b8';
             ctx.font = '10px Arial';
             ctx.textAlign = 'center';
             const labelInterval = Math.max(1, Math.floor(recentData.length / 8));
             recentData.forEach((entry, i) => {
                 if (i % labelInterval === 0 || i === recentData.length - 1) {
                     const dateLabel = new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                    ctx.fillText(dateLabel, getX(i), canvas.height - padding + 20);
+                    ctx.fillText(dateLabel, getX(i), H - padding + 20);
                 }
             });
 
@@ -4050,9 +4122,9 @@
             ctx.font = '11px Arial';
             ctx.textAlign = 'left';
             
-            ctx.fillStyle = '#fbbf24';
+            ctx.fillStyle = '#d97706';
             ctx.fillRect(padding, 10, 15, 10);
-            ctx.fillStyle = 'rgba(241,245,249,0.8)';
+            ctx.fillStyle = '#1e293b';
             ctx.fillText('Daily', padding + 20, 18);
             
             ctx.strokeStyle = '#dc2626';
@@ -4061,7 +4133,7 @@
             ctx.moveTo(padding + 80, 15);
             ctx.lineTo(padding + 95, 15);
             ctx.stroke();
-            ctx.fillStyle = 'rgba(241,245,249,0.8)';
+            ctx.fillStyle = '#1e293b';
             ctx.fillText('7-Day Avg', padding + 100, 18);
 
             // Calculate and display stats
@@ -4106,11 +4178,9 @@
         }
 
         function drawCarbsChart() {
-            const canvas = document.getElementById('carbsChart');
-            if (!canvas) return;
-            
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const setup = setupCanvas('carbsChart', 200);
+            if (!setup) return;
+            const { canvas, ctx, width: W, height: H } = setup;
 
             // Get toggle states
             const showDailyBars = document.getElementById('showDailyBars')?.checked ?? true;
@@ -4118,10 +4188,10 @@
             const showGoalLine = document.getElementById('showGoalLine')?.checked ?? true;
 
             if (dayHistory.length === 0) {
-                ctx.fillStyle = 'rgba(148,163,184,0.5)';
+                ctx.fillStyle = '#94a3b8';
                 ctx.font = '14px DM Sans, sans-serif';
                 ctx.textAlign = 'center';
-                ctx.fillText('No carbs data yet', canvas.width / 2, canvas.height / 2);
+                ctx.fillText('No carbs data yet', W / 2, H / 2);
                 document.getElementById('carbsStats').innerHTML = '<div style="text-align: center; color: #999;">Start tracking to see stats</div>';
                 return;
             }
@@ -4136,8 +4206,8 @@
 
             // Chart dimensions
             const padding = 50;
-            const chartWidth = canvas.width - padding * 2;
-            const chartHeight = canvas.height - padding * 2;
+            const chartWidth = W - padding * 2;
+            const chartHeight = H - padding * 2;
 
             // Find max value
             const hasGoal = dailyGoals && dailyGoals.carbs;
@@ -4146,7 +4216,7 @@
             ) * 1.1;
 
             // Draw grid lines
-            ctx.strokeStyle = 'rgba(148,163,184,0.12)';
+            ctx.strokeStyle = '#e2e8f0';
             ctx.lineWidth = 1;
             for (let i = 0; i <= 4; i++) {
                 const y = padding + (chartHeight / 4) * i;
@@ -4154,27 +4224,27 @@
                 
                 ctx.beginPath();
                 ctx.moveTo(padding, y);
-                ctx.lineTo(canvas.width - padding, y);
+                ctx.lineTo(W - padding, y);
                 ctx.stroke();
                 
                 // Y-axis labels
-                ctx.fillStyle = 'rgba(148,163,184,0.6)';
+                ctx.fillStyle = '#94a3b8';
                 ctx.font = '11px Arial';
                 ctx.textAlign = 'right';
                 ctx.fillText(Math.round(value) + 'g', padding - 5, y + 4);
             }
 
             // Draw axes
-            ctx.strokeStyle = 'rgba(148,163,184,0.3)';
+            ctx.strokeStyle = '#cbd5e1';
             ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.moveTo(padding, padding);
-            ctx.lineTo(padding, canvas.height - padding);
-            ctx.lineTo(canvas.width - padding, canvas.height - padding);
+            ctx.lineTo(padding, H - padding);
+            ctx.lineTo(W - padding, H - padding);
             ctx.stroke();
 
             const getX = (index) => padding + (chartWidth / (recentData.length - 1)) * index;
-            const getY = (carbs) => canvas.height - padding - (carbs / maxCarbs) * chartHeight;
+            const getY = (carbs) => H - padding - (carbs / maxCarbs) * chartHeight;
 
             // Draw goal line if exists (and enabled)
             if (showGoalLine && hasGoal) {
@@ -4185,11 +4255,11 @@
                 ctx.beginPath();
                 const goalY = getY(dailyGoals.carbs);
                 ctx.moveTo(padding, goalY);
-                ctx.lineTo(canvas.width - padding, goalY);
+                ctx.lineTo(W - padding, goalY);
                 ctx.stroke();
                 ctx.setLineDash([]);
                 
-                ctx.fillStyle = '#fbbf24';
+                ctx.fillStyle = '#d97706';
                 ctx.font = 'bold 11px Arial';
                 ctx.textAlign = 'left';
                 ctx.fillText(`Goal: ${dailyGoals.carbs}g`, padding + 5, goalY - 5);
@@ -4215,7 +4285,7 @@
                 recentData.forEach((entry, i) => {
                     const x = getX(i);
                     const y = getY(entry.carbs);
-                    const height = canvas.height - padding - y;
+                    const height = H - padding - y;
                     
                     const withinGoal = hasGoal && Math.abs(entry.carbs - dailyGoals.carbs) <= dailyGoals.carbs * 0.1;
                     ctx.fillStyle = withinGoal ? '#f59e0b' : '#fdba74';
@@ -4236,14 +4306,14 @@
             }
 
             // Date labels
-            ctx.fillStyle = 'rgba(148,163,184,0.6)';
+            ctx.fillStyle = '#94a3b8';
             ctx.font = '10px Arial';
             ctx.textAlign = 'center';
             const labelInterval = Math.max(1, Math.floor(recentData.length / 8));
             recentData.forEach((entry, i) => {
                 if (i % labelInterval === 0 || i === recentData.length - 1) {
                     const dateLabel = new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                    ctx.fillText(dateLabel, getX(i), canvas.height - padding + 20);
+                    ctx.fillText(dateLabel, getX(i), H - padding + 20);
                 }
             });
 
@@ -4252,9 +4322,9 @@
             ctx.textAlign = 'left';
             
             if (showDailyBars) {
-                ctx.fillStyle = '#fbbf24';
+                ctx.fillStyle = '#d97706';
                 ctx.fillRect(padding, 10, 15, 10);
-                ctx.fillStyle = 'rgba(241,245,249,0.8)';
+                ctx.fillStyle = '#1e293b';
                 ctx.fillText('Daily', padding + 20, 18);
             }
             
@@ -4265,7 +4335,7 @@
                 ctx.moveTo(padding + 80, 15);
                 ctx.lineTo(padding + 95, 15);
                 ctx.stroke();
-                ctx.fillStyle = 'rgba(241,245,249,0.8)';
+                ctx.fillStyle = '#1e293b';
                 ctx.fillText('7-Day Avg', padding + 100, 18);
             }
 
@@ -4303,11 +4373,9 @@
         }
 
         function drawFatsChart() {
-            const canvas = document.getElementById('fatsChart');
-            if (!canvas) return;
-            
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const setup = setupCanvas('fatsChart', 200);
+            if (!setup) return;
+            const { canvas, ctx, width: W, height: H } = setup;
 
             // Get toggle states
             const showDailyBars = document.getElementById('showDailyBars')?.checked ?? true;
@@ -4315,10 +4383,10 @@
             const showGoalLine = document.getElementById('showGoalLine')?.checked ?? true;
 
             if (dayHistory.length === 0) {
-                ctx.fillStyle = 'rgba(148,163,184,0.5)';
+                ctx.fillStyle = '#94a3b8';
                 ctx.font = '14px DM Sans, sans-serif';
                 ctx.textAlign = 'center';
-                ctx.fillText('No fats data yet', canvas.width / 2, canvas.height / 2);
+                ctx.fillText('No fats data yet', W / 2, H / 2);
                 document.getElementById('fatsStats').innerHTML = '<div style="text-align: center; color: #999;">Start tracking to see stats</div>';
                 return;
             }
@@ -4333,8 +4401,8 @@
 
             // Chart dimensions
             const padding = 50;
-            const chartWidth = canvas.width - padding * 2;
-            const chartHeight = canvas.height - padding * 2;
+            const chartWidth = W - padding * 2;
+            const chartHeight = H - padding * 2;
 
             // Find max value
             const hasGoal = dailyGoals && dailyGoals.fats;
@@ -4343,7 +4411,7 @@
             ) * 1.1;
 
             // Draw grid lines
-            ctx.strokeStyle = 'rgba(148,163,184,0.12)';
+            ctx.strokeStyle = '#e2e8f0';
             ctx.lineWidth = 1;
             for (let i = 0; i <= 4; i++) {
                 const y = padding + (chartHeight / 4) * i;
@@ -4351,27 +4419,27 @@
                 
                 ctx.beginPath();
                 ctx.moveTo(padding, y);
-                ctx.lineTo(canvas.width - padding, y);
+                ctx.lineTo(W - padding, y);
                 ctx.stroke();
                 
                 // Y-axis labels
-                ctx.fillStyle = 'rgba(148,163,184,0.6)';
+                ctx.fillStyle = '#94a3b8';
                 ctx.font = '11px Arial';
                 ctx.textAlign = 'right';
                 ctx.fillText(Math.round(value) + 'g', padding - 5, y + 4);
             }
 
             // Draw axes
-            ctx.strokeStyle = 'rgba(148,163,184,0.3)';
+            ctx.strokeStyle = '#cbd5e1';
             ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.moveTo(padding, padding);
-            ctx.lineTo(padding, canvas.height - padding);
-            ctx.lineTo(canvas.width - padding, canvas.height - padding);
+            ctx.lineTo(padding, H - padding);
+            ctx.lineTo(W - padding, H - padding);
             ctx.stroke();
 
             const getX = (index) => padding + (chartWidth / (recentData.length - 1)) * index;
-            const getY = (fats) => canvas.height - padding - (fats / maxFats) * chartHeight;
+            const getY = (fats) => H - padding - (fats / maxFats) * chartHeight;
 
             // Draw goal line if exists (and enabled)
             if (showGoalLine && hasGoal) {
@@ -4382,7 +4450,7 @@
                 ctx.beginPath();
                 const goalY = getY(dailyGoals.fats);
                 ctx.moveTo(padding, goalY);
-                ctx.lineTo(canvas.width - padding, goalY);
+                ctx.lineTo(W - padding, goalY);
                 ctx.stroke();
                 ctx.setLineDash([]);
                 
@@ -4412,7 +4480,7 @@
                 recentData.forEach((entry, i) => {
                     const x = getX(i);
                     const y = getY(entry.fats);
-                    const height = canvas.height - padding - y;
+                    const height = H - padding - y;
                     
                     const withinGoal = hasGoal && Math.abs(entry.fats - dailyGoals.fats) <= dailyGoals.fats * 0.1;
                     ctx.fillStyle = withinGoal ? '#10b981' : '#6ee7b7';
@@ -4433,14 +4501,14 @@
             }
 
             // Date labels
-            ctx.fillStyle = 'rgba(148,163,184,0.6)';
+            ctx.fillStyle = '#94a3b8';
             ctx.font = '10px Arial';
             ctx.textAlign = 'center';
             const labelInterval = Math.max(1, Math.floor(recentData.length / 8));
             recentData.forEach((entry, i) => {
                 if (i % labelInterval === 0 || i === recentData.length - 1) {
                     const dateLabel = new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                    ctx.fillText(dateLabel, getX(i), canvas.height - padding + 20);
+                    ctx.fillText(dateLabel, getX(i), H - padding + 20);
                 }
             });
 
@@ -4451,7 +4519,7 @@
             if (showDailyBars) {
                 ctx.fillStyle = '#10b981';
                 ctx.fillRect(padding, 10, 15, 10);
-                ctx.fillStyle = 'rgba(241,245,249,0.8)';
+                ctx.fillStyle = '#1e293b';
                 ctx.fillText('Daily', padding + 20, 18);
             }
             
@@ -4462,7 +4530,7 @@
                 ctx.moveTo(padding + 80, 15);
                 ctx.lineTo(padding + 95, 15);
                 ctx.stroke();
-                ctx.fillStyle = 'rgba(241,245,249,0.8)';
+                ctx.fillStyle = '#1e293b';
                 ctx.fillText('7-Day Avg', padding + 100, 18);
             }
 
@@ -4815,21 +4883,19 @@
         }
 
         function drawWeightChart() {
-            const canvas = document.getElementById('weightChart');
-            const ctx = canvas.getContext('2d');
+            const setup = setupCanvas('weightChart', 350);
+            if (!setup) return;
+            const { canvas, ctx, width: W, height: H } = setup;
             const showMorning = document.getElementById('showMorningWeight').checked;
             const showWeekly = document.getElementById('showWeeklyAvg').checked;
             const showTrendLine = document.getElementById('showTrendLine').checked;
             const showCalories = document.getElementById('showCalories').checked;
 
-            // Clear canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
             if (weightData.length === 0) {
-                ctx.fillStyle = 'rgba(148,163,184,0.5)';
+                ctx.fillStyle = '#94a3b8';
                 ctx.font = '16px DM Sans, sans-serif';
                 ctx.textAlign = 'center';
-                ctx.fillText('No weight data to display', canvas.width / 2, canvas.height / 2);
+                ctx.fillText('No weight data to display', W / 2, H / 2);
                 return;
             }
 
@@ -4861,8 +4927,8 @@
             // Chart dimensions
             const padding = 60;
             const rightPadding = showCalories ? 80 : 60;
-            const chartWidth = canvas.width - padding - rightPadding;
-            const chartHeight = canvas.height - padding * 2;
+            const chartWidth = W - padding - rightPadding;
+            const chartHeight = H - padding * 2;
 
             // Find min/max weights
             let allWeights = [];
@@ -4872,10 +4938,10 @@
             });
 
             if (allWeights.length === 0 && !showCalories) {
-                ctx.fillStyle = 'rgba(148,163,184,0.5)';
+                ctx.fillStyle = '#94a3b8';
                 ctx.font = '16px DM Sans, sans-serif';
                 ctx.textAlign = 'center';
-                ctx.fillText('No data selected to display', canvas.width / 2, canvas.height / 2);
+                ctx.fillText('No data selected to display', W / 2, H / 2);
                 return;
             }
 
@@ -4900,9 +4966,9 @@
 
             // Draw grid lines and Y-axis labels (weight)
             if (allWeights.length > 0) {
-                ctx.strokeStyle = '#e0e0e0';
+                ctx.strokeStyle = '#e2e8f0';
                 ctx.lineWidth = 1;
-                ctx.fillStyle = 'rgba(148,163,184,0.6)';
+                ctx.fillStyle = '#94a3b8';
                 ctx.font = '12px Arial';
                 ctx.textAlign = 'right';
                 
@@ -4912,7 +4978,7 @@
                     
                     ctx.beginPath();
                     ctx.moveTo(padding, y);
-                    ctx.lineTo(canvas.width - rightPadding, y);
+                    ctx.lineTo(W - rightPadding, y);
                     ctx.stroke();
                     
                     ctx.fillText(weight.toFixed(1) + ' lb', padding - 10, y + 4);
@@ -4921,7 +4987,7 @@
 
             // Draw right Y-axis labels (calories)
             if (showCalories) {
-                ctx.fillStyle = '#fbbf24';
+                ctx.fillStyle = '#d97706';
                 ctx.font = '12px Arial';
                 ctx.textAlign = 'left';
                 
@@ -4929,31 +4995,31 @@
                     const y = padding + (chartHeight / 5) * i;
                     const calories = maxCalories - (calorieRange / 5) * i;
                     
-                    ctx.fillText(Math.round(calories) + ' cal', canvas.width - rightPadding + 10, y + 4);
+                    ctx.fillText(Math.round(calories) + ' cal', W - rightPadding + 10, y + 4);
                 }
             }
 
             // Draw axes
-            ctx.strokeStyle = 'rgba(148,163,184,0.3)';
+            ctx.strokeStyle = '#cbd5e1';
             ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.moveTo(padding, padding);
-            ctx.lineTo(padding, canvas.height - padding);
-            ctx.lineTo(canvas.width - rightPadding, canvas.height - padding);
+            ctx.lineTo(padding, H - padding);
+            ctx.lineTo(W - rightPadding, H - padding);
             if (showCalories) {
-                ctx.moveTo(canvas.width - rightPadding, padding);
-                ctx.lineTo(canvas.width - rightPadding, canvas.height - padding);
+                ctx.moveTo(W - rightPadding, padding);
+                ctx.lineTo(W - rightPadding, H - padding);
             }
             ctx.stroke();
 
             // Function to get Y coordinate for weight
             const getY = (weight) => {
-                return canvas.height - padding - ((weight - minWeight) / weightRange) * chartHeight;
+                return H - padding - ((weight - minWeight) / weightRange) * chartHeight;
             };
 
             // Function to get Y coordinate for calories
             const getCalorieY = (calories) => {
-                return canvas.height - padding - ((calories - minCalories) / calorieRange) * chartHeight;
+                return H - padding - ((calories - minCalories) / calorieRange) * chartHeight;
             };
 
             // Function to get X coordinate for index
@@ -4969,7 +5035,7 @@
                         const x = getX(i);
                         const y = getCalorieY(entry.calories);
                         const barWidth = chartWidth / sortedData.length * 0.6;
-                        ctx.fillRect(x - barWidth/2, y, barWidth, canvas.height - padding - y);
+                        ctx.fillRect(x - barWidth/2, y, barWidth, H - padding - y);
                     }
                 });
             }
@@ -4997,7 +5063,7 @@
                 ctx.stroke();
 
                 // Draw points
-                ctx.fillStyle = '#60a5fa';
+                ctx.fillStyle = '#3b82f6';
                 sortedData.forEach((entry, i) => {
                     if (entry.morningWeight) {
                         const x = getX(i);
@@ -5083,7 +5149,7 @@
                 ctx.beginPath();
                 const goalY = getY(goalWeight);
                 ctx.moveTo(padding, goalY);
-                ctx.lineTo(canvas.width - rightPadding, goalY);
+                ctx.lineTo(W - rightPadding, goalY);
                 ctx.stroke();
                 ctx.setLineDash([]);
 
@@ -5095,7 +5161,7 @@
             }
 
             // Draw date labels (show every nth date to avoid crowding)
-            ctx.fillStyle = 'rgba(148,163,184,0.6)';
+            ctx.fillStyle = '#94a3b8';
             ctx.font = '11px Arial';
             ctx.textAlign = 'center';
             const labelInterval = Math.max(1, Math.floor(sortedData.length / 10));
@@ -5104,7 +5170,7 @@
                 if (i % labelInterval === 0 || i === sortedData.length - 1) {
                     const x = getX(i);
                     const dateLabel = new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                    ctx.fillText(dateLabel, x, canvas.height - padding + 20);
+                    ctx.fillText(dateLabel, x, H - padding + 20);
                 }
             });
 
@@ -5179,6 +5245,16 @@
 
             canvas.addEventListener('mouseleave', function() {
                 tooltip.style.display = 'none';
+            });
+
+            // Redraw all charts on window resize for responsive layout
+            let resizeTimer;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(function() {
+                    redrawAllCharts();
+                    drawWeightChart();
+                }, 150);
             });
         });
 
