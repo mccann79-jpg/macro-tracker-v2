@@ -1182,6 +1182,15 @@
 </nav>
 
     <script>
+        // Helper: get today's date in YYYY-MM-DD using LOCAL timezone (not UTC)
+        function getLocalDateString(date) {
+            const d = date || new Date();
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
         // ============================================
         // FIREBASE CONFIGURATION
         // ============================================
@@ -1644,7 +1653,7 @@
             loadGoalWeight();
             
             // Set today's date as default for close out and weight entry
-            const today = new Date().toISOString().split('T')[0];
+            const today = getLocalDateString();
             document.getElementById('closeOutDate').value = today;
             document.getElementById('weightDate').value = today;
             
@@ -3257,7 +3266,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `saved-meals-${new Date().toISOString().split('T')[0]}.csv`;
+            a.download = `saved-meals-${getLocalDateString()}.csv`;
             a.click();
             URL.revokeObjectURL(url);
         }
@@ -3452,7 +3461,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `food-database-${new Date().toISOString().split('T')[0]}.csv`;
+            a.download = `food-database-${getLocalDateString()}.csv`;
             a.click();
             URL.revokeObjectURL(url);
         }
@@ -4783,7 +4792,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `macro-history-${new Date().toISOString().split('T')[0]}.csv`;
+            a.download = `macro-history-${getLocalDateString()}.csv`;
             a.click();
             URL.revokeObjectURL(url);
         }
@@ -4932,7 +4941,7 @@
             drawWeightChart();
 
             // Clear form
-            document.getElementById('weightDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('weightDate').value = getLocalDateString();
             document.getElementById('morningWeight').value = '';
             document.getElementById('weightNotes').value = '';
         }
@@ -5416,7 +5425,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `weight-data-${new Date().toISOString().split('T')[0]}.csv`;
+            a.download = `weight-data-${getLocalDateString()}.csv`;
             a.click();
             URL.revokeObjectURL(url);
         }
@@ -5470,7 +5479,7 @@
                         
                         if (isNaN(date.getTime())) continue;
 
-                        const isoDate = date.toISOString().split('T')[0];
+                        const isoDate = getLocalDateString(date);
 
                         const entry = {
                             date: isoDate,
