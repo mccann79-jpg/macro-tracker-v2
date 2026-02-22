@@ -1083,12 +1083,22 @@
             <!-- Macro Preview -->
             <div id="macroPreview" style="display:none; padding:12px; background:var(--bg-elevated); border-radius:8px; margin-bottom:12px;">
                 <div style="font-size:12px; color:var(--text-muted); text-transform:uppercase; margin-bottom:6px;">This will add:</div>
-                <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
                     <span style="color:var(--calories); font-weight:600;"><span id="previewCalories">0</span> cal</span>
                     <span style="color:var(--fats); font-weight:600;"><span id="previewFats">0</span>g F</span>
                     <span style="color:var(--carbs); font-weight:600;"><span id="previewCarbs">0</span>g C</span>
                     <span style="color:var(--protein); font-weight:600;"><span id="previewProtein">0</span>g P</span>
                     <span style="color:var(--accent-purple); font-weight:600;"><span id="previewFiber">0</span>g Fiber</span>
+                </div>
+                <div style="border-top:1px solid var(--border); padding-top:10px;">
+                    <div style="font-size:12px; color:var(--text-muted); text-transform:uppercase; margin-bottom:6px;">Daily totals after adding:</div>
+                    <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                        <span style="color:var(--calories); font-weight:600;"><span id="projectedCalories">0</span> cal</span>
+                        <span style="color:var(--fats); font-weight:600;"><span id="projectedFats">0</span>g F</span>
+                        <span style="color:var(--carbs); font-weight:600;"><span id="projectedCarbs">0</span>g C</span>
+                        <span style="color:var(--protein); font-weight:600;"><span id="projectedProtein">0</span>g P</span>
+                        <span style="color:var(--accent-purple); font-weight:600;"><span id="projectedFiber">0</span>g Fiber</span>
+                    </div>
                 </div>
             </div>
             
@@ -2947,7 +2957,45 @@
             document.getElementById('previewFats').textContent = macros.fats.toFixed(1);
             document.getElementById('previewFiber').textContent = macros.fiber.toFixed(1);
             document.getElementById('previewCalories').textContent = Math.round(macros.calories);
+            
+            // Update projected daily totals
+            const currentTotals = getCurrentDayTotals();
+            document.getElementById('projectedCalories').textContent = Math.round(currentTotals.calories + macros.calories);
+            document.getElementById('projectedFats').textContent = (currentTotals.fats + macros.fats).toFixed(1);
+            document.getElementById('projectedCarbs').textContent = (currentTotals.carbs + macros.carbs).toFixed(1);
+            document.getElementById('projectedProtein').textContent = (currentTotals.protein + macros.protein).toFixed(1);
+            document.getElementById('projectedFiber').textContent = (currentTotals.fiber + macros.fiber).toFixed(1);
+            
             preview.style.display = 'block';
+        }
+        
+        function getCurrentDayTotals() {
+            let totalProtein = 0;
+            let totalCarbs = 0;
+            let totalFats = 0;
+            let totalFiber = 0;
+            let totalCalories = 0;
+
+            todaysMeals.forEach(item => {
+                const itemType = item.type || 'meal';
+                const amount = item.amount !== undefined ? item.amount : (item.servings || 1);
+                
+                if (itemType === 'food') {
+                    totalProtein += item.macros.protein;
+                    totalCarbs += item.macros.carbs;
+                    totalFats += item.macros.fats;
+                    totalFiber += item.macros.fiber || 0;
+                    totalCalories += item.macros.calories || (item.macros.protein * 4 + item.macros.carbs * 4 + item.macros.fats * 9);
+                } else {
+                    totalProtein += item.macros.protein * amount;
+                    totalCarbs += item.macros.carbs * amount;
+                    totalFats += item.macros.fats * amount;
+                    totalFiber += (item.macros.fiber || 0) * amount;
+                    totalCalories += (item.macros.calories || (item.macros.protein * 4 + item.macros.carbs * 4 + item.macros.fats * 9)) * amount;
+                }
+            });
+            
+            return { protein: totalProtein, carbs: totalCarbs, fats: totalFats, fiber: totalFiber, calories: totalCalories };
         }
         
         function calculateMacrosForItem(type, name, amount, unit) {
@@ -3083,6 +3131,15 @@
                 document.getElementById('previewFats').textContent = macros.fats.toFixed(1);
                 document.getElementById('previewFiber').textContent = macros.fiber.toFixed(1);
                 document.getElementById('previewCalories').textContent = Math.round(macros.calories);
+                
+                // Update projected daily totals
+                const currentTotals = getCurrentDayTotals();
+                document.getElementById('projectedCalories').textContent = Math.round(currentTotals.calories + macros.calories);
+                document.getElementById('projectedFats').textContent = (currentTotals.fats + macros.fats).toFixed(1);
+                document.getElementById('projectedCarbs').textContent = (currentTotals.carbs + macros.carbs).toFixed(1);
+                document.getElementById('projectedProtein').textContent = (currentTotals.protein + macros.protein).toFixed(1);
+                document.getElementById('projectedFiber').textContent = (currentTotals.fiber + macros.fiber).toFixed(1);
+                
                 preview.style.display = 'block';
             }
         }
