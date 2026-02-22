@@ -324,14 +324,14 @@
             margin-bottom: 6px;
         }
         .total-value {
-            font-family: 'Space Mono', monospace;
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
             font-size: 1.6rem;
-            font-weight: 700;
+            font-weight: 600;
             line-height: 1.2;
         }
         .total-remaining {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.9rem;
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 1.1rem;
             font-weight: 600;
             line-height: 1.2;
             margin-top: 4px;
@@ -3163,10 +3163,10 @@
             const carbsPct = totalCalories > 0 ? ((totalCarbs * 4 / totalCalories) * 100).toFixed(0) : 0;
             const fatsPct = totalCalories > 0 ? ((totalFats * 9 / totalCalories) * 100).toFixed(0) : 0;
 
-            document.getElementById('dayProtein').textContent = totalProtein.toFixed(1);
-            document.getElementById('dayCarbs').textContent = totalCarbs.toFixed(1);
-            document.getElementById('dayFats').textContent = totalFats.toFixed(1);
-            document.getElementById('dayCalories').textContent = totalCalories.toFixed(0);
+            document.getElementById('dayProtein').textContent = Math.round(totalProtein);
+            document.getElementById('dayCarbs').textContent = Math.round(totalCarbs);
+            document.getElementById('dayFats').textContent = Math.round(totalFats);
+            document.getElementById('dayCalories').textContent = Math.round(totalCalories);
             document.getElementById('dayFiber').textContent = totalFiber.toFixed(1);
             
             // Update remaining amounts if goals are set
