@@ -1091,13 +1091,9 @@
                     <span style="color:var(--accent-purple); font-weight:600;"><span id="previewFiber">0</span>g Fiber</span>
                 </div>
                 <div style="border-top:1px solid var(--border); padding-top:10px;">
-                    <div style="font-size:12px; color:var(--text-muted); text-transform:uppercase; margin-bottom:6px;">Daily totals after adding:</div>
-                    <div style="display:flex; flex-wrap:wrap; gap:8px;">
-                        <span style="color:var(--calories); font-weight:600;"><span id="projectedCalories">0</span> cal</span>
-                        <span style="color:var(--fats); font-weight:600;"><span id="projectedFats">0</span>g F</span>
-                        <span style="color:var(--carbs); font-weight:600;"><span id="projectedCarbs">0</span>g C</span>
-                        <span style="color:var(--protein); font-weight:600;"><span id="projectedProtein">0</span>g P</span>
-                        <span style="color:var(--accent-purple); font-weight:600;"><span id="projectedFiber">0</span>g Fiber</span>
+                    <div style="font-size:12px; color:var(--text-muted); text-transform:uppercase; margin-bottom:6px;">After adding vs goals:</div>
+                    <div id="projectedVsGoals" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(90px, 1fr)); gap:6px; font-size:13px;">
+                        <!-- Populated by JS -->
                     </div>
                 </div>
             </div>
@@ -1250,6 +1246,90 @@
             <div id="emptyWeightMessage" class="empty-state" style="display:none;">No weight entries yet.</div>
         </div>
     </div>
+
+    <!-- ========== MEAL PREP PAGE ========== -->
+    <div id="prepPage" class="page">
+        <div class="card">
+            <div class="card-header">
+                <h2>Meal Prep Plans</h2>
+                <button class="btn btn-sm" onclick="createNewPrepPlan()">+ New Plan</button>
+            </div>
+            <div id="prepPlansList"></div>
+            <div id="emptyPrepMessage" class="empty-state">No meal prep plans yet. Create one to start planning your meals!</div>
+        </div>
+        
+        <!-- Active Plan Editor -->
+        <div id="prepPlanEditor" class="card" style="display:none;">
+            <div class="card-header">
+                <input type="text" id="prepPlanName" placeholder="Plan name (e.g., Week 1, Cutting Phase)" style="flex:1; font-size:1.1rem; font-weight:600; border:none; background:transparent; color:var(--text-primary);">
+                <button class="btn-success btn-sm" onclick="savePrepPlan()">Save</button>
+                <button class="btn-danger btn-sm" onclick="cancelPrepPlan()">Cancel</button>
+            </div>
+            
+            <!-- Add items to plan -->
+            <div style="margin-bottom:16px; padding-bottom:16px; border-bottom:1px solid var(--border);">
+                <div class="form-group" style="position:relative; margin-bottom:8px;">
+                    <input type="text" id="prepSearchItem" placeholder="Search foods & meals to add..."
+                        onfocus="filterPrepDropdown()"
+                        onkeyup="filterPrepDropdown()"
+                        autocomplete="off">
+                    <div id="prepDropdown" class="autocomplete-dropdown"></div>
+                </div>
+            </div>
+            
+            <!-- Plan Items Table -->
+            <div class="table-wrap">
+                <table id="prepItemsTable">
+                    <thead>
+                        <tr>
+                            <th style="text-align:left; width:40%;">Item</th>
+                            <th style="width:80px;">Amount</th>
+                            <th style="width:70px;">Cal</th>
+                            <th style="width:50px;">F</th>
+                            <th style="width:50px;">C</th>
+                            <th style="width:50px;">P</th>
+                            <th style="width:40px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="prepItemsBody"></tbody>
+                    <tfoot>
+                        <tr style="font-weight:700; background:var(--bg-elevated);">
+                            <td>Total</td>
+                            <td></td>
+                            <td id="prepTotalCal">0</td>
+                            <td id="prepTotalFat">0</td>
+                            <td id="prepTotalCarbs">0</td>
+                            <td id="prepTotalProtein">0</td>
+                            <td></td>
+                        </tr>
+                        <tr id="prepGoalRow" style="font-size:0.85rem; color:var(--text-muted);">
+                            <td>Goal</td>
+                            <td></td>
+                            <td id="prepGoalCal">—</td>
+                            <td id="prepGoalFat">—</td>
+                            <td id="prepGoalCarbs">—</td>
+                            <td id="prepGoalProtein">—</td>
+                            <td></td>
+                        </tr>
+                        <tr id="prepDiffRow" style="font-size:0.85rem;">
+                            <td>Remaining</td>
+                            <td></td>
+                            <td id="prepDiffCal">—</td>
+                            <td id="prepDiffFat">—</td>
+                            <td id="prepDiffCarbs">—</td>
+                            <td id="prepDiffProtein">—</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            
+            <div style="margin-top:16px; display:flex; gap:8px; flex-wrap:wrap;">
+                <button class="btn" onclick="addPrepPlanToDay()">📋 Add All to My Day</button>
+                <button class="btn btn-ghost" onclick="duplicatePrepPlan()">📄 Duplicate Plan</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Bottom Tab Navigation -->
@@ -1261,6 +1341,10 @@
     <button class="nav-tab" onclick="showPage('meals', this)" id="tab-meals">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
         Meals
+    </button>
+    <button class="nav-tab" onclick="showPage('prep', this)" id="tab-prep">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Prep
     </button>
     <button class="nav-tab" onclick="showPage('day', this)" id="tab-day">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
@@ -1346,6 +1430,9 @@
         let dayHistory = JSON.parse(localStorage.getItem('dayHistory')) || [];
         let weightData = JSON.parse(localStorage.getItem('weightData')) || [];
         let goalWeight = localStorage.getItem('goalWeight') ? parseFloat(localStorage.getItem('goalWeight')) : null;
+        let mealPrepPlans = JSON.parse(localStorage.getItem('mealPrepPlans')) || [];
+        let currentPrepPlan = null;
+        let currentPrepPlanIndex = -1;
 
         // CLEANUP: Remove any invalid entries from dayHistory (like meal objects that got mixed in)
         const originalHistoryLength = dayHistory.length;
@@ -1540,6 +1627,11 @@
                         loadedFromCloud = true;
                     }
                     
+                    if (data.mealPrepPlans) {
+                        mealPrepPlans = data.mealPrepPlans;
+                        localStorage.setItem('mealPrepPlans', JSON.stringify(mealPrepPlans));
+                    }
+                    
                     if (data.dailyGoals) {
                         dailyGoals = data.dailyGoals;
                         localStorage.setItem('dailyGoals', JSON.stringify(dailyGoals));
@@ -1615,6 +1707,10 @@
                             renderWeightTable();
                             drawWeightChart();
                         }
+                        if (data.mealPrepPlans) {
+                            mealPrepPlans = data.mealPrepPlans;
+                            localStorage.setItem('mealPrepPlans', JSON.stringify(mealPrepPlans));
+                        }
                         localStorage.setItem('lastSync', data._lastSync.toString());
                     }
                 }
@@ -1656,6 +1752,7 @@
                 dailyGoals: cleanNaN(dailyGoals),
                 dayHistory: cleanNaN(dayHistory),
                 weightData: cleanNaN(weightData),
+                mealPrepPlans: cleanNaN(mealPrepPlans),
                 _lastSync: timestamp
             }).then(() => {
                 localStorage.setItem('lastSync', timestamp.toString());
@@ -1806,6 +1903,9 @@
             }
             if (pageName === 'day') {
                 setTimeout(() => { drawHistoryChart(); }, 100);
+            }
+            if (pageName === 'prep') {
+                renderPrepPlans();
             }
         }
 
@@ -2958,15 +3058,70 @@
             document.getElementById('previewFiber').textContent = macros.fiber.toFixed(1);
             document.getElementById('previewCalories').textContent = Math.round(macros.calories);
             
-            // Update projected daily totals
-            const currentTotals = getCurrentDayTotals();
-            document.getElementById('projectedCalories').textContent = Math.round(currentTotals.calories + macros.calories);
-            document.getElementById('projectedFats').textContent = (currentTotals.fats + macros.fats).toFixed(1);
-            document.getElementById('projectedCarbs').textContent = (currentTotals.carbs + macros.carbs).toFixed(1);
-            document.getElementById('projectedProtein').textContent = (currentTotals.protein + macros.protein).toFixed(1);
-            document.getElementById('projectedFiber').textContent = (currentTotals.fiber + macros.fiber).toFixed(1);
+            // Update projected vs goals
+            updateProjectedVsGoals(macros);
             
             preview.style.display = 'block';
+        }
+        
+        function updateProjectedVsGoals(macros) {
+            const currentTotals = getCurrentDayTotals();
+            const projected = {
+                calories: currentTotals.calories + macros.calories,
+                fats: currentTotals.fats + macros.fats,
+                carbs: currentTotals.carbs + macros.carbs,
+                protein: currentTotals.protein + macros.protein,
+                fiber: currentTotals.fiber + macros.fiber
+            };
+            
+            let html = '';
+            
+            // Calories
+            const calGoal = dailyGoals?.calories;
+            const calDiff = calGoal ? projected.calories - calGoal : null;
+            html += `<div style="text-align:center;">
+                <div style="font-weight:700; color:${calDiff !== null && calDiff > 0 ? 'var(--accent-red)' : 'var(--calories)'};">${Math.round(projected.calories)}</div>
+                <div style="font-size:11px; color:var(--text-muted);">${calGoal ? '/ ' + calGoal : 'cal'}</div>
+                ${calDiff !== null ? `<div style="font-size:10px; color:${calDiff > 0 ? 'var(--accent-red)' : 'var(--accent-green)'};">${calDiff > 0 ? '+' : ''}${Math.round(calDiff)}</div>` : ''}
+            </div>`;
+            
+            // Fats
+            const fatGoal = dailyGoals?.fats;
+            const fatDiff = fatGoal ? projected.fats - fatGoal : null;
+            html += `<div style="text-align:center;">
+                <div style="font-weight:700; color:${fatDiff !== null && fatDiff > 0 ? 'var(--accent-red)' : 'var(--fats)'};">${projected.fats.toFixed(1)}g</div>
+                <div style="font-size:11px; color:var(--text-muted);">${fatGoal ? '/ ' + fatGoal + 'g F' : 'fat'}</div>
+                ${fatDiff !== null ? `<div style="font-size:10px; color:${fatDiff > 0 ? 'var(--accent-red)' : 'var(--accent-green)'};">${fatDiff > 0 ? '+' : ''}${fatDiff.toFixed(1)}</div>` : ''}
+            </div>`;
+            
+            // Carbs
+            const carbGoal = dailyGoals?.carbs;
+            const carbDiff = carbGoal ? projected.carbs - carbGoal : null;
+            html += `<div style="text-align:center;">
+                <div style="font-weight:700; color:${carbDiff !== null && carbDiff > 0 ? 'var(--accent-red)' : 'var(--carbs)'};">${projected.carbs.toFixed(1)}g</div>
+                <div style="font-size:11px; color:var(--text-muted);">${carbGoal ? '/ ' + carbGoal + 'g C' : 'carbs'}</div>
+                ${carbDiff !== null ? `<div style="font-size:10px; color:${carbDiff > 0 ? 'var(--accent-red)' : 'var(--accent-green)'};">${carbDiff > 0 ? '+' : ''}${carbDiff.toFixed(1)}</div>` : ''}
+            </div>`;
+            
+            // Protein
+            const proteinGoal = dailyGoals?.protein;
+            const proteinDiff = proteinGoal ? projected.protein - proteinGoal : null;
+            html += `<div style="text-align:center;">
+                <div style="font-weight:700; color:${proteinDiff !== null && proteinDiff < 0 ? 'var(--accent-red)' : 'var(--protein)'};">${projected.protein.toFixed(1)}g</div>
+                <div style="font-size:11px; color:var(--text-muted);">${proteinGoal ? '/ ' + proteinGoal + 'g P' : 'protein'}</div>
+                ${proteinDiff !== null ? `<div style="font-size:10px; color:${proteinDiff >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'};">${proteinDiff > 0 ? '+' : ''}${proteinDiff.toFixed(1)}</div>` : ''}
+            </div>`;
+            
+            // Fiber
+            const fiberGoal = dailyGoals?.fiber;
+            const fiberDiff = fiberGoal ? projected.fiber - fiberGoal : null;
+            html += `<div style="text-align:center;">
+                <div style="font-weight:700; color:${fiberDiff !== null && fiberDiff < 0 ? 'var(--accent-red)' : 'var(--accent-purple)'};">${projected.fiber.toFixed(1)}g</div>
+                <div style="font-size:11px; color:var(--text-muted);">${fiberGoal ? '/ ' + fiberGoal + 'g' : 'fiber'}</div>
+                ${fiberDiff !== null ? `<div style="font-size:10px; color:${fiberDiff >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'};">${fiberDiff > 0 ? '+' : ''}${fiberDiff.toFixed(1)}</div>` : ''}
+            </div>`;
+            
+            document.getElementById('projectedVsGoals').innerHTML = html;
         }
         
         function getCurrentDayTotals() {
@@ -2989,7 +3144,7 @@
                 } else {
                     totalProtein += item.macros.protein * amount;
                     totalCarbs += item.macros.carbs * amount;
-                    totalFats += item.macros.fats * amount;
+                    totalFats += (item.macros.fats || 0) * amount;
                     totalFiber += (item.macros.fiber || 0) * amount;
                     totalCalories += (item.macros.calories || (item.macros.protein * 4 + item.macros.carbs * 4 + item.macros.fats * 9)) * amount;
                 }
@@ -3132,13 +3287,8 @@
                 document.getElementById('previewFiber').textContent = macros.fiber.toFixed(1);
                 document.getElementById('previewCalories').textContent = Math.round(macros.calories);
                 
-                // Update projected daily totals
-                const currentTotals = getCurrentDayTotals();
-                document.getElementById('projectedCalories').textContent = Math.round(currentTotals.calories + macros.calories);
-                document.getElementById('projectedFats').textContent = (currentTotals.fats + macros.fats).toFixed(1);
-                document.getElementById('projectedCarbs').textContent = (currentTotals.carbs + macros.carbs).toFixed(1);
-                document.getElementById('projectedProtein').textContent = (currentTotals.protein + macros.protein).toFixed(1);
-                document.getElementById('projectedFiber').textContent = (currentTotals.fiber + macros.fiber).toFixed(1);
+                // Update projected vs goals
+                updateProjectedVsGoals(macros);
                 
                 preview.style.display = 'block';
             }
@@ -6363,6 +6513,356 @@
                 calculateProjection();
             }
         }
+
+        // ========== MEAL PREP FUNCTIONS ==========
+        
+        function renderPrepPlans() {
+            const container = document.getElementById('prepPlansList');
+            const emptyMsg = document.getElementById('emptyPrepMessage');
+            
+            if (mealPrepPlans.length === 0) {
+                container.innerHTML = '';
+                emptyMsg.style.display = 'block';
+                return;
+            }
+            
+            emptyMsg.style.display = 'none';
+            container.innerHTML = mealPrepPlans.map((plan, index) => {
+                const totals = calculatePrepPlanTotals(plan.items);
+                return `
+                    <div class="food-item" style="display:flex; justify-content:space-between; align-items:center; padding:12px; border-bottom:1px solid var(--border);">
+                        <div style="flex:1;">
+                            <div style="font-weight:600;">${plan.name}</div>
+                            <div style="font-size:0.8rem; color:var(--text-muted);">
+                                ${plan.items.length} items · ${Math.round(totals.calories)} cal · ${totals.protein.toFixed(0)}g P
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:6px;">
+                            <button class="btn-success btn-sm" onclick="editPrepPlan(${index})">Edit</button>
+                            <button class="btn btn-sm" onclick="addPrepPlanToDayByIndex(${index})">+ Day</button>
+                            <button class="btn-danger btn-sm" onclick="deletePrepPlan(${index})">×</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function createNewPrepPlan() {
+            currentPrepPlan = { name: '', items: [] };
+            currentPrepPlanIndex = -1;
+            document.getElementById('prepPlanName').value = '';
+            document.getElementById('prepPlanEditor').style.display = 'block';
+            renderPrepItems();
+            updatePrepGoals();
+        }
+        
+        function editPrepPlan(index) {
+            currentPrepPlan = JSON.parse(JSON.stringify(mealPrepPlans[index])); // Deep copy
+            currentPrepPlanIndex = index;
+            document.getElementById('prepPlanName').value = currentPrepPlan.name;
+            document.getElementById('prepPlanEditor').style.display = 'block';
+            renderPrepItems();
+            updatePrepGoals();
+        }
+        
+        function savePrepPlan() {
+            const name = document.getElementById('prepPlanName').value.trim() || 'Untitled Plan';
+            currentPrepPlan.name = name;
+            
+            if (currentPrepPlanIndex >= 0) {
+                mealPrepPlans[currentPrepPlanIndex] = currentPrepPlan;
+            } else {
+                mealPrepPlans.push(currentPrepPlan);
+            }
+            
+            localStorage.setItem('mealPrepPlans', JSON.stringify(mealPrepPlans));
+            syncToFirebase();
+            
+            document.getElementById('prepPlanEditor').style.display = 'none';
+            currentPrepPlan = null;
+            currentPrepPlanIndex = -1;
+            renderPrepPlans();
+        }
+        
+        function cancelPrepPlan() {
+            document.getElementById('prepPlanEditor').style.display = 'none';
+            currentPrepPlan = null;
+            currentPrepPlanIndex = -1;
+        }
+        
+        function deletePrepPlan(index) {
+            if (confirm('Delete this meal prep plan?')) {
+                mealPrepPlans.splice(index, 1);
+                localStorage.setItem('mealPrepPlans', JSON.stringify(mealPrepPlans));
+                syncToFirebase();
+                renderPrepPlans();
+            }
+        }
+        
+        function duplicatePrepPlan() {
+            if (!currentPrepPlan) return;
+            const newPlan = JSON.parse(JSON.stringify(currentPrepPlan));
+            newPlan.name = currentPrepPlan.name + ' (Copy)';
+            mealPrepPlans.push(newPlan);
+            localStorage.setItem('mealPrepPlans', JSON.stringify(mealPrepPlans));
+            syncToFirebase();
+            renderPrepPlans();
+            alert('Plan duplicated!');
+        }
+        
+        function filterPrepDropdown() {
+            const searchInput = document.getElementById('prepSearchItem');
+            const dropdown = document.getElementById('prepDropdown');
+            const query = searchInput.value.toLowerCase().trim();
+            
+            let results = [];
+            
+            // Search meals
+            savedMeals.filter(m => !query || m.name.toLowerCase().includes(query))
+                .slice(0, 8).forEach(meal => {
+                    const cal = meal.perServing.calories || (meal.perServing.protein * 4 + meal.perServing.carbs * 4 + meal.perServing.fats * 9);
+                    results.push({
+                        type: 'meal',
+                        name: meal.name,
+                        data: meal,
+                        html: `<div class="dropdown-item-name" style="color:var(--accent);">${meal.name}</div>
+                               <div class="dropdown-item-meta">🍽 Meal · P:${meal.perServing.protein.toFixed(0)}g C:${meal.perServing.carbs.toFixed(0)}g F:${meal.perServing.fats.toFixed(0)}g · ${cal.toFixed(0)} cal</div>`
+                    });
+                });
+            
+            // Search foods
+            foodDatabase.filter(f => !query || f.name.toLowerCase().includes(query))
+                .slice(0, 8).forEach(food => {
+                    const cal = food.calories || (food.protein * 4 + food.carbs * 4 + food.fats * 9);
+                    results.push({
+                        type: 'food',
+                        name: food.name,
+                        data: food,
+                        html: `<div class="dropdown-item-name">${food.name}</div>
+                               <div class="dropdown-item-meta">🥄 ${food.servingAmount} ${UNIT_LABELS[food.servingUnit]} · P:${food.protein}g · ${cal.toFixed(0)} cal</div>`
+                    });
+                });
+            
+            if (results.length === 0) {
+                dropdown.innerHTML = '<div class="empty-state" style="padding:12px;">No results</div>';
+                dropdown.style.display = 'block';
+                return;
+            }
+            
+            dropdown.innerHTML = results.map(r => `
+                <div onclick="addItemToPrepPlan('${r.type}', '${r.name.replace(/'/g, "\\'")}')" class="dropdown-item">
+                    ${r.html}
+                </div>
+            `).join('');
+            dropdown.style.display = 'block';
+        }
+        
+        function addItemToPrepPlan(type, name) {
+            document.getElementById('prepSearchItem').value = '';
+            document.getElementById('prepDropdown').style.display = 'none';
+            
+            let item;
+            if (type === 'meal') {
+                const meal = savedMeals.find(m => m.name === name);
+                if (!meal) return;
+                item = {
+                    type: 'meal',
+                    name: meal.name,
+                    amount: 1,
+                    unit: 'serving',
+                    macros: { ...meal.perServing }
+                };
+            } else {
+                const food = foodDatabase.find(f => f.name === name);
+                if (!food) return;
+                item = {
+                    type: 'food',
+                    name: food.name,
+                    amount: food.servingAmount,
+                    unit: food.servingUnit,
+                    servingAmount: food.servingAmount,
+                    servingUnit: food.servingUnit,
+                    baseMacros: {
+                        protein: food.protein,
+                        carbs: food.carbs,
+                        fats: food.fats,
+                        fiber: food.fiber || 0,
+                        calories: food.calories || (food.protein * 4 + food.carbs * 4 + food.fats * 9)
+                    },
+                    macros: {
+                        protein: food.protein,
+                        carbs: food.carbs,
+                        fats: food.fats,
+                        fiber: food.fiber || 0,
+                        calories: food.calories || (food.protein * 4 + food.carbs * 4 + food.fats * 9)
+                    }
+                };
+            }
+            
+            currentPrepPlan.items.push(item);
+            renderPrepItems();
+        }
+        
+        function renderPrepItems() {
+            const tbody = document.getElementById('prepItemsBody');
+            
+            if (!currentPrepPlan || currentPrepPlan.items.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:20px;">Add foods or meals above</td></tr>';
+                updatePrepTotals();
+                return;
+            }
+            
+            tbody.innerHTML = currentPrepPlan.items.map((item, index) => `
+                <tr>
+                    <td style="text-align:left;">
+                        <div style="font-weight:500; font-size:0.9rem;">${item.name}</div>
+                        <div style="font-size:0.75rem; color:var(--text-muted);">${item.type === 'meal' ? '🍽 Meal' : '🥄 Food'}</div>
+                    </td>
+                    <td>
+                        <input type="number" value="${item.amount}" min="0.1" step="0.1" 
+                            style="width:60px; padding:4px; text-align:center; border:1px solid var(--border); border-radius:4px;"
+                            onchange="updatePrepItemAmount(${index}, this.value)">
+                        <div style="font-size:0.7rem; color:var(--text-muted);">${item.unit}</div>
+                    </td>
+                    <td style="color:var(--calories);">${Math.round(item.macros.calories * (item.type === 'meal' ? item.amount : 1))}</td>
+                    <td style="color:var(--fats);">${(item.macros.fats * (item.type === 'meal' ? item.amount : 1)).toFixed(1)}</td>
+                    <td style="color:var(--carbs);">${(item.macros.carbs * (item.type === 'meal' ? item.amount : 1)).toFixed(1)}</td>
+                    <td style="color:var(--protein);">${(item.macros.protein * (item.type === 'meal' ? item.amount : 1)).toFixed(1)}</td>
+                    <td><button class="btn-danger btn-sm" onclick="removePrepItem(${index})">×</button></td>
+                </tr>
+            `).join('');
+            
+            updatePrepTotals();
+        }
+        
+        function updatePrepItemAmount(index, newAmount) {
+            const item = currentPrepPlan.items[index];
+            const amount = parseFloat(newAmount) || 0;
+            item.amount = amount;
+            
+            if (item.type === 'food' && item.baseMacros) {
+                const multiplier = amount / item.servingAmount;
+                item.macros = {
+                    protein: item.baseMacros.protein * multiplier,
+                    carbs: item.baseMacros.carbs * multiplier,
+                    fats: item.baseMacros.fats * multiplier,
+                    fiber: item.baseMacros.fiber * multiplier,
+                    calories: item.baseMacros.calories * multiplier
+                };
+            }
+            
+            renderPrepItems();
+        }
+        
+        function removePrepItem(index) {
+            currentPrepPlan.items.splice(index, 1);
+            renderPrepItems();
+        }
+        
+        function calculatePrepPlanTotals(items) {
+            let totals = { calories: 0, fats: 0, carbs: 0, protein: 0, fiber: 0 };
+            
+            items.forEach(item => {
+                const mult = item.type === 'meal' ? item.amount : 1;
+                totals.calories += (item.macros.calories || 0) * mult;
+                totals.fats += (item.macros.fats || 0) * mult;
+                totals.carbs += (item.macros.carbs || 0) * mult;
+                totals.protein += (item.macros.protein || 0) * mult;
+                totals.fiber += (item.macros.fiber || 0) * mult;
+            });
+            
+            return totals;
+        }
+        
+        function updatePrepTotals() {
+            if (!currentPrepPlan) return;
+            
+            const totals = calculatePrepPlanTotals(currentPrepPlan.items);
+            
+            document.getElementById('prepTotalCal').textContent = Math.round(totals.calories);
+            document.getElementById('prepTotalFat').textContent = totals.fats.toFixed(1);
+            document.getElementById('prepTotalCarbs').textContent = totals.carbs.toFixed(1);
+            document.getElementById('prepTotalProtein').textContent = totals.protein.toFixed(1);
+            
+            // Update difference from goals
+            if (dailyGoals) {
+                const calDiff = dailyGoals.calories - totals.calories;
+                const fatDiff = dailyGoals.fats ? dailyGoals.fats - totals.fats : null;
+                const carbDiff = dailyGoals.carbs ? dailyGoals.carbs - totals.carbs : null;
+                const proteinDiff = dailyGoals.protein - totals.protein;
+                
+                document.getElementById('prepDiffCal').innerHTML = `<span style="color:${calDiff >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'};">${calDiff >= 0 ? '' : '+'}${Math.round(-calDiff)}</span>`;
+                document.getElementById('prepDiffFat').innerHTML = fatDiff !== null ? `<span style="color:${fatDiff >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'};">${fatDiff >= 0 ? '' : '+'}${(-fatDiff).toFixed(1)}</span>` : '—';
+                document.getElementById('prepDiffCarbs').innerHTML = carbDiff !== null ? `<span style="color:${carbDiff >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'};">${carbDiff >= 0 ? '' : '+'}${(-carbDiff).toFixed(1)}</span>` : '—';
+                document.getElementById('prepDiffProtein').innerHTML = `<span style="color:${proteinDiff <= 0 ? 'var(--accent-green)' : 'var(--accent-red)'};">${proteinDiff <= 0 ? '+' : ''}${(-proteinDiff).toFixed(1)}</span>`;
+            }
+        }
+        
+        function updatePrepGoals() {
+            if (dailyGoals) {
+                document.getElementById('prepGoalCal').textContent = dailyGoals.calories || '—';
+                document.getElementById('prepGoalFat').textContent = dailyGoals.fats || '—';
+                document.getElementById('prepGoalCarbs').textContent = dailyGoals.carbs || '—';
+                document.getElementById('prepGoalProtein').textContent = dailyGoals.protein || '—';
+            }
+        }
+        
+        function addPrepPlanToDay() {
+            if (!currentPrepPlan || currentPrepPlan.items.length === 0) {
+                alert('No items in this plan');
+                return;
+            }
+            
+            currentPrepPlan.items.forEach(item => {
+                const mealToAdd = {
+                    type: item.type,
+                    name: item.name,
+                    amount: item.amount,
+                    unit: item.unit,
+                    macros: { ...item.macros }
+                };
+                todaysMeals.push(mealToAdd);
+            });
+            
+            localStorage.setItem('todaysMeals', JSON.stringify(todaysMeals));
+            syncToFirebase();
+            calculateDayTotals();
+            renderTodaysMeals();
+            
+            alert(`Added ${currentPrepPlan.items.length} items to your day!`);
+        }
+        
+        function addPrepPlanToDayByIndex(index) {
+            const plan = mealPrepPlans[index];
+            if (!plan || plan.items.length === 0) return;
+            
+            plan.items.forEach(item => {
+                const mealToAdd = {
+                    type: item.type,
+                    name: item.name,
+                    amount: item.amount,
+                    unit: item.unit,
+                    macros: { ...item.macros }
+                };
+                todaysMeals.push(mealToAdd);
+            });
+            
+            localStorage.setItem('todaysMeals', JSON.stringify(todaysMeals));
+            syncToFirebase();
+            calculateDayTotals();
+            renderTodaysMeals();
+            
+            alert(`Added ${plan.items.length} items from "${plan.name}" to your day!`);
+        }
+        
+        // Close prep dropdown when clicking elsewhere
+        document.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('prepDropdown');
+            const input = document.getElementById('prepSearchItem');
+            if (dropdown && input && !dropdown.contains(e.target) && e.target !== input) {
+                dropdown.style.display = 'none';
+            }
+        });
 
         // Register Service Worker for PWA
         if ('serviceWorker' in navigator) {
