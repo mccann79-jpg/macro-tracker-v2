@@ -527,20 +527,20 @@
 
         /* ===== GOALS DISPLAY ===== */
         .goals-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
         }
         .goal-chip {
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 0.82rem;
-            font-weight: 600;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-primary);
         }
-        .goal-chip-protein { background: #dbeafe; color: var(--protein); }
-        .goal-chip-calories { background: #ffedd5; color: var(--calories); }
-        .goal-chip-carbs { background: #fef3c7; color: var(--carbs); }
-        .goal-chip-fats { background: #dcfce7; color: var(--fats); }
+        .goal-chip-protein { }
+        .goal-chip-calories { }
+        .goal-chip-carbs { }
+        .goal-chip-fats { }
 
         /* ===== CHART TOGGLES ===== */
         .chart-toggles {
@@ -913,48 +913,6 @@
 
     <!-- ========== MY DAY PAGE ========== -->
     <div id="dayPage" class="page">
-        <!-- Goals -->
-        <div class="card">
-            <div class="card-header">
-                <h2>Daily Goals</h2>
-                <button class="btn-ghost btn-sm" onclick="toggleGoalsEdit()">
-                    <span id="goalsEditBtnText">Set Goals</span>
-                </button>
-            </div>
-            <div id="goalsForm" style="display:none; margin-bottom:12px;">
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
-                    <div class="form-group" style="margin-bottom:0;">
-                        <label for="goalProtein">Protein (g) *</label>
-                        <input type="number" id="goalProtein" min="0" step="1" placeholder="150">
-                    </div>
-                    <div class="form-group" style="margin-bottom:0;">
-                        <label for="goalCalories">Calories *</label>
-                        <input type="number" id="goalCalories" min="0" step="1" placeholder="2000">
-                    </div>
-                    <div class="form-group" style="margin-bottom:0;">
-                        <label for="goalCarbs">Carbs (g) <span style="color:var(--text-muted)">opt</span></label>
-                        <input type="number" id="goalCarbs" min="0" step="1" placeholder="—">
-                    </div>
-                    <div class="form-group" style="margin-bottom:0;">
-                        <label for="goalFats">Fats (g) <span style="color:var(--text-muted)">opt</span></label>
-                        <input type="number" id="goalFats" min="0" step="1" placeholder="—">
-                    </div>
-                </div>
-                <div style="display:flex; gap:8px;">
-                    <button class="btn" onclick="saveGoals()" style="flex:1;">Save Goals</button>
-                    <button class="btn btn-danger" onclick="clearGoals()" style="flex:0;">Clear</button>
-                </div>
-            </div>
-            <div id="goalsDisplay" style="display:none;">
-                <div class="goals-grid">
-                    <div class="goal-chip goal-chip-protein">Protein: <span id="displayGoalProtein">0</span>g</div>
-                    <div class="goal-chip goal-chip-calories">Cal: <span id="displayGoalCalories">0</span></div>
-                    <div id="displayGoalCarbsContainer" class="goal-chip goal-chip-carbs" style="display:none;">Carbs: <span id="displayGoalCarbs">0</span>g</div>
-                    <div id="displayGoalFatsContainer" class="goal-chip goal-chip-fats" style="display:none;">Fats: <span id="displayGoalFats">0</span>g</div>
-                </div>
-            </div>
-        </div>
-
         <!-- Daily Totals Hero -->
         <div class="totals-hero">
             <h2>Daily Totals</h2>
@@ -985,6 +943,44 @@
                 </div>
             </div>
             <div class="fiber-display">Fiber: <strong id="dayFiber">0</strong>g</div>
+            
+            <!-- Goals Display -->
+            <div id="goalsDisplay" style="display:none; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+                <div class="goals-grid">
+                    <div class="goal-chip goal-chip-protein">Protein: <span id="displayGoalProtein">0</span>g</div>
+                    <div class="goal-chip goal-chip-carbs" id="displayGoalCarbsContainer" style="display:none;">Carbs: <span id="displayGoalCarbs">0</span>g</div>
+                    <div class="goal-chip goal-chip-fats" id="displayGoalFatsContainer" style="display:none;">Fats: <span id="displayGoalFats">0</span>g</div>
+                    <div class="goal-chip goal-chip-calories">Cal: <span id="displayGoalCalories">0</span></div>
+                    <button class="btn-ghost btn-sm" onclick="toggleGoalsEdit()" style="margin-left: 8px;">
+                        <span id="goalsEditBtnText">Edit</span>
+                    </button>
+                </div>
+            </div>
+            <div id="goalsForm" style="display:none; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label for="goalProtein">Protein (g) *</label>
+                        <input type="number" id="goalProtein" min="0" step="1" placeholder="150">
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label for="goalCalories">Calories *</label>
+                        <input type="number" id="goalCalories" min="0" step="1" placeholder="2000">
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label for="goalCarbs">Carbs (g) <span style="color:var(--text-muted)">opt</span></label>
+                        <input type="number" id="goalCarbs" min="0" step="1" placeholder="—">
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label for="goalFats">Fats (g) <span style="color:var(--text-muted)">opt</span></label>
+                        <input type="number" id="goalFats" min="0" step="1" placeholder="—">
+                    </div>
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn" onclick="saveGoals()" style="flex:1;">Save Goals</button>
+                    <button class="btn btn-danger" onclick="clearGoals()" style="flex:0;">Clear</button>
+                </div>
+            </div>
+            
             <div class="totals-actions">
                 <input type="date" id="closeOutDate" style="padding:7px 10px; background:var(--bg-input); border:1px solid var(--border); border-radius:8px; color:var(--text-primary); font-family:inherit; font-size:0.8rem;">
                 <button class="btn-success btn-sm" onclick="closeOutDay()">📊 Close Out</button>
