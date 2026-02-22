@@ -3227,10 +3227,26 @@
                 const calPct = dailyGoals.calories ? Math.min((totalCalories / dailyGoals.calories) * 100, 100) : 0;
                 const cPct = dailyGoals.carbs ? Math.min((totalCarbs / dailyGoals.carbs) * 100, 100) : 0;
                 const fPct = dailyGoals.fats ? Math.min((totalFats / dailyGoals.fats) * 100, 100) : 0;
+                
                 document.getElementById('proteinBar').style.width = pPct + '%';
+                document.getElementById('proteinBar').style.background = totalProtein <= dailyGoals.protein ? 'var(--accent-green)' : 'var(--accent-red)';
+                
                 document.getElementById('caloriesBar').style.width = calPct + '%';
-                document.getElementById('carbsBar').style.width = cPct + '%';
-                document.getElementById('fatsBar').style.width = fPct + '%';
+                document.getElementById('caloriesBar').style.background = totalCalories <= dailyGoals.calories ? 'var(--accent-green)' : 'var(--accent-red)';
+                
+                if (dailyGoals.carbs) {
+                    document.getElementById('carbsBar').style.width = cPct + '%';
+                    document.getElementById('carbsBar').style.background = totalCarbs <= dailyGoals.carbs ? 'var(--accent-green)' : 'var(--accent-red)';
+                } else {
+                    document.getElementById('carbsBar').style.width = '0%';
+                }
+                
+                if (dailyGoals.fats) {
+                    document.getElementById('fatsBar').style.width = fPct + '%';
+                    document.getElementById('fatsBar').style.background = totalFats <= dailyGoals.fats ? 'var(--accent-green)' : 'var(--accent-red)';
+                } else {
+                    document.getElementById('fatsBar').style.width = '0%';
+                }
             } else {
                 document.getElementById('proteinBar').style.width = '0%';
                 document.getElementById('caloriesBar').style.width = '0%';
