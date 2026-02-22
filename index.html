@@ -327,6 +327,14 @@
             font-family: 'Space Mono', monospace;
             font-size: 1.6rem;
             font-weight: 700;
+            line-height: 1.1;
+        }
+        .total-remaining {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.6rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-top: 2px;
         }
         .total-sub {
             font-size: 0.72rem;
@@ -945,30 +953,26 @@
                 <div class="total-item">
                     <div class="total-label">Protein</div>
                     <div class="total-value" style="color:var(--protein);" id="dayProtein">0</div>
-                    <div class="total-sub" id="dayProteinPct" style="color:var(--text-muted);">0%</div>
+                    <div class="total-remaining" id="remainingProtein"></div>
                     <div class="progress-bar-container"><div class="progress-bar-fill" id="proteinBar" style="background:var(--protein); width:0%;"></div></div>
-                    <div class="total-sub" id="remainingProtein"></div>
                 </div>
                 <div class="total-item">
                     <div class="total-label">Carbs</div>
                     <div class="total-value" style="color:var(--carbs);" id="dayCarbs">0</div>
-                    <div class="total-sub" id="dayCarbsPct" style="color:var(--text-muted);">0%</div>
+                    <div class="total-remaining" id="remainingCarbs"></div>
                     <div class="progress-bar-container"><div class="progress-bar-fill" id="carbsBar" style="background:var(--carbs); width:0%;"></div></div>
-                    <div class="total-sub" id="remainingCarbs"></div>
                 </div>
                 <div class="total-item">
                     <div class="total-label">Fats</div>
                     <div class="total-value" style="color:var(--fats);" id="dayFats">0</div>
-                    <div class="total-sub" id="dayFatsPct" style="color:var(--text-muted);">0%</div>
+                    <div class="total-remaining" id="remainingFats"></div>
                     <div class="progress-bar-container"><div class="progress-bar-fill" id="fatsBar" style="background:var(--fats); width:0%;"></div></div>
-                    <div class="total-sub" id="remainingFats"></div>
                 </div>
                 <div class="total-item">
                     <div class="total-label">Calories</div>
                     <div class="total-value" style="color:var(--calories);" id="dayCalories">0</div>
-                    <div class="total-sub" style="color:var(--text-muted);">Total</div>
+                    <div class="total-remaining" id="remainingCalories"></div>
                     <div class="progress-bar-container"><div class="progress-bar-fill" id="caloriesBar" style="background:var(--calories); width:0%;"></div></div>
-                    <div class="total-sub" id="remainingCalories"></div>
                 </div>
             </div>
             <div class="fiber-display">Fiber: <strong id="dayFiber">0</strong>g</div>
@@ -3164,11 +3168,6 @@
             document.getElementById('dayCalories').textContent = totalCalories.toFixed(0);
             document.getElementById('dayFiber').textContent = totalFiber.toFixed(1);
             
-            // Update percentages
-            document.getElementById('dayProteinPct').textContent = proteinPct + '%';
-            document.getElementById('dayCarbsPct').textContent = carbsPct + '%';
-            document.getElementById('dayFatsPct').textContent = fatsPct + '%';
-            
             // Update remaining amounts if goals are set
             if (dailyGoals) {
                 const remainingProtein = dailyGoals.protein - totalProtein;
@@ -3176,21 +3175,21 @@
                 
                 document.getElementById('remainingProtein').innerHTML = 
                     remainingProtein >= 0 
-                    ? `<span style="color: var(--accent-green);">${remainingProtein.toFixed(0)}g left</span>` 
-                    : `<span style="color: var(--accent-red);">${Math.abs(remainingProtein).toFixed(0)}g over</span>`;
+                    ? `<span class="remaining-good">${remainingProtein.toFixed(0)}g left</span>` 
+                    : `<span class="remaining-over">${Math.abs(remainingProtein).toFixed(0)}g over</span>`;
                 
                 document.getElementById('remainingCalories').innerHTML = 
                     remainingCalories >= 0 
-                    ? `<span style="color: var(--accent-green);">${remainingCalories.toFixed(0)} left</span>` 
-                    : `<span style="color: var(--accent-red);">${Math.abs(remainingCalories).toFixed(0)} over</span>`;
+                    ? `<span class="remaining-good">${remainingCalories.toFixed(0)} left</span>` 
+                    : `<span class="remaining-over">${Math.abs(remainingCalories).toFixed(0)} over</span>`;
                 
                 // Optional carbs goal
                 if (dailyGoals.carbs !== null && dailyGoals.carbs !== undefined) {
                     const remainingCarbs = dailyGoals.carbs - totalCarbs;
                     document.getElementById('remainingCarbs').innerHTML = 
                         remainingCarbs >= 0 
-                        ? `<span style="color: var(--accent-green);">${remainingCarbs.toFixed(0)}g left</span>` 
-                        : `<span style="color: var(--accent-red);">${Math.abs(remainingCarbs).toFixed(0)}g over</span>`;
+                        ? `<span class="remaining-good">${remainingCarbs.toFixed(0)}g left</span>` 
+                        : `<span class="remaining-over">${Math.abs(remainingCarbs).toFixed(0)}g over</span>`;
                 } else {
                     document.getElementById('remainingCarbs').innerHTML = '';
                 }
@@ -3200,8 +3199,8 @@
                     const remainingFats = dailyGoals.fats - totalFats;
                     document.getElementById('remainingFats').innerHTML = 
                         remainingFats >= 0 
-                        ? `<span style="color: var(--accent-green);">${remainingFats.toFixed(0)}g left</span>` 
-                        : `<span style="color: var(--accent-red);">${Math.abs(remainingFats).toFixed(0)}g over</span>`;
+                        ? `<span class="remaining-good">${remainingFats.toFixed(0)}g left</span>` 
+                        : `<span class="remaining-over">${Math.abs(remainingFats).toFixed(0)}g over</span>`;
                 } else {
                     document.getElementById('remainingFats').innerHTML = '';
                 }
