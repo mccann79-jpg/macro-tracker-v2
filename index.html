@@ -546,6 +546,7 @@
         .goal-chip-calories { }
         .goal-chip-carbs { }
         .goal-chip-fats { }
+        .goal-chip-fiber { }
 
         /* ===== CHART TOGGLES ===== */
         .chart-toggles {
@@ -722,6 +723,16 @@
         @media (display-mode: standalone) {
             .app-header { padding-top: 8px; }
         }
+        
+        /* Hide number input spinners */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
     </style>
 </head>
 <body>
@@ -775,27 +786,27 @@
                     </div>
                     <small>Nutrition facts per this serving size</small>
                 </div>
+                <div class="form-group">
+                    <label for="calories">Calories <span style="color:var(--text-muted)">(auto if blank)</span></label>
+                    <input type="number" id="calories" step="1" min="0" placeholder="(P×4)+(C×4)+(F×9)">
+                </div>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                     <div class="form-group">
-                        <label for="protein">Protein (g)</label>
-                        <input type="number" id="protein" step="0.1" required min="0">
+                        <label for="fats">Fat (g)</label>
+                        <input type="number" id="fats" step="0.1" required min="0">
                     </div>
                     <div class="form-group">
                         <label for="carbs">Carbs (g)</label>
                         <input type="number" id="carbs" step="0.1" required min="0">
                     </div>
                     <div class="form-group">
-                        <label for="fats">Fats (g)</label>
-                        <input type="number" id="fats" step="0.1" required min="0">
+                        <label for="protein">Protein (g)</label>
+                        <input type="number" id="protein" step="0.1" required min="0">
                     </div>
                     <div class="form-group">
                         <label for="fiber">Fiber (g) <span style="color:var(--text-muted)">(opt)</span></label>
                         <input type="number" id="fiber" step="0.1" min="0" value="0">
                     </div>
-                </div>
-                <div class="form-group">
-                    <label for="calories">Calories <span style="color:var(--text-muted)">(auto if blank)</span></label>
-                    <input type="number" id="calories" step="1" min="0" placeholder="(P×4)+(C×4)+(F×9)">
                 </div>
                 <button type="submit" class="btn" id="submitFoodBtn">Add to Database</button>
                 <button type="button" class="btn btn-ghost" id="cancelEditBtn" style="display:none; margin-top:8px; width:100%;" onclick="cancelEdit()">Cancel Edit</button>
@@ -955,6 +966,7 @@
                     <div class="goal-chip goal-chip-protein">Protein: <span id="displayGoalProtein">0</span>g</div>
                     <div class="goal-chip goal-chip-carbs" id="displayGoalCarbsContainer" style="display:none;">Carbs: <span id="displayGoalCarbs">0</span>g</div>
                     <div class="goal-chip goal-chip-fats" id="displayGoalFatsContainer" style="display:none;">Fats: <span id="displayGoalFats">0</span>g</div>
+                    <div class="goal-chip goal-chip-fiber" id="displayGoalFiberContainer" style="display:none;">Fiber: <span id="displayGoalFiber">0</span>g</div>
                     <div class="goal-chip goal-chip-calories">Cal: <span id="displayGoalCalories">0</span></div>
                     <button class="btn-ghost btn-sm" onclick="toggleGoalsEdit()" style="margin-left: 8px;">
                         <span id="goalsEditBtnText">Edit</span>
@@ -978,6 +990,10 @@
                     <div class="form-group" style="margin-bottom:0;">
                         <label for="goalFats">Fats (g) <span style="color:var(--text-muted)">opt</span></label>
                         <input type="number" id="goalFats" min="0" step="1" placeholder="—">
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label for="goalFiber">Fiber (g) <span style="color:var(--text-muted)">opt</span></label>
+                        <input type="number" id="goalFiber" min="0" step="1" placeholder="—">
                     </div>
                 </div>
                 <div style="display:flex; gap:8px;">
@@ -1012,24 +1028,70 @@
                 <input type="hidden" id="selectedItemName" value="">
                 <input type="hidden" id="selectedItemType" value="">
             </div>
+            
+            <!-- Input Mode Toggle -->
             <div class="form-group">
-                <label>Amount</label>
-                <div class="form-row">
-                    <input type="number" id="itemAmountForDay" min="0.1" step="0.1" value="1">
-                    <select id="itemUnitForDay">
-                        <option value="serving">servings</option>
-                        <option value="g">g</option>
-                        <option value="oz">oz</option>
-                        <option value="lb">lb</option>
-                        <option value="cup">cup</option>
-                        <option value="tbsp">tbsp</option>
-                        <option value="tsp">tsp</option>
-                        <option value="ml">ml</option>
-                        <option value="fl_oz">fl oz</option>
-                        <option value="piece">piece</option>
-                    </select>
+                <label style="margin-bottom:8px; display:block;">Input Mode</label>
+                <div style="display:flex; gap:8px; margin-bottom:12px;">
+                    <button type="button" class="btn btn-sm" id="modeAmountBtn" onclick="setInputMode('amount')" style="flex:1; background:var(--accent); color:white;">By Amount</button>
+                    <button type="button" class="btn btn-sm btn-ghost" id="modeTargetBtn" onclick="setInputMode('target')" style="flex:1;">By Target Macro</button>
                 </div>
             </div>
+            
+            <!-- Amount Mode (default) -->
+            <div id="amountModeInputs">
+                <div class="form-group">
+                    <label>Amount</label>
+                    <div class="form-row">
+                        <input type="number" id="itemAmountForDay" min="0.1" step="0.1" value="1" oninput="updateMacroPreview()">
+                        <select id="itemUnitForDay" onchange="updateMacroPreview()">
+                            <option value="serving">servings</option>
+                            <option value="g">g</option>
+                            <option value="oz">oz</option>
+                            <option value="lb">lb</option>
+                            <option value="cup">cup</option>
+                            <option value="tbsp">tbsp</option>
+                            <option value="tsp">tsp</option>
+                            <option value="ml">ml</option>
+                            <option value="fl_oz">fl oz</option>
+                            <option value="piece">piece</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Target Macro Mode -->
+            <div id="targetModeInputs" style="display:none;">
+                <div class="form-group">
+                    <label>I want this much:</label>
+                    <div class="form-row">
+                        <input type="number" id="targetMacroValue" min="0.1" step="0.1" placeholder="30" oninput="calculateFromTargetMacro()">
+                        <select id="targetMacroType" onchange="calculateFromTargetMacro()">
+                            <option value="calories">Calories</option>
+                            <option value="fats">g Fat</option>
+                            <option value="carbs">g Carbs</option>
+                            <option value="protein">g Protein</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="calculatedAmountDisplay" style="display:none; padding:12px; background:var(--bg-elevated); border-radius:8px; margin-bottom:12px;">
+                    <div style="font-size:12px; color:var(--text-muted); text-transform:uppercase; margin-bottom:4px;">You'll need:</div>
+                    <div style="font-size:18px; font-weight:700; color:var(--accent);" id="calculatedAmountText">—</div>
+                </div>
+            </div>
+            
+            <!-- Macro Preview -->
+            <div id="macroPreview" style="display:none; padding:12px; background:var(--bg-elevated); border-radius:8px; margin-bottom:12px;">
+                <div style="font-size:12px; color:var(--text-muted); text-transform:uppercase; margin-bottom:6px;">This will add:</div>
+                <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                    <span style="color:var(--calories); font-weight:600;"><span id="previewCalories">0</span> cal</span>
+                    <span style="color:var(--fats); font-weight:600;"><span id="previewFats">0</span>g F</span>
+                    <span style="color:var(--carbs); font-weight:600;"><span id="previewCarbs">0</span>g C</span>
+                    <span style="color:var(--protein); font-weight:600;"><span id="previewProtein">0</span>g P</span>
+                    <span style="color:var(--accent-purple); font-weight:600;"><span id="previewFiber">0</span>g Fiber</span>
+                </div>
+            </div>
+            
             <button class="btn" id="addItemToDay">Add to Day</button>
         </div>
 
@@ -1078,12 +1140,17 @@
                     <canvas id="fatsChart" width="400" height="200"></canvas>
                     <div id="fatsStats" style="margin-top:8px;"></div>
                 </div>
+                <div class="chart-cell">
+                    <h3 style="color:var(--accent-purple); font-size:0.9rem; margin-bottom:8px;">Fiber</h3>
+                    <canvas id="fiberChart" width="400" height="200"></canvas>
+                    <div id="fiberStats" style="margin-top:8px;"></div>
+                </div>
             </div>
             <div class="table-wrap">
                 <table>
                     <thead>
                         <tr>
-                            <th style="text-align:left;">Date</th><th>Cal</th><th>Goal</th><th>Protein</th><th>Goal</th><th>Carbs</th><th>Fats</th><th></th>
+                            <th style="text-align:left;">Date</th><th>Cal</th><th>Goal</th><th>Protein</th><th>Goal</th><th>Carbs</th><th>Fats</th><th>Fiber</th><th></th>
                         </tr>
                     </thead>
                     <tbody id="historyTableBody"></tbody>
@@ -2804,6 +2871,220 @@
             document.getElementById('selectedItemName').value = name;
             document.getElementById('selectedItemType').value = type;
             document.getElementById('dayUnifiedDropdown').style.display = 'none';
+            
+            // Update preview and set default unit
+            const item = type === 'meal' ? savedMeals.find(m => m.name === name) : foodDatabase.find(f => f.name === name);
+            if (item) {
+                // Set default unit to match serving unit
+                const unitSelect = document.getElementById('itemUnitForDay');
+                if (type === 'food' && item.servingUnit) {
+                    // Try to match the serving unit
+                    const option = Array.from(unitSelect.options).find(o => o.value === item.servingUnit);
+                    if (option) unitSelect.value = item.servingUnit;
+                    else unitSelect.value = 'serving';
+                } else {
+                    unitSelect.value = 'serving';
+                }
+                document.getElementById('itemAmountForDay').value = type === 'food' ? item.servingAmount : 1;
+            }
+            updateMacroPreview();
+        }
+        
+        // Input mode toggle
+        let currentInputMode = 'amount';
+        
+        function setInputMode(mode) {
+            currentInputMode = mode;
+            const amountInputs = document.getElementById('amountModeInputs');
+            const targetInputs = document.getElementById('targetModeInputs');
+            const amountBtn = document.getElementById('modeAmountBtn');
+            const targetBtn = document.getElementById('modeTargetBtn');
+            
+            if (mode === 'amount') {
+                amountInputs.style.display = 'block';
+                targetInputs.style.display = 'none';
+                amountBtn.style.background = 'var(--accent)';
+                amountBtn.style.color = 'white';
+                amountBtn.classList.remove('btn-ghost');
+                targetBtn.style.background = '';
+                targetBtn.style.color = '';
+                targetBtn.classList.add('btn-ghost');
+                updateMacroPreview();
+            } else {
+                amountInputs.style.display = 'none';
+                targetInputs.style.display = 'block';
+                targetBtn.style.background = 'var(--accent)';
+                targetBtn.style.color = 'white';
+                targetBtn.classList.remove('btn-ghost');
+                amountBtn.style.background = '';
+                amountBtn.style.color = '';
+                amountBtn.classList.add('btn-ghost');
+                calculateFromTargetMacro();
+            }
+        }
+        
+        function updateMacroPreview() {
+            const name = document.getElementById('selectedItemName').value;
+            const type = document.getElementById('selectedItemType').value;
+            const preview = document.getElementById('macroPreview');
+            
+            if (!name || !type) {
+                preview.style.display = 'none';
+                return;
+            }
+            
+            const amount = parseFloat(document.getElementById('itemAmountForDay').value) || 0;
+            const unit = document.getElementById('itemUnitForDay').value;
+            
+            let macros = calculateMacrosForItem(type, name, amount, unit);
+            if (!macros) {
+                preview.style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('previewProtein').textContent = macros.protein.toFixed(1);
+            document.getElementById('previewCarbs').textContent = macros.carbs.toFixed(1);
+            document.getElementById('previewFats').textContent = macros.fats.toFixed(1);
+            document.getElementById('previewFiber').textContent = macros.fiber.toFixed(1);
+            document.getElementById('previewCalories').textContent = Math.round(macros.calories);
+            preview.style.display = 'block';
+        }
+        
+        function calculateMacrosForItem(type, name, amount, unit) {
+            if (type === 'meal') {
+                const meal = savedMeals.find(m => m.name === name);
+                if (!meal) return null;
+                
+                // For meals, amount is servings
+                const multiplier = unit === 'serving' ? amount : amount; // Meals always use servings
+                return {
+                    protein: meal.perServing.protein * multiplier,
+                    carbs: meal.perServing.carbs * multiplier,
+                    fats: meal.perServing.fats * multiplier,
+                    fiber: (meal.perServing.fiber || 0) * multiplier,
+                    calories: (meal.perServing.calories || (meal.perServing.protein * 4 + meal.perServing.carbs * 4 + meal.perServing.fats * 9)) * multiplier
+                };
+            } else {
+                const food = foodDatabase.find(f => f.name === name);
+                if (!food) return null;
+                
+                // Convert amount to serving multiplier
+                let multiplier = 1;
+                const servingAmount = food.servingAmount || 100;
+                const servingUnit = food.servingUnit || 'g';
+                
+                if (unit === 'serving') {
+                    multiplier = amount;
+                } else if (unit === servingUnit) {
+                    multiplier = amount / servingAmount;
+                } else {
+                    // Convert units
+                    const amountInGrams = convertToGrams(amount, unit);
+                    const servingInGrams = convertToGrams(servingAmount, servingUnit);
+                    if (servingInGrams > 0) {
+                        multiplier = amountInGrams / servingInGrams;
+                    }
+                }
+                
+                return {
+                    protein: food.protein * multiplier,
+                    carbs: food.carbs * multiplier,
+                    fats: food.fats * multiplier,
+                    fiber: (food.fiber || 0) * multiplier,
+                    calories: (food.calories || (food.protein * 4 + food.carbs * 4 + food.fats * 9)) * multiplier
+                };
+            }
+        }
+        
+        function convertToGrams(amount, unit) {
+            const conversions = {
+                'g': 1,
+                'oz': 28.3495,
+                'lb': 453.592,
+                'kg': 1000,
+                'ml': 1, // Approximate for water-like density
+                'cup': 240,
+                'tbsp': 15,
+                'tsp': 5,
+                'fl_oz': 30,
+                'piece': 100, // Approximate
+                'serving': 100 // Approximate
+            };
+            return amount * (conversions[unit] || 1);
+        }
+        
+        function calculateFromTargetMacro() {
+            const name = document.getElementById('selectedItemName').value;
+            const type = document.getElementById('selectedItemType').value;
+            const targetValue = parseFloat(document.getElementById('targetMacroValue').value) || 0;
+            const targetType = document.getElementById('targetMacroType').value;
+            const calculatedDisplay = document.getElementById('calculatedAmountDisplay');
+            const preview = document.getElementById('macroPreview');
+            
+            if (!name || !type || targetValue <= 0) {
+                calculatedDisplay.style.display = 'none';
+                preview.style.display = 'none';
+                return;
+            }
+            
+            // Get the base macros per serving
+            let baseMacros;
+            let servingAmount, servingUnit;
+            
+            if (type === 'meal') {
+                const meal = savedMeals.find(m => m.name === name);
+                if (!meal) return;
+                baseMacros = {
+                    protein: meal.perServing.protein,
+                    carbs: meal.perServing.carbs,
+                    fats: meal.perServing.fats,
+                    calories: meal.perServing.calories || (meal.perServing.protein * 4 + meal.perServing.carbs * 4 + meal.perServing.fats * 9)
+                };
+                servingAmount = 1;
+                servingUnit = 'serving';
+            } else {
+                const food = foodDatabase.find(f => f.name === name);
+                if (!food) return;
+                baseMacros = {
+                    protein: food.protein,
+                    carbs: food.carbs,
+                    fats: food.fats,
+                    calories: food.calories || (food.protein * 4 + food.carbs * 4 + food.fats * 9)
+                };
+                servingAmount = food.servingAmount || 100;
+                servingUnit = food.servingUnit || 'g';
+            }
+            
+            // Calculate how many servings needed to hit target
+            const macroPerServing = baseMacros[targetType];
+            if (!macroPerServing || macroPerServing <= 0) {
+                document.getElementById('calculatedAmountText').textContent = `This food has no ${targetType}`;
+                calculatedDisplay.style.display = 'block';
+                preview.style.display = 'none';
+                return;
+            }
+            
+            const servingsNeeded = targetValue / macroPerServing;
+            const amountNeeded = servingsNeeded * servingAmount;
+            
+            // Update the amount field
+            document.getElementById('itemAmountForDay').value = amountNeeded.toFixed(1);
+            document.getElementById('itemUnitForDay').value = servingUnit;
+            
+            // Display calculated amount
+            document.getElementById('calculatedAmountText').textContent = `${amountNeeded.toFixed(1)} ${UNIT_LABELS[servingUnit] || servingUnit}`;
+            calculatedDisplay.style.display = 'block';
+            
+            // Update preview
+            const macros = calculateMacrosForItem(type, name, amountNeeded, servingUnit);
+            if (macros) {
+                document.getElementById('previewProtein').textContent = macros.protein.toFixed(1);
+                document.getElementById('previewCarbs').textContent = macros.carbs.toFixed(1);
+                document.getElementById('previewFats').textContent = macros.fats.toFixed(1);
+                document.getElementById('previewFiber').textContent = macros.fiber.toFixed(1);
+                document.getElementById('previewCalories').textContent = Math.round(macros.calories);
+                preview.style.display = 'block';
+            }
         }
 
         function addItemToDay() {
@@ -3703,19 +3984,22 @@
             const calories = parseFloat(document.getElementById('goalCalories').value);
             const carbs = document.getElementById('goalCarbs').value ? parseFloat(document.getElementById('goalCarbs').value) : null;
             const fats = document.getElementById('goalFats').value ? parseFloat(document.getElementById('goalFats').value) : null;
+            const fiber = document.getElementById('goalFiber').value ? parseFloat(document.getElementById('goalFiber').value) : null;
             
             if (!protein || !calories) {
                 alert('Please set at least Protein and Calorie goals');
                 return;
             }
             
-            dailyGoals = { protein, calories, carbs, fats };
+            dailyGoals = { protein, calories, carbs, fats, fiber };
             localStorage.setItem('dailyGoals', JSON.stringify(dailyGoals));
+            syncToFirebase();
             
             // Update display
             displayGoals();
             toggleGoalsEdit();
             calculateDayTotals();
+            drawHistoryChart();
         }
 
         function clearGoals() {
@@ -3731,6 +4015,7 @@
                 document.getElementById('goalCalories').value = '';
                 document.getElementById('goalCarbs').value = '';
                 document.getElementById('goalFats').value = '';
+                document.getElementById('goalFiber').value = '';
                 
                 calculateDayTotals();
             }
@@ -3760,7 +4045,21 @@
                 document.getElementById('displayGoalFatsContainer').style.display = 'none';
             }
             
+            if (dailyGoals.fiber !== null && dailyGoals.fiber !== undefined) {
+                document.getElementById('displayGoalFiber').textContent = dailyGoals.fiber;
+                document.getElementById('displayGoalFiberContainer').style.display = 'block';
+            } else {
+                document.getElementById('displayGoalFiberContainer').style.display = 'none';
+            }
+            
             document.getElementById('goalsDisplay').style.display = 'block';
+            
+            // Populate form fields for editing
+            document.getElementById('goalProtein').value = dailyGoals.protein || '';
+            document.getElementById('goalCalories').value = dailyGoals.calories || '';
+            document.getElementById('goalCarbs').value = dailyGoals.carbs || '';
+            document.getElementById('goalFats').value = dailyGoals.fats || '';
+            document.getElementById('goalFiber').value = dailyGoals.fiber || '';
         }
 
         // Close Out Day function
@@ -3862,6 +4161,7 @@
                 const rowBg = 'transparent';
                 const calDiff = entry.calorieGoal ? entry.calories - entry.calorieGoal : null;
                 const proteinDiff = entry.proteinGoal ? entry.protein - entry.proteinGoal : null;
+                const fiberVal = entry.fiber || 0;
 
                 return `
                     <tr style="background: ${rowBg}; border-bottom: 1px solid var(--border);" id="historyRow${index}">
@@ -3878,14 +4178,15 @@
                         </td>
                         <td style="padding: 8px; text-align: center; color: var(--carbs); font-weight: 600;">${entry.carbs}g</td>
                         <td style="padding: 8px; text-align: center; color: var(--accent-green); font-weight: 600;">${entry.fats}g</td>
+                        <td style="padding: 8px; text-align: center; color: var(--accent-purple); font-weight: 600;">${fiberVal}g</td>
                         <td style="padding: 8px; text-align: center;">
                             <button onclick="toggleEditHistoryEntry(${index})" class="btn-success btn-sm" style="margin-right:2px;">Edit</button>
                             <button onclick="deleteHistoryEntry('${entry.date}')" style="background: #dc2626; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.75rem;">Del</button>
                         </td>
                     </tr>
                     <tr id="editRow${index}" style="display: none; background: #fffbeb; border-bottom: 2px solid #f59e0b;">
-                        <td colspan="8" style="padding: 16px;">
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 12px;">
+                        <td colspan="9" style="padding: 16px;">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 12px; margin-bottom: 12px;">
                                 <div>
                                     <label style="display: block; font-size: 0.85rem; margin-bottom: 4px; font-weight: 600;">Date</label>
                                     <input type="date" id="editDate${index}" value="${entry.date}" style="width: 100%; padding: 6px; border: 2px solid #f59e0b; border-radius: 4px;">
@@ -3905,6 +4206,10 @@
                                 <div>
                                     <label style="display: block; font-size: 0.85rem; margin-bottom: 4px; font-weight: 600;">Fats (g)</label>
                                     <input type="number" id="editFats${index}" value="${entry.fats}" step="0.1" style="width: 100%; padding: 6px; border: 2px solid #f59e0b; border-radius: 4px;">
+                                </div>
+                                <div>
+                                    <label style="display: block; font-size: 0.85rem; margin-bottom: 4px; font-weight: 600;">Fiber (g)</label>
+                                    <input type="number" id="editFiber${index}" value="${fiberVal}" step="0.1" style="width: 100%; padding: 6px; border: 2px solid #f59e0b; border-radius: 4px;">
                                 </div>
                             </div>
                             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
@@ -3938,11 +4243,12 @@
         }
 
         function drawHistoryChart() {
-            // Draw all four charts
+            // Draw all five charts
             drawProteinChart();
             drawCalorieChart();
             drawCarbsChart();
             drawFatsChart();
+            drawFiberChart();
         }
 
         function drawProteinChart() {
@@ -4726,6 +5032,203 @@
             `;
         }
 
+        function drawFiberChart() {
+            const setup = setupCanvas('fiberChart', 200);
+            if (!setup) return;
+            const { canvas, ctx, width: W, height: H } = setup;
+
+            // Get toggle states
+            const showDailyBars = document.getElementById('showDailyBars')?.checked ?? true;
+            const show7DayAvg = document.getElementById('show7DayAvg')?.checked ?? true;
+            const showGoalLine = document.getElementById('showGoalLine')?.checked ?? true;
+
+            if (dayHistory.length === 0) {
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = '14px DM Sans, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('No fiber data yet', W / 2, H / 2);
+                document.getElementById('fiberStats').innerHTML = '<div style="text-align: center; color: #999;">Start tracking to see stats</div>';
+                return;
+            }
+
+            // Get last 30 days and calculate 7-day rolling averages
+            const recentData = dayHistory.slice(0, 30).reverse();
+            recentData.forEach((entry, index) => {
+                const fiberVal = entry.fiber || 0;
+                const last7 = recentData.slice(Math.max(0, index - 6), index + 1);
+                const avg = last7.reduce((sum, e) => sum + (e.fiber || 0), 0) / last7.length;
+                entry.fiber7DayAvg = avg;
+            });
+
+            // Chart dimensions
+            const padding = 50;
+            const chartWidth = W - padding * 2;
+            const chartHeight = H - padding * 2;
+
+            // Find max value
+            const hasGoal = dailyGoals && dailyGoals.fiber;
+            const maxFiber = Math.max(
+                ...recentData.map(d => Math.max(d.fiber || 0, hasGoal ? dailyGoals.fiber : 0, d.fiber7DayAvg || 0)),
+                1
+            ) * 1.1;
+
+            // Draw grid lines
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 4; i++) {
+                const y = padding + (chartHeight / 4) * i;
+                const value = maxFiber - (maxFiber / 4) * i;
+                
+                ctx.beginPath();
+                ctx.moveTo(padding, y);
+                ctx.lineTo(W - padding, y);
+                ctx.stroke();
+                
+                // Y-axis labels
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = '11px Arial';
+                ctx.textAlign = 'right';
+                ctx.fillText(Math.round(value) + 'g', padding - 5, y + 4);
+            }
+
+            // Draw axes
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, H - padding);
+            ctx.lineTo(W - padding, H - padding);
+            ctx.stroke();
+
+            const getX = (index) => padding + (chartWidth / (recentData.length - 1)) * index;
+            const getY = (fiber) => H - padding - (fiber / maxFiber) * chartHeight;
+
+            // Draw goal line if exists (and enabled)
+            if (showGoalLine && hasGoal) {
+                ctx.strokeStyle = '#c4b5fd';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]);
+                ctx.beginPath();
+                const goalY = getY(dailyGoals.fiber);
+                ctx.moveTo(padding, goalY);
+                ctx.lineTo(W - padding, goalY);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                ctx.fillStyle = '#7c3aed';
+                ctx.font = 'bold 11px Arial';
+                ctx.textAlign = 'left';
+                ctx.fillText(`Goal: ${dailyGoals.fiber}g`, padding + 5, goalY - 5);
+            }
+
+            // Draw 7-day average line (if enabled)
+            if (show7DayAvg) {
+                ctx.strokeStyle = '#7c3aed';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                recentData.forEach((entry, i) => {
+                    const x = getX(i);
+                    const y = getY(entry.fiber7DayAvg);
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                });
+                ctx.stroke();
+            }
+
+            // Draw daily fiber bars (if enabled)
+            if (showDailyBars) {
+                const barWidth = Math.min(chartWidth / recentData.length * 0.6, 15);
+                recentData.forEach((entry, i) => {
+                    const x = getX(i);
+                    const fiberVal = entry.fiber || 0;
+                    const y = getY(fiberVal);
+                    const height = H - padding - y;
+                    
+                    const withinGoal = hasGoal && Math.abs(fiberVal - dailyGoals.fiber) <= dailyGoals.fiber * 0.1;
+                    ctx.fillStyle = withinGoal ? '#7c3aed' : '#c4b5fd';
+                    ctx.fillRect(x - barWidth / 2, y, barWidth, height);
+                });
+            }
+
+            // Draw points on 7-day line (if enabled)
+            if (show7DayAvg) {
+                recentData.forEach((entry, i) => {
+                    const x = getX(i);
+                    const y = getY(entry.fiber7DayAvg);
+                    ctx.fillStyle = '#7c3aed';
+                    ctx.beginPath();
+                    ctx.arc(x, y, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+            }
+
+            // Date labels
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '10px Arial';
+            ctx.textAlign = 'center';
+            const labelInterval = Math.max(1, Math.floor(recentData.length / 8));
+            recentData.forEach((entry, i) => {
+                if (i % labelInterval === 0 || i === recentData.length - 1) {
+                    const dateLabel = new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                    ctx.fillText(dateLabel, getX(i), H - padding + 20);
+                }
+            });
+
+            // Legend
+            ctx.font = '11px Arial';
+            ctx.textAlign = 'left';
+            
+            if (showDailyBars) {
+                ctx.fillStyle = '#7c3aed';
+                ctx.fillRect(padding, 10, 15, 10);
+                ctx.fillStyle = '#1e293b';
+                ctx.fillText('Daily', padding + 20, 18);
+            }
+            
+            if (show7DayAvg) {
+                ctx.strokeStyle = '#7c3aed';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(padding + 80, 15);
+                ctx.lineTo(padding + 95, 15);
+                ctx.stroke();
+                ctx.fillStyle = '#1e293b';
+                ctx.fillText('7-Day Avg', padding + 100, 18);
+            }
+
+            // Calculate and display stats
+            const last7Days = recentData.slice(-7);
+            const avg7Day = last7Days.reduce((sum, e) => sum + (e.fiber || 0), 0) / last7Days.length;
+            const goal = hasGoal ? dailyGoals.fiber : 0;
+            const daysWithinGoal = hasGoal ? recentData.filter(e => Math.abs((e.fiber || 0) - goal) <= goal * 0.1).length : 0;
+            const avgDiff = avg7Day - goal;
+
+            document.getElementById('fiberStats').innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;">
+                    <div>
+                        <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">7-Day Average</div>
+                        <div style="font-size: 1.2rem; font-weight: 700; color: var(--accent-purple);">${avg7Day.toFixed(1)}g</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Goal</div>
+                        <div style="font-size: 1.2rem; font-weight: 700; color: var(--accent-purple);">${hasGoal ? goal + 'g' : 'Not set'}</div>
+                    </div>
+                    ${hasGoal ? `
+                    <div>
+                        <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Difference</div>
+                        <div style="font-size: 1.3rem; font-weight: 700; color: ${avgDiff >= -goal * 0.1 && avgDiff <= goal * 0.1 ? '#10b981' : '#dc2626'};">
+                            ${avgDiff >= 0 ? '+' : ''}${avgDiff.toFixed(1)}g
+                        </div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Within ±10%</div>
+                        <div style="font-size: 1.2rem; font-weight: 700; color: var(--accent-purple);">${daysWithinGoal}/${recentData.length} days</div>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
         // Edit history entry - inline editing
         function toggleEditHistoryEntry(index) {
             const editRow = document.getElementById(`editRow${index}`);
@@ -4755,6 +5258,7 @@
             const newProtein = parseFloat(document.getElementById(`editProtein${index}`).value);
             const newCarbs = parseFloat(document.getElementById(`editCarbs${index}`).value);
             const newFats = parseFloat(document.getElementById(`editFats${index}`).value);
+            const newFiber = parseFloat(document.getElementById(`editFiber${index}`).value) || 0;
 
             // Check if new date already exists (and it's not the same entry)
             if (newDate !== oldDate && dayHistory.some((e, i) => e.date === newDate && i !== index)) {
@@ -4768,6 +5272,7 @@
             entry.protein = newProtein;
             entry.carbs = newCarbs;
             entry.fats = newFats;
+            entry.fiber = newFiber;
 
             // Resort by date
             dayHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
