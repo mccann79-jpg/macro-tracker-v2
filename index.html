@@ -1100,24 +1100,24 @@
                     <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); font-weight:600; margin-bottom:14px;">This will add</div>
                     <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:8px; text-align:center;">
                         <div>
-                            <div style="font-size:0.65rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-muted); font-weight:600; margin-bottom:4px;">Protein</div>
-                            <div style="font-size:1.2rem; font-weight:700; color:var(--protein);"><span id="previewProtein">0</span><span style="font-size:0.75rem; font-weight:500;">g</span></div>
+                            <div style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-primary); font-weight:600; margin-bottom:4px;">Protein</div>
+                            <div style="font-size:0.95rem; font-weight:700; color:var(--text-primary);"><span id="previewProtein">0</span>g</div>
                         </div>
                         <div>
-                            <div style="font-size:0.65rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-muted); font-weight:600; margin-bottom:4px;">Carbs</div>
-                            <div style="font-size:1.2rem; font-weight:700; color:var(--carbs);"><span id="previewCarbs">0</span><span style="font-size:0.75rem; font-weight:500;">g</span></div>
+                            <div style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-primary); font-weight:600; margin-bottom:4px;">Carbs</div>
+                            <div style="font-size:0.95rem; font-weight:700; color:var(--text-primary);"><span id="previewCarbs">0</span>g</div>
                         </div>
                         <div>
-                            <div style="font-size:0.65rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-muted); font-weight:600; margin-bottom:4px;">Fats</div>
-                            <div style="font-size:1.2rem; font-weight:700; color:var(--fats);"><span id="previewFats">0</span><span style="font-size:0.75rem; font-weight:500;">g</span></div>
+                            <div style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-primary); font-weight:600; margin-bottom:4px;">Fats</div>
+                            <div style="font-size:0.95rem; font-weight:700; color:var(--text-primary);"><span id="previewFats">0</span>g</div>
                         </div>
                         <div>
-                            <div style="font-size:0.65rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-muted); font-weight:600; margin-bottom:4px;">Calories</div>
-                            <div style="font-size:1.2rem; font-weight:700; color:var(--calories);"><span id="previewCalories">0</span></div>
+                            <div style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-primary); font-weight:600; margin-bottom:4px;">Calories</div>
+                            <div style="font-size:0.95rem; font-weight:700; color:var(--text-primary);"><span id="previewCalories">0</span></div>
                         </div>
                         <div>
-                            <div style="font-size:0.65rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-muted); font-weight:600; margin-bottom:4px;">Fiber</div>
-                            <div style="font-size:1.2rem; font-weight:700; color:var(--accent-purple);"><span id="previewFiber">0</span><span style="font-size:0.75rem; font-weight:500;">g</span></div>
+                            <div style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-primary); font-weight:600; margin-bottom:4px;">Fiber</div>
+                            <div style="font-size:0.95rem; font-weight:700; color:var(--text-primary);"><span id="previewFiber">0</span>g</div>
                         </div>
                     </div>
                 </div>
@@ -3100,10 +3100,10 @@
                 return;
             }
             
-            document.getElementById('previewProtein').textContent = macros.protein.toFixed(1);
-            document.getElementById('previewCarbs').textContent = macros.carbs.toFixed(1);
-            document.getElementById('previewFats').textContent = macros.fats.toFixed(1);
-            document.getElementById('previewFiber').textContent = macros.fiber.toFixed(1);
+            document.getElementById('previewProtein').textContent = Math.round(macros.protein);
+            document.getElementById('previewCarbs').textContent = Math.round(macros.carbs);
+            document.getElementById('previewFats').textContent = Math.round(macros.fats);
+            document.getElementById('previewFiber').textContent = Math.round(macros.fiber);
             document.getElementById('previewCalories').textContent = Math.round(macros.calories);
             
             // Update projected vs goals
@@ -3122,29 +3122,26 @@
                 fiber: currentTotals.fiber + macros.fiber
             };
             
-            function makeCell(value, unit, goal, color, isHigherBetter) {
-                const diff = goal ? value - goal : null;
+            function makeCell(label, value, unit, goal, isHigherBetter) {
+                const rounded = Math.round(value);
+                const diff = goal ? Math.round(value - goal) : null;
                 const isOver = diff !== null && (isHigherBetter ? diff < 0 : diff > 0);
-                const valueColor = diff !== null && isOver ? 'var(--accent-red)' : color;
                 const diffColor = diff !== null ? (isOver ? 'var(--accent-red)' : 'var(--accent-green)') : '';
-                const pct = goal ? Math.min((value / goal) * 100, 100) : 0;
                 
                 return `<div>
-                    <div style="font-size:1.1rem; font-weight:700; color:${valueColor};">${unit === '' ? Math.round(value) : value.toFixed(1)}<span style="font-size:0.7rem; font-weight:500;">${unit}</span></div>
-                    ${goal ? `<div style="font-size:0.7rem; color:var(--text-muted);">/ ${goal}${unit}</div>` : ''}
-                    ${diff !== null ? `<div style="font-size:0.7rem; font-weight:600; color:${diffColor};">${diff > 0 ? '+' : ''}${unit === '' ? Math.round(diff) : diff.toFixed(1)}</div>` : ''}
-                    ${goal ? `<div style="width:100%; height:3px; background:var(--bg-elevated); border-radius:2px; margin-top:4px; overflow:hidden;">
-                        <div style="height:100%; width:${pct}%; background:${valueColor}; border-radius:2px; transition:width 0.3s;"></div>
-                    </div>` : ''}
+                    <div style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-primary); font-weight:600; margin-bottom:4px;">${label}</div>
+                    <div style="font-size:0.95rem; font-weight:700; color:var(--text-primary);">${rounded}${unit}</div>
+                    ${goal ? `<div style="font-size:0.8rem; color:var(--text-primary);">/ ${goal}${unit}</div>` : ''}
+                    ${diff !== null ? `<div style="font-size:0.8rem; font-weight:600; color:${diffColor};">${diff > 0 ? '+' : ''}${diff}${unit}</div>` : ''}
                 </div>`;
             }
             
             let html = '';
-            html += makeCell(projected.protein, 'g', dailyGoals?.protein, 'var(--protein)', true);
-            html += makeCell(projected.carbs, 'g', dailyGoals?.carbs, 'var(--carbs)', false);
-            html += makeCell(projected.fats, 'g', dailyGoals?.fats, 'var(--fats)', false);
-            html += makeCell(projected.calories, '', dailyGoals?.calories, 'var(--calories)', false);
-            html += makeCell(projected.fiber, 'g', dailyGoals?.fiber, 'var(--accent-purple)', true);
+            html += makeCell('Protein', projected.protein, 'g', dailyGoals?.protein, true);
+            html += makeCell('Carbs', projected.carbs, 'g', dailyGoals?.carbs, false);
+            html += makeCell('Fats', projected.fats, 'g', dailyGoals?.fats, false);
+            html += makeCell('Calories', projected.calories, '', dailyGoals?.calories, false);
+            html += makeCell('Fiber', projected.fiber, 'g', dailyGoals?.fiber, true);
             
             document.getElementById('projectedVsGoals').innerHTML = html;
         }
@@ -3316,10 +3313,10 @@
             // Update preview
             const macros = calculateMacrosForItem(type, name, amountNeeded, servingUnit);
             if (macros) {
-                document.getElementById('previewProtein').textContent = macros.protein.toFixed(1);
-                document.getElementById('previewCarbs').textContent = macros.carbs.toFixed(1);
-                document.getElementById('previewFats').textContent = macros.fats.toFixed(1);
-                document.getElementById('previewFiber').textContent = macros.fiber.toFixed(1);
+                document.getElementById('previewProtein').textContent = Math.round(macros.protein);
+                document.getElementById('previewCarbs').textContent = Math.round(macros.carbs);
+                document.getElementById('previewFats').textContent = Math.round(macros.fats);
+                document.getElementById('previewFiber').textContent = Math.round(macros.fiber);
                 document.getElementById('previewCalories').textContent = Math.round(macros.calories);
                 
                 // Update projected vs goals
@@ -3559,26 +3556,95 @@
             syncToFirebase(); // Sync to cloud
         }
 
-        function updateDayMealAmount(id, amount) {
-            const meal = todaysMeals.find(m => m.id === id);
-            if (meal) {
-                meal.amount = parseFloat(amount);
-                localStorage.setItem('todaysMeals', JSON.stringify(todaysMeals));
-                renderDayMeals();
-                calculateDayTotals();
-                syncToFirebase(); // Sync to cloud
+        function updateDayItemAmount(index, newAmount) {
+            const item = todaysMeals[index];
+            if (!item) return;
+            const amount = parseFloat(newAmount) || 0;
+            
+            if (item.type === 'food') {
+                // Recalculate food macros from database
+                const foodName = item.foodName || item.name;
+                const food = foodDatabase.find(f => f.name === foodName);
+                if (food) {
+                    const unit = item.unit || food.servingUnit || 'g';
+                    const baseUnits = convertToBaseUnit(amount, unit);
+                    const foodBaseUnits = convertToBaseUnit(food.servingAmount, food.servingUnit);
+                    const multiplier = foodBaseUnits > 0 ? baseUnits / foodBaseUnits : 0;
+                    
+                    item.amount = amount;
+                    item.macros = {
+                        protein: food.protein * multiplier,
+                        carbs: food.carbs * multiplier,
+                        fats: food.fats * multiplier,
+                        fiber: (food.fiber || 0) * multiplier,
+                        calories: (food.calories !== undefined ? food.calories : (food.protein * 4 + food.carbs * 4 + food.fats * 9)) * multiplier
+                    };
+                } else {
+                    // Food not in database anymore — scale from current macros
+                    const oldAmount = item.amount || 1;
+                    const scale = oldAmount > 0 ? amount / oldAmount : 1;
+                    item.amount = amount;
+                    item.macros = {
+                        protein: item.macros.protein * scale,
+                        carbs: item.macros.carbs * scale,
+                        fats: item.macros.fats * scale,
+                        fiber: (item.macros.fiber || 0) * scale,
+                        calories: (item.macros.calories || 0) * scale
+                    };
+                }
+            } else {
+                // Meals: amount is servings, macros are per-serving
+                item.amount = amount;
             }
+            
+            localStorage.setItem('todaysMeals', JSON.stringify(todaysMeals));
+            renderDayMeals();
+            calculateDayTotals();
+            syncToFirebase();
         }
 
-        function updateDayMealUnit(id, unit) {
-            const meal = todaysMeals.find(m => m.id === id);
-            if (meal) {
-                meal.unit = unit;
-                localStorage.setItem('todaysMeals', JSON.stringify(todaysMeals));
-                renderDayMeals();
-                calculateDayTotals();
-                syncToFirebase(); // Sync to cloud
+        function updateDayItemUnit(index, newUnit) {
+            const item = todaysMeals[index];
+            if (!item) return;
+            
+            if (item.type === 'food') {
+                const foodName = item.foodName || item.name;
+                const food = foodDatabase.find(f => f.name === foodName);
+                if (food) {
+                    const amount = item.amount || 1;
+                    const baseUnits = convertToBaseUnit(amount, newUnit);
+                    const foodBaseUnits = convertToBaseUnit(food.servingAmount, food.servingUnit);
+                    const multiplier = foodBaseUnits > 0 ? baseUnits / foodBaseUnits : 0;
+                    
+                    item.unit = newUnit;
+                    item.macros = {
+                        protein: food.protein * multiplier,
+                        carbs: food.carbs * multiplier,
+                        fats: food.fats * multiplier,
+                        fiber: (food.fiber || 0) * multiplier,
+                        calories: (food.calories !== undefined ? food.calories : (food.protein * 4 + food.carbs * 4 + food.fats * 9)) * multiplier
+                    };
+                } else {
+                    item.unit = newUnit;
+                }
+            } else {
+                item.unit = newUnit;
             }
+            
+            localStorage.setItem('todaysMeals', JSON.stringify(todaysMeals));
+            renderDayMeals();
+            calculateDayTotals();
+            syncToFirebase();
+        }
+
+        // Legacy compatibility wrappers
+        function updateDayMealAmount(id, amount) {
+            const index = todaysMeals.findIndex(m => m.id === id);
+            if (index >= 0) updateDayItemAmount(index, amount);
+        }
+        function updateDayMealUnit(id, unit) {
+            const index = todaysMeals.findIndex(m => m.id === id);
+            if (index >= 0) updateDayItemUnit(index, unit);
         }
 
         function renderDayMeals() {
@@ -3611,7 +3677,7 @@
             todaysMeals.forEach((item, index) => {
                 // Handle legacy data and determine type
                 const itemType = item.type || 'meal';
-                const displayName = item.mealName || item.foodName || 'Unknown Item';
+                const displayName = item.mealName || item.foodName || item.name || 'Unknown Item';
                 const amount = item.amount !== undefined ? item.amount : (item.servings || 1);
                 const unit = item.unit || 'serving';
                 
@@ -3647,10 +3713,9 @@
                             <div style="display: flex; gap: 4px; justify-content: center; align-items: center;">
                                 <input type="number" value="${amount}" step="0.1" min="0.1" 
                                     style="width: 60px; padding: 4px; border: 1px solid var(--border); border-radius: 4px; text-align: center;"
-                                    onchange="updateDayMealAmount(${item.id}, this.value)" ${itemType === 'food' ? 'disabled' : ''}>
-                                <select onchange="updateDayMealUnit(${item.id}, this.value)" 
-                                    style="padding: 4px; border: 1px solid var(--border); border-radius: 4px; font-size: 0.85rem;"
-                                    ${itemType === 'food' ? 'disabled' : ''}>
+                                    onchange="updateDayItemAmount(${index}, this.value)">
+                                <select onchange="updateDayItemUnit(${index}, this.value)" 
+                                    style="padding: 4px; border: 1px solid var(--border); border-radius: 4px; font-size: 0.85rem;">
                                     <option value="serving" ${unit === 'serving' ? 'selected' : ''}>srv</option>
                                     <option value="g" ${unit === 'g' ? 'selected' : ''}>g</option>
                                     <option value="oz" ${unit === 'oz' ? 'selected' : ''}>oz</option>
@@ -4339,6 +4404,7 @@
             let totalProtein = 0;
             let totalCarbs = 0;
             let totalFats = 0;
+            let totalFiber = 0;
             let totalCalories = 0;
 
             todaysMeals.forEach(item => {
@@ -4349,11 +4415,13 @@
                     totalProtein += item.macros.protein;
                     totalCarbs += item.macros.carbs;
                     totalFats += item.macros.fats;
+                    totalFiber += item.macros.fiber || 0;
                     totalCalories += item.macros.calories || (item.macros.protein * 4 + item.macros.carbs * 4 + item.macros.fats * 9);
                 } else {
                     totalProtein += item.macros.protein * amount;
                     totalCarbs += item.macros.carbs * amount;
                     totalFats += item.macros.fats * amount;
+                    totalFiber += (item.macros.fiber || 0) * amount;
                     totalCalories += (item.macros.calories || (item.macros.protein * 4 + item.macros.carbs * 4 + item.macros.fats * 9)) * amount;
                 }
             });
@@ -4372,6 +4440,7 @@
                 protein: parseFloat(totalProtein.toFixed(1)),
                 carbs: parseFloat(totalCarbs.toFixed(1)),
                 fats: parseFloat(totalFats.toFixed(1)),
+                fiber: parseFloat(totalFiber.toFixed(1)),
                 calorieGoal: dailyGoals ? dailyGoals.calories : null,
                 proteinGoal: dailyGoals ? dailyGoals.protein : null
             };
