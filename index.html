@@ -1067,32 +1067,63 @@
                     <div class="form-row">
                         <input type="number" id="targetMacroValue" min="0.1" step="0.1" placeholder="30" oninput="calculateFromTargetMacro()">
                         <select id="targetMacroType" onchange="calculateFromTargetMacro()">
+                            <option value="protein">g Protein</option>
                             <option value="calories">Calories</option>
                             <option value="fats">g Fat</option>
                             <option value="carbs">g Carbs</option>
-                            <option value="protein">g Protein</option>
                         </select>
                     </div>
                 </div>
-                <div id="calculatedAmountDisplay" style="display:none; padding:12px; background:var(--bg-elevated); border-radius:8px; margin-bottom:12px;">
-                    <div style="font-size:12px; color:var(--text-muted); text-transform:uppercase; margin-bottom:4px;">You'll need:</div>
-                    <div style="font-size:18px; font-weight:700; color:var(--accent);" id="calculatedAmountText">—</div>
+                <div id="calculatedAmountDisplay" style="display:none; padding:16px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:12px; box-shadow:var(--shadow-sm);">
+                    <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); font-weight:600; margin-bottom:8px;">You'll need:</div>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <div style="font-size:1.5rem; font-weight:700; color:var(--accent);" id="calculatedAmountText">—</div>
+                        <select id="targetUnitSelect" onchange="convertTargetUnit()" style="padding:6px 10px; border:1px solid var(--border); border-radius:6px; font-size:0.85rem; background:var(--bg-input); color:var(--text-primary); font-family:inherit;">
+                            <option value="serving">servings</option>
+                            <option value="g">g</option>
+                            <option value="oz">oz</option>
+                            <option value="lb">lb</option>
+                            <option value="cup">cup</option>
+                            <option value="tbsp">tbsp</option>
+                            <option value="tsp">tsp</option>
+                            <option value="ml">ml</option>
+                            <option value="fl_oz">fl oz</option>
+                            <option value="piece">piece</option>
+                        </select>
+                    </div>
                 </div>
             </div>
             
             <!-- Macro Preview -->
-            <div id="macroPreview" style="display:none; padding:12px; background:var(--bg-elevated); border-radius:8px; margin-bottom:12px;">
-                <div style="font-size:12px; color:var(--text-muted); text-transform:uppercase; margin-bottom:6px;">This will add:</div>
-                <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
-                    <span style="color:var(--calories); font-weight:600;"><span id="previewCalories">0</span> cal</span>
-                    <span style="color:var(--fats); font-weight:600;"><span id="previewFats">0</span>g F</span>
-                    <span style="color:var(--carbs); font-weight:600;"><span id="previewCarbs">0</span>g C</span>
-                    <span style="color:var(--protein); font-weight:600;"><span id="previewProtein">0</span>g P</span>
-                    <span style="color:var(--accent-purple); font-weight:600;"><span id="previewFiber">0</span>g Fiber</span>
+            <div id="macroPreview" style="display:none; margin-bottom:12px;">
+                <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow-sm);">
+                    <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); font-weight:600; margin-bottom:14px;">This will add</div>
+                    <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:8px; text-align:center;">
+                        <div>
+                            <div style="font-size:0.65rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-muted); font-weight:600; margin-bottom:4px;">Protein</div>
+                            <div style="font-size:1.2rem; font-weight:700; color:var(--protein);"><span id="previewProtein">0</span><span style="font-size:0.75rem; font-weight:500;">g</span></div>
+                        </div>
+                        <div>
+                            <div style="font-size:0.65rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-muted); font-weight:600; margin-bottom:4px;">Carbs</div>
+                            <div style="font-size:1.2rem; font-weight:700; color:var(--carbs);"><span id="previewCarbs">0</span><span style="font-size:0.75rem; font-weight:500;">g</span></div>
+                        </div>
+                        <div>
+                            <div style="font-size:0.65rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-muted); font-weight:600; margin-bottom:4px;">Fats</div>
+                            <div style="font-size:1.2rem; font-weight:700; color:var(--fats);"><span id="previewFats">0</span><span style="font-size:0.75rem; font-weight:500;">g</span></div>
+                        </div>
+                        <div>
+                            <div style="font-size:0.65rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-muted); font-weight:600; margin-bottom:4px;">Calories</div>
+                            <div style="font-size:1.2rem; font-weight:700; color:var(--calories);"><span id="previewCalories">0</span></div>
+                        </div>
+                        <div>
+                            <div style="font-size:0.65rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-muted); font-weight:600; margin-bottom:4px;">Fiber</div>
+                            <div style="font-size:1.2rem; font-weight:700; color:var(--accent-purple);"><span id="previewFiber">0</span><span style="font-size:0.75rem; font-weight:500;">g</span></div>
+                        </div>
+                    </div>
                 </div>
-                <div style="border-top:1px solid var(--border); padding-top:10px;">
-                    <div style="font-size:12px; color:var(--text-muted); text-transform:uppercase; margin-bottom:6px;">After adding vs goals:</div>
-                    <div id="projectedVsGoals" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(90px, 1fr)); gap:6px; font-size:13px;">
+                <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-top:8px; box-shadow:var(--shadow-sm);">
+                    <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); font-weight:600; margin-bottom:14px;">After adding vs goals</div>
+                    <div id="projectedVsGoals" style="display:grid; grid-template-columns:repeat(5, 1fr); gap:8px; text-align:center;">
                         <!-- Populated by JS -->
                     </div>
                 </div>
@@ -3091,52 +3122,29 @@
                 fiber: currentTotals.fiber + macros.fiber
             };
             
+            function makeCell(value, unit, goal, color, isHigherBetter) {
+                const diff = goal ? value - goal : null;
+                const isOver = diff !== null && (isHigherBetter ? diff < 0 : diff > 0);
+                const valueColor = diff !== null && isOver ? 'var(--accent-red)' : color;
+                const diffColor = diff !== null ? (isOver ? 'var(--accent-red)' : 'var(--accent-green)') : '';
+                const pct = goal ? Math.min((value / goal) * 100, 100) : 0;
+                
+                return `<div>
+                    <div style="font-size:1.1rem; font-weight:700; color:${valueColor};">${unit === '' ? Math.round(value) : value.toFixed(1)}<span style="font-size:0.7rem; font-weight:500;">${unit}</span></div>
+                    ${goal ? `<div style="font-size:0.7rem; color:var(--text-muted);">/ ${goal}${unit}</div>` : ''}
+                    ${diff !== null ? `<div style="font-size:0.7rem; font-weight:600; color:${diffColor};">${diff > 0 ? '+' : ''}${unit === '' ? Math.round(diff) : diff.toFixed(1)}</div>` : ''}
+                    ${goal ? `<div style="width:100%; height:3px; background:var(--bg-elevated); border-radius:2px; margin-top:4px; overflow:hidden;">
+                        <div style="height:100%; width:${pct}%; background:${valueColor}; border-radius:2px; transition:width 0.3s;"></div>
+                    </div>` : ''}
+                </div>`;
+            }
+            
             let html = '';
-            
-            // Calories
-            const calGoal = dailyGoals?.calories;
-            const calDiff = calGoal ? projected.calories - calGoal : null;
-            html += `<div style="text-align:center;">
-                <div style="font-weight:700; color:${calDiff !== null && calDiff > 0 ? 'var(--accent-red)' : 'var(--calories)'};">${Math.round(projected.calories)}</div>
-                <div style="font-size:11px; color:var(--text-muted);">${calGoal ? '/ ' + calGoal : 'cal'}</div>
-                ${calDiff !== null ? `<div style="font-size:10px; color:${calDiff > 0 ? 'var(--accent-red)' : 'var(--accent-green)'};">${calDiff > 0 ? '+' : ''}${Math.round(calDiff)}</div>` : ''}
-            </div>`;
-            
-            // Fats
-            const fatGoal = dailyGoals?.fats;
-            const fatDiff = fatGoal ? projected.fats - fatGoal : null;
-            html += `<div style="text-align:center;">
-                <div style="font-weight:700; color:${fatDiff !== null && fatDiff > 0 ? 'var(--accent-red)' : 'var(--fats)'};">${projected.fats.toFixed(1)}g</div>
-                <div style="font-size:11px; color:var(--text-muted);">${fatGoal ? '/ ' + fatGoal + 'g F' : 'fat'}</div>
-                ${fatDiff !== null ? `<div style="font-size:10px; color:${fatDiff > 0 ? 'var(--accent-red)' : 'var(--accent-green)'};">${fatDiff > 0 ? '+' : ''}${fatDiff.toFixed(1)}</div>` : ''}
-            </div>`;
-            
-            // Carbs
-            const carbGoal = dailyGoals?.carbs;
-            const carbDiff = carbGoal ? projected.carbs - carbGoal : null;
-            html += `<div style="text-align:center;">
-                <div style="font-weight:700; color:${carbDiff !== null && carbDiff > 0 ? 'var(--accent-red)' : 'var(--carbs)'};">${projected.carbs.toFixed(1)}g</div>
-                <div style="font-size:11px; color:var(--text-muted);">${carbGoal ? '/ ' + carbGoal + 'g C' : 'carbs'}</div>
-                ${carbDiff !== null ? `<div style="font-size:10px; color:${carbDiff > 0 ? 'var(--accent-red)' : 'var(--accent-green)'};">${carbDiff > 0 ? '+' : ''}${carbDiff.toFixed(1)}</div>` : ''}
-            </div>`;
-            
-            // Protein
-            const proteinGoal = dailyGoals?.protein;
-            const proteinDiff = proteinGoal ? projected.protein - proteinGoal : null;
-            html += `<div style="text-align:center;">
-                <div style="font-weight:700; color:${proteinDiff !== null && proteinDiff < 0 ? 'var(--accent-red)' : 'var(--protein)'};">${projected.protein.toFixed(1)}g</div>
-                <div style="font-size:11px; color:var(--text-muted);">${proteinGoal ? '/ ' + proteinGoal + 'g P' : 'protein'}</div>
-                ${proteinDiff !== null ? `<div style="font-size:10px; color:${proteinDiff >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'};">${proteinDiff > 0 ? '+' : ''}${proteinDiff.toFixed(1)}</div>` : ''}
-            </div>`;
-            
-            // Fiber
-            const fiberGoal = dailyGoals?.fiber;
-            const fiberDiff = fiberGoal ? projected.fiber - fiberGoal : null;
-            html += `<div style="text-align:center;">
-                <div style="font-weight:700; color:${fiberDiff !== null && fiberDiff < 0 ? 'var(--accent-red)' : 'var(--accent-purple)'};">${projected.fiber.toFixed(1)}g</div>
-                <div style="font-size:11px; color:var(--text-muted);">${fiberGoal ? '/ ' + fiberGoal + 'g' : 'fiber'}</div>
-                ${fiberDiff !== null ? `<div style="font-size:10px; color:${fiberDiff >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'};">${fiberDiff > 0 ? '+' : ''}${fiberDiff.toFixed(1)}</div>` : ''}
-            </div>`;
+            html += makeCell(projected.protein, 'g', dailyGoals?.protein, 'var(--protein)', true);
+            html += makeCell(projected.carbs, 'g', dailyGoals?.carbs, 'var(--carbs)', false);
+            html += makeCell(projected.fats, 'g', dailyGoals?.fats, 'var(--fats)', false);
+            html += makeCell(projected.calories, '', dailyGoals?.calories, 'var(--calories)', false);
+            html += makeCell(projected.fiber, 'g', dailyGoals?.fiber, 'var(--accent-purple)', true);
             
             document.getElementById('projectedVsGoals').innerHTML = html;
         }
@@ -3233,6 +3241,9 @@
             return amount * (conversions[unit] || 1);
         }
         
+        // State for target macro unit conversion
+        let targetCalcState = { servingsNeeded: 0, servingAmount: 0, servingUnit: 'g', type: '', name: '' };
+        
         function calculateFromTargetMacro() {
             const name = document.getElementById('selectedItemName').value;
             const type = document.getElementById('selectedItemType').value;
@@ -3278,7 +3289,7 @@
             // Calculate how many servings needed to hit target
             const macroPerServing = baseMacros[targetType];
             if (!macroPerServing || macroPerServing <= 0) {
-                document.getElementById('calculatedAmountText').textContent = `This food has no ${targetType}`;
+                document.getElementById('calculatedAmountText').textContent = `No ${targetType}`;
                 calculatedDisplay.style.display = 'block';
                 preview.style.display = 'none';
                 return;
@@ -3286,6 +3297,13 @@
             
             const servingsNeeded = targetValue / macroPerServing;
             const amountNeeded = servingsNeeded * servingAmount;
+            
+            // Store state for unit conversion
+            targetCalcState = { servingsNeeded, servingAmount, servingUnit, type, name };
+            
+            // Set the unit selector to the food's native unit
+            const unitSelect = document.getElementById('targetUnitSelect');
+            unitSelect.value = servingUnit;
             
             // Update the amount field
             document.getElementById('itemAmountForDay').value = amountNeeded.toFixed(1);
@@ -3309,6 +3327,28 @@
                 
                 preview.style.display = 'block';
             }
+        }
+        
+        function convertTargetUnit() {
+            if (!targetCalcState.servingsNeeded) return;
+            
+            const newUnit = document.getElementById('targetUnitSelect').value;
+            const { servingsNeeded, servingAmount, servingUnit } = targetCalcState;
+            
+            // Amount in the food's native unit
+            const nativeAmount = servingsNeeded * servingAmount;
+            
+            // Convert from native unit to new unit
+            const nativeInGrams = convertToGrams(nativeAmount, servingUnit);
+            const newUnitInGrams = convertToGrams(1, newUnit);
+            const convertedAmount = newUnitInGrams > 0 ? nativeInGrams / newUnitInGrams : nativeAmount;
+            
+            // Update display
+            document.getElementById('calculatedAmountText').textContent = `${convertedAmount.toFixed(1)} ${UNIT_LABELS[newUnit] || newUnit}`;
+            
+            // Also update the amount fields so "Add to Day" uses the converted unit
+            document.getElementById('itemAmountForDay').value = convertedAmount.toFixed(1);
+            document.getElementById('itemUnitForDay').value = newUnit;
         }
 
         function addItemToDay() {
