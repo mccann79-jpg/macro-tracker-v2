@@ -2206,8 +2206,8 @@
             currentMealBuilder.push({
                 ...food,
                 builderId: Date.now(),
-                amount: food.servingAmount,
-                unit: food.servingUnit
+                amount: food.lastUsedAmount || food.servingAmount,
+                unit: food.lastUsedUnit || food.servingUnit
             });
 
             renderMealBuilder();
@@ -3056,20 +3056,25 @@
             document.getElementById('selectedItemType').value = type;
             document.getElementById('dayUnifiedDropdown').style.display = 'none';
             
-            // Update preview and set default unit
+            // Update preview and set default unit (prefer last used unit/amount)
             const item = type === 'meal' ? savedMeals.find(m => m.name === name) : foodDatabase.find(f => f.name === name);
             if (item) {
-                // Set default unit to match serving unit
                 const unitSelect = document.getElementById('itemUnitForDay');
-                if (type === 'food' && item.servingUnit) {
-                    // Try to match the serving unit
-                    const option = Array.from(unitSelect.options).find(o => o.value === item.servingUnit);
-                    if (option) unitSelect.value = item.servingUnit;
-                    else unitSelect.value = 'serving';
+                if (type === 'food') {
+                    const preferredUnit = item.lastUsedUnit || item.servingUnit;
+                    const preferredAmount = item.lastUsedAmount || item.servingAmount;
+                    if (preferredUnit) {
+                        const option = Array.from(unitSelect.options).find(o => o.value === preferredUnit);
+                        if (option) unitSelect.value = preferredUnit;
+                        else unitSelect.value = 'serving';
+                    } else {
+                        unitSelect.value = 'serving';
+                    }
+                    document.getElementById('itemAmountForDay').value = preferredAmount;
                 } else {
                     unitSelect.value = 'serving';
+                    document.getElementById('itemAmountForDay').value = 1;
                 }
-                document.getElementById('itemAmountForDay').value = type === 'food' ? item.servingAmount : 1;
             }
             updateMacroPreview();
         }
@@ -3431,6 +3436,11 @@
                         calories: (food.calories !== undefined ? food.calories : (food.protein * 4 + food.carbs * 4 + food.fats * 9)) * multiplier
                     }
                 });
+
+                // Remember last used unit and amount for this food
+                food.lastUsedUnit = unit;
+                food.lastUsedAmount = amount;
+                localStorage.setItem('foodDatabase', JSON.stringify(foodDatabase));
             }
 
             localStorage.setItem('todaysMeals', JSON.stringify(todaysMeals));
