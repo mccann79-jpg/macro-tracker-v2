@@ -6055,7 +6055,8 @@
         }
 
         function drawWeightChart() {
-            const setup = setupCanvas('weightChart', 350);
+            const chartH = window.innerWidth < 500 ? 260 : 350;
+            const setup = setupCanvas('weightChart', chartH);
             if (!setup) return;
             const { canvas, ctx, width: W, height: H } = setup;
             const showMorning = document.getElementById('showMorningWeight').checked;
@@ -6096,9 +6097,10 @@
                 entry.calories = historyEntry ? historyEntry.calories : null;
             });
 
-            // Chart dimensions
-            const padding = 60;
-            const rightPadding = showCalories ? 80 : 60;
+            // Chart dimensions — responsive padding for mobile
+            const isMobile = W < 500;
+            const padding = isMobile ? 40 : 60;
+            const rightPadding = showCalories ? (isMobile ? 55 : 80) : (isMobile ? 35 : 60);
             const chartWidth = W - padding - rightPadding;
             const chartHeight = H - padding * 2;
 
@@ -6137,37 +6139,40 @@
             }
 
             // Draw grid lines and Y-axis labels (weight)
+            const labelFont = isMobile ? '10px Arial' : '12px Arial';
             if (allWeights.length > 0) {
                 ctx.strokeStyle = '#e2e8f0';
                 ctx.lineWidth = 1;
                 ctx.fillStyle = '#94a3b8';
-                ctx.font = '12px Arial';
+                ctx.font = labelFont;
                 ctx.textAlign = 'right';
-                
-                for (let i = 0; i <= 5; i++) {
-                    const y = padding + (chartHeight / 5) * i;
-                    const weight = maxWeight - (weightRange / 5) * i;
-                    
+
+                const gridLines = isMobile ? 4 : 5;
+                for (let i = 0; i <= gridLines; i++) {
+                    const y = padding + (chartHeight / gridLines) * i;
+                    const weight = maxWeight - (weightRange / gridLines) * i;
+
                     ctx.beginPath();
                     ctx.moveTo(padding, y);
                     ctx.lineTo(W - rightPadding, y);
                     ctx.stroke();
-                    
-                    ctx.fillText(weight.toFixed(1) + ' lb', padding - 10, y + 4);
+
+                    ctx.fillText(weight.toFixed(isMobile ? 0 : 1) + ' lb', padding - 6, y + 4);
                 }
             }
 
             // Draw right Y-axis labels (calories)
             if (showCalories) {
                 ctx.fillStyle = '#d97706';
-                ctx.font = '12px Arial';
+                ctx.font = labelFont;
                 ctx.textAlign = 'left';
-                
-                for (let i = 0; i <= 5; i++) {
-                    const y = padding + (chartHeight / 5) * i;
-                    const calories = maxCalories - (calorieRange / 5) * i;
-                    
-                    ctx.fillText(Math.round(calories) + ' cal', W - rightPadding + 10, y + 4);
+
+                const gridLines = isMobile ? 4 : 5;
+                for (let i = 0; i <= gridLines; i++) {
+                    const y = padding + (chartHeight / gridLines) * i;
+                    const calories = maxCalories - (calorieRange / gridLines) * i;
+
+                    ctx.fillText(Math.round(calories), W - rightPadding + 6, y + 4);
                 }
             }
 
@@ -6212,10 +6217,14 @@
                 });
             }
 
+            // Responsive sizes for lines and points
+            const lineWidth = isMobile ? 2 : 3;
+            const pointRadius = isMobile ? 3 : 5;
+
             // Draw morning weight line (skip blanks)
             if (showMorning) {
                 ctx.strokeStyle = '#3b82f6';
-                ctx.lineWidth = 3;
+                ctx.lineWidth = lineWidth;
                 ctx.beginPath();
                 let firstPoint = true;
 
@@ -6223,7 +6232,7 @@
                     if (entry.morningWeight) {
                         const x = getX(i);
                         const y = getY(entry.morningWeight);
-                        
+
                         if (firstPoint) {
                             ctx.moveTo(x, y);
                             firstPoint = false;
@@ -6241,7 +6250,7 @@
                         const x = getX(i);
                         const y = getY(entry.morningWeight);
                         ctx.beginPath();
-                        ctx.arc(x, y, 5, 0, Math.PI * 2);
+                        ctx.arc(x, y, pointRadius, 0, Math.PI * 2);
                         ctx.fill();
                     }
                 });
@@ -6250,7 +6259,7 @@
             // Draw 7-day average line (skip blanks)
             if (showWeekly) {
                 ctx.strokeStyle = '#10b981';
-                ctx.lineWidth = 3;
+                ctx.lineWidth = lineWidth;
                 ctx.beginPath();
                 let firstPoint = true;
 
@@ -6258,7 +6267,7 @@
                     if (entry.calculated7DayAvg) {
                         const x = getX(i);
                         const y = getY(entry.calculated7DayAvg);
-                        
+
                         if (firstPoint) {
                             ctx.moveTo(x, y);
                             firstPoint = false;
@@ -6276,7 +6285,7 @@
                         const x = getX(i);
                         const y = getY(entry.calculated7DayAvg);
                         ctx.beginPath();
-                        ctx.arc(x, y, 5, 0, Math.PI * 2);
+                        ctx.arc(x, y, pointRadius, 0, Math.PI * 2);
                         ctx.fill();
                     }
                 });
@@ -6327,16 +6336,17 @@
 
                 // Draw goal label
                 ctx.fillStyle = '#8b5cf6';
-                ctx.font = 'bold 12px Arial';
+                ctx.font = isMobile ? 'bold 10px Arial' : 'bold 12px Arial';
                 ctx.textAlign = 'left';
-                ctx.fillText(`Goal: ${goalWeight} lb`, padding + 10, goalY - 5);
+                ctx.fillText(`Goal: ${goalWeight} lb`, padding + 6, goalY - 5);
             }
 
             // Draw date labels (show every nth date to avoid crowding)
             ctx.fillStyle = '#94a3b8';
-            ctx.font = '11px Arial';
+            ctx.font = isMobile ? '9px Arial' : '11px Arial';
             ctx.textAlign = 'center';
-            const labelInterval = Math.max(1, Math.floor(sortedData.length / 10));
+            const maxLabels = isMobile ? 5 : 10;
+            const labelInterval = Math.max(1, Math.floor(sortedData.length / maxLabels));
             
             sortedData.forEach((entry, i) => {
                 if (i % labelInterval === 0 || i === sortedData.length - 1) {
