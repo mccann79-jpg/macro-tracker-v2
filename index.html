@@ -250,7 +250,7 @@
         .card-header h2 { margin-bottom: 0; }
 
         /* ===== FORMS ===== */
-        .form-group { margin-bottom: 14px; position: relative; z-index: 1; }
+        .form-group { margin-bottom: 14px; }
         .form-row {
             display: grid;
             grid-template-columns: 2fr 1fr;
@@ -552,10 +552,7 @@
         /* ===== DROPDOWN ===== */
         .autocomplete-dropdown {
             display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
+            position: fixed;
             background: rgba(255, 255, 255, 0.72);
             -webkit-backdrop-filter: blur(32px) saturate(1.3);
             backdrop-filter: blur(32px) saturate(1.3);
@@ -565,7 +562,7 @@
             max-height: 260px;
             overflow-y: auto;
             box-shadow: 0 12px 40px rgba(0, 0, 0, 0.10);
-            z-index: 1000;
+            z-index: 9500;
         }
         .dropdown-item {
             padding: 10px 12px;
@@ -2081,13 +2078,18 @@
                     const dropdown = document.getElementById('mealFoodDropdown');
                     if (dropdown) dropdown.style.display = 'none';
                 }
-                
+
                 // Close day meal dropdown
                 if (!e.target.closest('#searchItemForDay') && !e.target.closest('#dayUnifiedDropdown')) {
                     const dropdown = document.getElementById('dayUnifiedDropdown');
                     if (dropdown) dropdown.style.display = 'none';
                 }
             });
+
+            // Close all fixed dropdowns on scroll so they don't float detached
+            window.addEventListener('scroll', function() {
+                document.querySelectorAll('.autocomplete-dropdown').forEach(d => d.style.display = 'none');
+            }, { passive: true });
         });
 
         function showPage(pageName, tabEl) {
@@ -2119,6 +2121,20 @@
             if (pageName === 'prep') {
                 renderPrepPlans();
             }
+        }
+
+        // Position and show a fixed dropdown below its input
+        function showDropdown(dropdown) {
+            const input = dropdown.previousElementSibling?.tagName === 'INPUT'
+                ? dropdown.previousElementSibling
+                : dropdown.parentElement.querySelector('input[type="text"]');
+            if (input) {
+                const rect = input.getBoundingClientRect();
+                dropdown.style.left = rect.left + 'px';
+                dropdown.style.width = rect.width + 'px';
+                dropdown.style.top = rect.bottom + 'px';
+            }
+            showDropdown(dropdown);
         }
 
         // Convert any unit to grams/ml equivalent
@@ -2672,7 +2688,7 @@
             
             if (matchingFoods.length === 0) {
                 dropdown.innerHTML = '<div class="empty-state" style="padding:12px;">No foods found</div>';
-                dropdown.style.display = 'block';
+                showDropdown(dropdown);
                 return;
             }
             
@@ -2694,7 +2710,7 @@
                 `;
             }).join('');
             
-            dropdown.style.display = 'block';
+            showDropdown(dropdown);
         }
 
         function selectMealFood(foodName) {
@@ -2749,7 +2765,7 @@
             
             if (matchingMeals.length === 0) {
                 dropdown.innerHTML = '<div class="empty-state" style="padding:12px;">No meals found</div>';
-                dropdown.style.display = 'block';
+                showDropdown(dropdown);
                 return;
             }
             
@@ -2773,7 +2789,7 @@
                 `;
             }).join('');
             
-            dropdown.style.display = 'block';
+            showDropdown(dropdown);
         }
 
         function selectDayMeal(mealName) {
@@ -2828,7 +2844,7 @@
             
             if (matchingFoods.length === 0) {
                 dropdown.innerHTML = '<div class="empty-state" style="padding:12px;">No foods found</div>';
-                dropdown.style.display = 'block';
+                showDropdown(dropdown);
                 return;
             }
             
@@ -2850,7 +2866,7 @@
                 `;
             }).join('');
             
-            dropdown.style.display = 'block';
+            showDropdown(dropdown);
         }
 
         function selectDayFood(foodName) {
@@ -2884,7 +2900,7 @@
                 // Show all meals when empty
                 const allMeals = savedMeals.slice(0, 10); // Limit to 10 for performance
                 renderMealDropdown(allMeals);
-                dropdown.style.display = 'block';
+                showDropdown(dropdown);
                 return;
             }
             
@@ -2966,7 +2982,7 @@
                 // Show all foods when empty
                 const allFoods = foodDatabase.slice(0, 10); // Limit to 10 for performance
                 renderFoodDropdown(allFoods);
-                dropdown.style.display = 'block';
+                showDropdown(dropdown);
                 return;
             }
             
@@ -3176,7 +3192,7 @@
 
             if (results.length === 0) {
                 dropdown.innerHTML = '<div class="empty-state" style="padding:12px;">No results found</div>';
-                dropdown.style.display = 'block';
+                showDropdown(dropdown);
                 return;
             }
 
@@ -3186,7 +3202,7 @@
                     ${r.html}
                 </div>
             `).join('');
-            dropdown.style.display = 'block';
+            showDropdown(dropdown);
         }
 
         function selectUnifiedItem(type, name) {
@@ -6957,7 +6973,7 @@
             
             if (results.length === 0) {
                 dropdown.innerHTML = '<div class="empty-state" style="padding:12px;">No results</div>';
-                dropdown.style.display = 'block';
+                showDropdown(dropdown);
                 return;
             }
             
@@ -6966,7 +6982,7 @@
                     ${r.html}
                 </div>
             `).join('');
-            dropdown.style.display = 'block';
+            showDropdown(dropdown);
         }
         
         function addItemToPrepPlan(type, name) {
