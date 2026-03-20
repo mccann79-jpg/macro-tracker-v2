@@ -1058,6 +1058,9 @@
                     <input type="file" id="importMealsInput" accept=".csv" style="display:none;" onchange="importSavedMeals(event)">
                 </div>
             </div>
+            <div class="search-wrap" style="margin-bottom:12px;">
+                <input type="text" id="searchSavedMeals" class="search-input" placeholder="Search saved meals..." oninput="renderSavedMeals()" autocomplete="off">
+            </div>
             <div class="table-wrap">
                 <div id="savedMealsList"></div>
             </div>
@@ -1415,89 +1418,6 @@
         </div>
     </div>
 
-    <!-- ========== MEAL PREP PAGE ========== -->
-    <div id="prepPage" class="page">
-        <div class="card">
-            <div class="card-header">
-                <h2>Meal Prep Plans</h2>
-                <button class="btn btn-sm" onclick="createNewPrepPlan()">+ New Plan</button>
-            </div>
-            <div id="prepPlansList"></div>
-            <div id="emptyPrepMessage" class="empty-state">No meal prep plans yet. Create one to start planning your meals!</div>
-        </div>
-        
-        <!-- Active Plan Editor -->
-        <div id="prepPlanEditor" class="card" style="display:none;">
-            <div class="card-header">
-                <input type="text" id="prepPlanName" placeholder="Plan name (e.g., Week 1, Cutting Phase)" style="flex:1; font-size:1.1rem; font-weight:600; border:none; background:transparent; color:var(--text-primary);">
-                <button class="btn-success btn-sm" onclick="savePrepPlan()">Save</button>
-                <button class="btn-danger btn-sm" onclick="cancelPrepPlan()">Cancel</button>
-            </div>
-            
-            <!-- Add items to plan -->
-            <div style="margin-bottom:16px; padding-bottom:16px; border-bottom:1px solid var(--border);">
-                <div class="form-group" style="position:relative; margin-bottom:8px;">
-                    <input type="text" id="prepSearchItem" placeholder="Search foods & meals to add..."
-                        onfocus="filterPrepDropdown()"
-                        onkeyup="filterPrepDropdown()"
-                        autocomplete="off">
-                    <div id="prepDropdown" class="autocomplete-dropdown"></div>
-                </div>
-            </div>
-            
-            <!-- Plan Items Table -->
-            <div class="table-wrap">
-                <table id="prepItemsTable">
-                    <thead>
-                        <tr>
-                            <th style="text-align:left; width:40%;">Item</th>
-                            <th style="width:80px;">Amount</th>
-                            <th style="width:70px;">Cal</th>
-                            <th style="width:50px;">F</th>
-                            <th style="width:50px;">C</th>
-                            <th style="width:50px;">P</th>
-                            <th style="width:40px;"></th>
-                        </tr>
-                    </thead>
-                    <tbody id="prepItemsBody"></tbody>
-                    <tfoot>
-                        <tr style="font-weight:700; background:var(--bg-elevated);">
-                            <td>Total</td>
-                            <td></td>
-                            <td id="prepTotalCal">0</td>
-                            <td id="prepTotalFat">0</td>
-                            <td id="prepTotalCarbs">0</td>
-                            <td id="prepTotalProtein">0</td>
-                            <td></td>
-                        </tr>
-                        <tr id="prepGoalRow" style="font-size:0.85rem; color:var(--text-muted);">
-                            <td>Goal</td>
-                            <td></td>
-                            <td id="prepGoalCal">—</td>
-                            <td id="prepGoalFat">—</td>
-                            <td id="prepGoalCarbs">—</td>
-                            <td id="prepGoalProtein">—</td>
-                            <td></td>
-                        </tr>
-                        <tr id="prepDiffRow" style="font-size:0.85rem;">
-                            <td>Remaining</td>
-                            <td></td>
-                            <td id="prepDiffCal">—</td>
-                            <td id="prepDiffFat">—</td>
-                            <td id="prepDiffCarbs">—</td>
-                            <td id="prepDiffProtein">—</td>
-                            <td></td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-            
-            <div style="margin-top:16px; display:flex; gap:8px; flex-wrap:wrap;">
-                <button class="btn" onclick="addPrepPlanToDay()">📋 Add All to My Day</button>
-                <button class="btn btn-ghost" onclick="duplicatePrepPlan()">📄 Duplicate Plan</button>
-            </div>
-        </div>
-    </div>
 </div>
 
 <!-- Bottom Tab Navigation -->
@@ -1513,10 +1433,6 @@
     <button class="nav-tab" onclick="showPage('database', this)" id="tab-database">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
         Foods
-    </button>
-    <button class="nav-tab" onclick="showPage('prep', this)" id="tab-prep">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        Prep
     </button>
     <button class="nav-tab" onclick="showPage('weight', this)" id="tab-weight">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
@@ -2572,14 +2488,23 @@
 
         function renderSavedMeals() {
             const listDiv = document.getElementById('savedMealsList');
-            
+            const query = (document.getElementById('searchSavedMeals')?.value || '').toLowerCase().trim();
+
             if (savedMeals.length === 0) {
                 listDiv.innerHTML = '<div class="empty-state">No saved meals yet</div>';
                 return;
             }
 
-            // Sort alphabetically by name
-            const sortedMeals = [...savedMeals].sort((a, b) => a.name.localeCompare(b.name));
+            // Filter and sort alphabetically by name
+            let sortedMeals = [...savedMeals].sort((a, b) => a.name.localeCompare(b.name));
+            if (query) {
+                sortedMeals = sortedMeals.filter(m => m.name.toLowerCase().includes(query));
+            }
+
+            if (sortedMeals.length === 0) {
+                listDiv.innerHTML = '<div class="empty-state">No meals match your search</div>';
+                return;
+            }
 
             // Create table
             let tableHTML = `
