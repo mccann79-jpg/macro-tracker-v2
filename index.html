@@ -218,9 +218,7 @@
 
         /* ===== CARDS ===== */
         .card {
-            background: var(--bg-card);
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            backdrop-filter: blur(var(--glass-blur));
+            background: rgba(255, 255, 255, 0.82);
             border: 1px solid var(--border);
             border-top-color: var(--glass-border-top);
             border-bottom-color: var(--glass-border-bottom);
@@ -367,9 +365,7 @@
 
         /* ===== DAILY TOTALS HERO ===== */
         .totals-hero {
-            background: rgba(255, 255, 255, 0.50);
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            backdrop-filter: blur(var(--glass-blur));
+            background: rgba(255, 255, 255, 0.82);
             border: 1px solid var(--border);
             border-top-color: var(--glass-border-top);
             border-radius: var(--radius);
@@ -556,7 +552,7 @@
             top: 100%;
             left: 0;
             right: 0;
-            background: rgba(255, 255, 255, 0.92);
+            background: #ffffff;
             border: 1.5px solid var(--border-focus);
             border-top: none;
             border-radius: 0 0 var(--radius-sm) var(--radius-sm);
@@ -848,8 +844,6 @@
         
         /* Backdrop-filter fallback for older browsers */
         @supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
-            .card,
-            .totals-hero,
             .bottom-nav,
             .app-header,
             .autocomplete-dropdown,
