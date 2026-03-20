@@ -2086,9 +2086,13 @@
                 }
             });
 
-            // Close all fixed dropdowns on scroll so they don't float detached
+            // Reposition fixed dropdowns on scroll so they stay aligned
             window.addEventListener('scroll', function() {
-                document.querySelectorAll('.autocomplete-dropdown').forEach(d => d.style.display = 'none');
+                document.querySelectorAll('.autocomplete-dropdown').forEach(d => {
+                    if (d.style.display !== 'none' && d.style.display !== '') {
+                        showDropdown(d);
+                    }
+                });
             }, { passive: true });
         });
 
@@ -2125,9 +2129,11 @@
 
         // Position and show a fixed dropdown below its input
         function showDropdown(dropdown) {
-            const input = dropdown.previousElementSibling?.tagName === 'INPUT'
-                ? dropdown.previousElementSibling
-                : dropdown.parentElement.querySelector('input[type="text"]');
+            if (!dropdown) return;
+            const prev = dropdown.previousElementSibling;
+            const input = (prev && prev.tagName === 'INPUT' && prev.type !== 'hidden')
+                ? prev
+                : dropdown.parentElement?.querySelector('input[type="text"]');
             if (input) {
                 const rect = input.getBoundingClientRect();
                 dropdown.style.left = rect.left + 'px';
