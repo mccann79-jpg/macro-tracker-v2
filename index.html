@@ -4454,20 +4454,24 @@
                         return;
                     }
 
-                    // Check for duplicates and only add new foods
+                    // Upsert: update existing foods with the CSV values, add new ones.
+                    // Empty CSV cells were skipped during parsing, so a blank column
+                    // won't wipe existing data — only populated fields (like the
+                    // density/volEq columns you filled in) get applied.
                     let addedCount = 0;
-                    let skippedCount = 0;
-                    const duplicates = [];
+                    let updatedCount = 0;
 
                     foods.forEach(newFood => {
-                        const existingFood = foodDatabase.find(f => 
+                        const existingFood = foodDatabase.find(f =>
                             f.name.toLowerCase() === newFood.name.toLowerCase()
                         );
-                        
+
                         if (existingFood) {
-                            // Duplicate found - skip it
-                            skippedCount++;
-                            duplicates.push(newFood.name);
+                            // Merge CSV values into the existing food, keeping its id
+                            const preservedId = existingFood.id;
+                            Object.assign(existingFood, newFood);
+                            existingFood.id = preservedId;
+                            updatedCount++;
                         } else {
                             // New food - add it
                             foodDatabase.push(newFood);
@@ -4479,19 +4483,13 @@
                     renderFoodList();
                     updateFoodSelectors();
                     syncToFirebase(); // Sync to cloud
-                    
+
                     // Show detailed results
                     let message = `Import Complete!\n\n`;
                     message += `✅ Added: ${addedCount} new foods\n`;
-                    message += `⏭️ Skipped: ${skippedCount} duplicates\n`;
+                    message += `🔄 Updated: ${updatedCount} existing foods\n`;
                     message += `📊 Total foods in database: ${foodDatabase.length}`;
-                    
-                    if (duplicates.length > 0 && duplicates.length <= 10) {
-                        message += `\n\nSkipped duplicates:\n${duplicates.join(', ')}`;
-                    } else if (duplicates.length > 10) {
-                        message += `\n\nSkipped duplicates:\n${duplicates.slice(0, 10).join(', ')}\n...and ${duplicates.length - 10} more`;
-                    }
-                    
+
                     alert(message);
                     
                     // Reset file input
