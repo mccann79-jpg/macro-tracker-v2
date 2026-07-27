@@ -908,6 +908,50 @@
             .day-items { display: grid; grid-template-columns: 1fr 1fr; }
         }
 
+        /* ===== MACRO PREVIEW GRIDS ===== */
+        /* All five macros stay on one row at every width — wrapping to 3+2 left a
+           ragged orphan row. Labels are abbreviated and sized to fit 393px. */
+        .macro-grid-5 {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 4px;
+            text-align: center;
+        }
+        .macro-cell { min-width: 0; }
+        .macro-cell-label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 3px;
+            white-space: nowrap;
+        }
+        .macro-cell-value {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+        .macro-cell-goal {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            margin-top: 1px;
+        }
+        .macro-cell-diff {
+            font-size: 0.65rem;
+            font-weight: 700;
+            white-space: nowrap;
+            margin-top: 1px;
+        }
+        @media (min-width: 520px) {
+            .macro-grid-5 { gap: 8px; }
+            .macro-cell-label { font-size: 0.7rem; letter-spacing: 0.04em; }
+            .macro-cell-value { font-size: 1.05rem; }
+            .macro-cell-goal, .macro-cell-diff { font-size: 0.75rem; }
+        }
+
         /* ===== TOAST ===== */
         #toastHost {
             position: fixed;
@@ -960,8 +1004,6 @@
             .weight-entry-grid { grid-template-columns: 1fr 1fr; }
             .weight-entry-grid > div:last-child { grid-column: 1 / -1; }
             .projection-grid { grid-template-columns: 1fr; }
-            /* Macro preview / projection: 5 columns is unreadable at 390px */
-            .macro-grid-5 { grid-template-columns: repeat(3, 1fr) !important; gap: 14px 8px !important; }
         }
 
         @media (max-width: 380px) {
@@ -1384,32 +1426,32 @@
             <div id="macroPreview" style="display:none; margin-bottom:12px;">
                 <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow-sm);">
                     <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); font-weight:600; margin-bottom:14px;">This will add</div>
-                    <div class="macro-grid-5" style="display:grid; grid-template-columns:repeat(5, 1fr); gap:8px; text-align:center;">
-                        <div>
-                            <div style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-primary); font-weight:600; margin-bottom:4px;">Protein</div>
-                            <div style="font-size:0.95rem; font-weight:700; color:var(--text-primary);"><span id="previewProtein">0</span>g</div>
+                    <div class="macro-grid-5">
+                        <div class="macro-cell">
+                            <div class="macro-cell-label">Protein</div>
+                            <div class="macro-cell-value"><span id="previewProtein">0</span>g</div>
                         </div>
-                        <div>
-                            <div style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-primary); font-weight:600; margin-bottom:4px;">Carbs</div>
-                            <div style="font-size:0.95rem; font-weight:700; color:var(--text-primary);"><span id="previewCarbs">0</span>g</div>
+                        <div class="macro-cell">
+                            <div class="macro-cell-label">Carbs</div>
+                            <div class="macro-cell-value"><span id="previewCarbs">0</span>g</div>
                         </div>
-                        <div>
-                            <div style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-primary); font-weight:600; margin-bottom:4px;">Fats</div>
-                            <div style="font-size:0.95rem; font-weight:700; color:var(--text-primary);"><span id="previewFats">0</span>g</div>
+                        <div class="macro-cell">
+                            <div class="macro-cell-label">Fats</div>
+                            <div class="macro-cell-value"><span id="previewFats">0</span>g</div>
                         </div>
-                        <div>
-                            <div style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-primary); font-weight:600; margin-bottom:4px;">Calories</div>
-                            <div style="font-size:0.95rem; font-weight:700; color:var(--text-primary);"><span id="previewCalories">0</span></div>
+                        <div class="macro-cell">
+                            <div class="macro-cell-label">Cals</div>
+                            <div class="macro-cell-value"><span id="previewCalories">0</span></div>
                         </div>
-                        <div>
-                            <div style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-primary); font-weight:600; margin-bottom:4px;">Fiber</div>
-                            <div style="font-size:0.95rem; font-weight:700; color:var(--text-primary);"><span id="previewFiber">0</span>g</div>
+                        <div class="macro-cell">
+                            <div class="macro-cell-label">Fiber</div>
+                            <div class="macro-cell-value"><span id="previewFiber">0</span>g</div>
                         </div>
                     </div>
                 </div>
                 <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-top:8px; box-shadow:var(--shadow-sm);">
                     <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); font-weight:600; margin-bottom:14px;">After adding vs goals</div>
-                    <div id="projectedVsGoals" class="macro-grid-5" style="display:grid; grid-template-columns:repeat(5, 1fr); gap:8px; text-align:center;">
+                    <div id="projectedVsGoals" class="macro-grid-5">
                         <!-- Populated by JS -->
                     </div>
                 </div>
@@ -3625,19 +3667,19 @@
                 const isOver = diff !== null && (isHigherBetter ? diff < 0 : diff > 0);
                 const diffColor = diff !== null ? (isOver ? 'var(--accent-red)' : 'var(--accent-green)') : '';
                 
-                return `<div>
-                    <div style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-primary); font-weight:600; margin-bottom:4px;">${label}</div>
-                    <div style="font-size:0.95rem; font-weight:700; color:var(--text-primary);">${rounded}${unit}</div>
-                    ${goal ? `<div style="font-size:0.8rem; color:var(--text-primary);">/ ${goal}${unit}</div>` : ''}
-                    ${diff !== null ? `<div style="font-size:0.8rem; font-weight:600; color:${diffColor};">${diff > 0 ? '+' : ''}${diff}${unit}</div>` : ''}
+                return `<div class="macro-cell">
+                    <div class="macro-cell-label">${label}</div>
+                    <div class="macro-cell-value">${rounded}${unit}</div>
+                    ${goal ? `<div class="macro-cell-goal">/ ${goal}${unit}</div>` : ''}
+                    ${diff !== null ? `<div class="macro-cell-diff" style="color:${diffColor};">${diff > 0 ? '+' : ''}${diff}${unit}</div>` : ''}
                 </div>`;
             }
-            
+
             let html = '';
             html += makeCell('Protein', projected.protein, 'g', dailyGoals?.protein, true);
             html += makeCell('Carbs', projected.carbs, 'g', dailyGoals?.carbs, false);
             html += makeCell('Fats', projected.fats, 'g', dailyGoals?.fats, false);
-            html += makeCell('Calories', projected.calories, '', dailyGoals?.calories, false);
+            html += makeCell('Cals', projected.calories, '', dailyGoals?.calories, false);
             html += makeCell('Fiber', projected.fiber, 'g', dailyGoals?.fiber, true);
             
             document.getElementById('projectedVsGoals').innerHTML = html;
