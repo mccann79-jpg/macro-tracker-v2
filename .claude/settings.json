@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e ' *)",
+      "Bash(python3 -)",
+      "Bash(grep -n 'dropdown-item-name.*\\\\${' index.html)",
+      "Bash(grep -n '\\\\${meal\\\\.name}\\\\|\\\\${food\\\\.name}\\\\|\\\\${entry\\\\.notes\\\\|\\\\${displayName}\\\\|\\\\${item\\\\.name}\\\\|\\\\${plan\\\\.name}' index.html)",
+      "Bash(node --check /private/tmp/claude-501/-Users-brendanmccann-Documents-GitHub-macro-tracker-v2/309ea9e0-1769-42de-9907-bc0e0cde2cc2/scratchpad/app.js)",
+      "Bash(node -e \"require.resolve\\('puppeteer'\\)\")",
+      "Bash(npx --no-install playwright --version)",
+      "Bash(git rev-list *)"
+    ]
+  }
+}
