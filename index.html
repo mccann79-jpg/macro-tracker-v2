@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Macro Tracker</title>
     
     <!-- PWA Manifest -->
@@ -92,6 +92,9 @@
             overflow-x: hidden;
             width: 100%;
             -webkit-tap-highlight-color: transparent;
+            /* Stop iOS from auto-inflating text in narrow blocks */
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
         }
 
         body {
@@ -274,7 +277,8 @@
             border: 1.5px solid var(--border);
             border-radius: var(--radius-sm);
             color: var(--text-primary);
-            font-size: 0.95rem;
+            /* 16px minimum — anything smaller makes iOS Safari zoom on focus */
+            font-size: 16px;
             font-family: inherit;
             transition: all 0.25s ease;
             -webkit-appearance: none;
@@ -516,7 +520,7 @@
             border: 1.5px solid var(--border);
             border-radius: var(--radius-sm);
             color: var(--text-primary);
-            font-size: 0.95rem;
+            font-size: 16px;
             font-family: inherit;
             transition: all 0.25s ease;
             box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.30);
@@ -816,6 +820,114 @@
                 0 8px 24px rgba(0, 0, 0, 0.10);
         }
 
+        /* ===== TODAY'S MEALS — CARD LIST (mobile) / TABLE (desktop) ===== */
+        .day-items { display: flex; flex-direction: column; gap: 10px; }
+        .day-item {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px 10px;
+            padding: 12px 14px;
+            background: rgba(255, 255, 255, 0.45);
+            border: 1px solid var(--border);
+            border-top-color: var(--glass-border-top);
+            border-radius: var(--radius-sm);
+            box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.35);
+        }
+        .day-item-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            min-width: 0;
+            overflow-wrap: anywhere;
+        }
+        .day-item-badge {
+            padding: 2px 7px;
+            border-radius: 6px;
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            flex: none;
+        }
+        .day-item-badge.food { background: rgba(22, 163, 74, 0.14); color: var(--accent-green); }
+        .day-item-badge.meal { background: rgba(13, 148, 136, 0.14); color: var(--accent-blue); }
+        .day-item-remove {
+            grid-column: 2;
+            grid-row: 1;
+            align-self: start;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            font-size: 0.9rem;
+            line-height: 1;
+            border-radius: 10px;
+        }
+        .day-item-macros {
+            grid-column: 1 / -1;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        .day-item-macros b { font-weight: 700; }
+        .day-item-controls {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .day-item-controls input[type="number"] {
+            width: 76px;
+            padding: 8px 10px;
+            text-align: center;
+        }
+        .day-item-controls select { width: auto; padding: 8px 26px 8px 10px; }
+        @media (min-width: 860px) {
+            .day-items { display: grid; grid-template-columns: 1fr 1fr; }
+        }
+
+        /* ===== TOAST ===== */
+        #toastHost {
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: calc(var(--nav-height) + var(--safe-bottom) + 16px);
+            z-index: 9500;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            pointer-events: none;
+            width: min(92vw, 420px);
+        }
+        .toast {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            text-align: center;
+            color: #fff;
+            background: rgba(30, 41, 59, 0.92);
+            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(16px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+            animation: toastIn 0.18s ease;
+        }
+        .toast.error { background: rgba(185, 28, 28, 0.94); }
+        .toast.success { background: rgba(15, 118, 110, 0.94); }
+        .toast.leaving { animation: toastOut 0.22s ease forwards; }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+        @keyframes toastOut { to { opacity: 0; transform: translateY(10px); } }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             body { padding-left: var(--safe-left); padding-right: var(--safe-right); }
@@ -826,15 +938,24 @@
             .totals-hero { padding: 18px 14px; }
             table { font-size: 0.75rem; }
             th, td { padding: 8px 5px; }
-            .btn-sm { padding: 4px 8px; font-size: 0.7rem; }
+            /* Keep small buttons thumb-sized (iOS wants ~44px; 36px + spacing is the
+               practical floor inside table rows) */
+            .btn-sm { padding: 8px 12px; font-size: 0.75rem; min-height: 36px; }
+            .btn-danger, .btn-success, .btn-ghost { min-height: 36px; }
+            .chart-toggle { min-height: 36px; padding: 8px 12px; }
             .weight-entry-grid { grid-template-columns: 1fr 1fr; }
             .weight-entry-grid > div:last-child { grid-column: 1 / -1; }
             .projection-grid { grid-template-columns: 1fr; }
+            /* Macro preview / projection: 5 columns is unreadable at 390px */
+            .macro-grid-5 { grid-template-columns: repeat(3, 1fr) !important; gap: 14px 8px !important; }
         }
 
-        @media (max-width: 380px) {
-            .totals-grid { grid-template-columns: repeat(2, 1fr); }
-            .total-value { font-size: 1.5rem; }
+        @media (max-width: 430px) {
+            .totals-grid { grid-template-columns: repeat(2, 1fr); gap: 14px 8px; }
+            .total-value { font-size: 1.6rem; }
+            /* 4-up borders look wrong once it wraps to 2-up */
+            .total-item { border-right: none; }
+            .total-item:nth-child(odd) { border-right: 1px solid var(--border); }
         }
         
         /* Standalone mode (added to home screen) */
@@ -881,6 +1002,9 @@
         <p class="pin-hint">First time? Enter any 4-digit PIN to create your account.</p>
     </div>
 </div>
+
+<!-- Toasts -->
+<div id="toastHost"></div>
 
 <!-- App Header -->
 <div class="app-header">
@@ -1249,7 +1373,7 @@
             <div id="macroPreview" style="display:none; margin-bottom:12px;">
                 <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow-sm);">
                     <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); font-weight:600; margin-bottom:14px;">This will add</div>
-                    <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:8px; text-align:center;">
+                    <div class="macro-grid-5" style="display:grid; grid-template-columns:repeat(5, 1fr); gap:8px; text-align:center;">
                         <div>
                             <div style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-primary); font-weight:600; margin-bottom:4px;">Protein</div>
                             <div style="font-size:0.95rem; font-weight:700; color:var(--text-primary);"><span id="previewProtein">0</span>g</div>
@@ -1274,7 +1398,7 @@
                 </div>
                 <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-top:8px; box-shadow:var(--shadow-sm);">
                     <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); font-weight:600; margin-bottom:14px;">After adding vs goals</div>
-                    <div id="projectedVsGoals" style="display:grid; grid-template-columns:repeat(5, 1fr); gap:8px; text-align:center;">
+                    <div id="projectedVsGoals" class="macro-grid-5" style="display:grid; grid-template-columns:repeat(5, 1fr); gap:8px; text-align:center;">
                         <!-- Populated by JS -->
                     </div>
                 </div>
@@ -1286,9 +1410,7 @@
         <!-- Today's Meals -->
         <div class="card">
             <h2>Today's Meals</h2>
-            <div class="table-wrap">
-                <div id="dayMealsList"></div>
-            </div>
+            <div id="dayMealsList"></div>
         </div>
 
         <!-- History -->
@@ -1452,6 +1574,46 @@
 </nav>
 
     <script>
+        // Escape untrusted text (food/meal names) before dropping it into innerHTML.
+        function esc(value) {
+            return String(value == null ? '' : value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // Render a value as a JS string literal that is safe inside a double-quoted
+        // HTML attribute, e.g. onclick="pick(${jsArg(name)})"
+        function jsArg(value) {
+            return esc(JSON.stringify(String(value == null ? '' : value)));
+        }
+
+        // Monotonic unique id — Date.now() alone collides when two items are added
+        // in the same millisecond (imports, prep plans, fast taps).
+        let __lastId = 0;
+        function newId() {
+            const now = Date.now();
+            __lastId = now > __lastId ? now : __lastId + 1;
+            return __lastId;
+        }
+
+        // Non-blocking feedback. alert() steals focus and requires a tap to dismiss,
+        // which is painful mid-logging on a phone.
+        function showToast(message, kind) {
+            const host = document.getElementById('toastHost');
+            if (!host) { console.log(message); return; }
+            const el = document.createElement('div');
+            el.className = 'toast' + (kind ? ' ' + kind : '');
+            el.textContent = message;
+            host.appendChild(el);
+            setTimeout(() => {
+                el.classList.add('leaving');
+                setTimeout(() => el.remove(), 240);
+            }, kind === 'error' ? 3200 : 2200);
+        }
+
         // Helper: get today's date in YYYY-MM-DD using LOCAL timezone (not UTC)
         function getLocalDateString(date) {
             const d = date || new Date();
@@ -1580,7 +1742,7 @@
         if (savedMeals.length === 0) {
             savedMeals = [
                 {
-                    id: Date.now(),
+                    id: newId(),
                     name: "Breakfast Protein Bowl",
                     totalServings: 1,
                     foods: [
@@ -1592,7 +1754,7 @@
                     perServing: { protein: 51.3, carbs: 68.4, fats: 6.5, fiber: 11.1, calories: 526 }
                 },
                 {
-                    id: Date.now() + 1,
+                    id: newId(),
                     name: "Chicken & Rice",
                     totalServings: 1,
                     foods: [
@@ -1604,7 +1766,7 @@
                     perServing: { protein: 53.3, carbs: 53, fats: 20.3, fiber: 6.2, calories: 598 }
                 },
                 {
-                    id: Date.now() + 2,
+                    id: newId(),
                     name: "Salmon Dinner",
                     totalServings: 1,
                     foods: [
@@ -1703,8 +1865,7 @@
                     if (cloudFoods > localFoods && data.foodDatabase) {
                         console.log('⬇️ Loading foods from cloud');
                         foodDatabase = data.foodDatabase;
-                        // Ensure all foods have IDs
-                        foodDatabase.forEach((food, i) => { if (!food.id) food.id = Date.now() + i; });
+                        ensureFoodIds();
                         applyDensitySeed(); // backfill volume<->weight data
                         localStorage.setItem('foodDatabase', JSON.stringify(foodDatabase));
                         loadedFromCloud = true;
@@ -1788,70 +1949,95 @@
             // Listen for changes from other devices
             firebaseRef.on('value', (snapshot) => {
                 const data = snapshot.val();
-                if (data && data._lastSync) {
-                    const localLastSync = parseInt(localStorage.getItem('lastSync') || '0');
-                    if (data._lastSync > localLastSync) {
-                        console.log('🔄 Remote data is newer - updating local');
-                        // Remote data is newer - update local
-                        if (data.foodDatabase) {
-                            foodDatabase = data.foodDatabase;
-                            // Ensure all foods have IDs
-                            foodDatabase.forEach((food, i) => { if (!food.id) food.id = Date.now() + i; });
-                            applyDensitySeed(); // backfill volume<->weight data
-                            localStorage.setItem('foodDatabase', JSON.stringify(foodDatabase));
-                            renderFoodList();
-                            updateFoodSelectors();
-                        }
-                        if (data.savedMeals) {
-                            savedMeals = data.savedMeals;
-                            localStorage.setItem('savedMeals', JSON.stringify(savedMeals));
-                            renderSavedMeals();
-                            updateMealSelector();
-                        }
-                        if (data.todaysMeals) {
-                            todaysMeals = data.todaysMeals;
-                            localStorage.setItem('todaysMeals', JSON.stringify(todaysMeals));
-                            renderDayMeals();
-                        } else if (data._counts && data._counts.todaysMeals === 0) {
-                            // Remote explicitly cleared today's meals (Firebase removes empty arrays)
-                            console.log('🔄 Remote cleared today\'s meals');
-                            todaysMeals = [];
-                            localStorage.setItem('todaysMeals', JSON.stringify(todaysMeals));
-                            renderDayMeals();
-                            calculateDayTotals();
-                        }
-                        if (data.dailyGoals !== undefined) {
-                            dailyGoals = data.dailyGoals;
-                            localStorage.setItem('dailyGoals', JSON.stringify(dailyGoals));
-                            displayGoals();
-                        }
-                        if (data.dayHistory) {
-                            dayHistory = data.dayHistory;
-                            localStorage.setItem('dayHistory', JSON.stringify(dayHistory));
-                            renderHistory();
-                            drawHistoryChart();
-                        }
-                        if (data.weightData) {
-                            weightData = data.weightData;
-                            localStorage.setItem('weightData', JSON.stringify(weightData));
-                            renderWeightTable();
-                            drawWeightChart();
-                        }
-                        if (data.mealPrepPlans) {
-                            mealPrepPlans = data.mealPrepPlans;
-                            localStorage.setItem('mealPrepPlans', JSON.stringify(mealPrepPlans));
-                        }
-                        localStorage.setItem('lastSync', data._lastSync.toString());
-                    }
+                if (!data || !data._lastSync) return;
+
+                // Firebase fires this listener for our OWN writes too (optimistically,
+                // before set() resolves). Re-applying our own payload used to rebuild
+                // every list and redraw every chart on each save — that's the flicker
+                // where values visibly change/jump, and it wiped out whatever field you
+                // were typing in. Ignore anything we wrote ourselves.
+                if (ownSyncTimestamps.has(data._lastSync)) return;
+
+                const localLastSync = parseInt(localStorage.getItem('lastSync') || '0');
+                if (data._lastSync <= localLastSync) return;
+
+                console.log('🔄 Remote data is newer - updating local');
+
+                // Only re-render a section when its data actually changed. Rebuilding a
+                // list steals focus from inputs inside it, so do it as rarely as possible.
+                const changed = (next, current) => JSON.stringify(next) !== JSON.stringify(current);
+
+                if (data.foodDatabase && changed(data.foodDatabase, foodDatabase)) {
+                    foodDatabase = data.foodDatabase;
+                    ensureFoodIds();
+                    applyDensitySeed(); // backfill volume<->weight data
+                    localStorage.setItem('foodDatabase', JSON.stringify(foodDatabase));
+                    renderFoodList();
+                    updateFoodSelectors();
                 }
+                if (data.savedMeals && changed(data.savedMeals, savedMeals)) {
+                    savedMeals = data.savedMeals;
+                    localStorage.setItem('savedMeals', JSON.stringify(savedMeals));
+                    renderSavedMeals();
+                    updateMealSelector();
+                }
+                if (data.todaysMeals) {
+                    if (changed(data.todaysMeals, todaysMeals)) {
+                        todaysMeals = data.todaysMeals;
+                        localStorage.setItem('todaysMeals', JSON.stringify(todaysMeals));
+                        renderDayMeals();
+                    }
+                } else if (data._counts && data._counts.todaysMeals === 0 && todaysMeals.length > 0) {
+                    // Remote explicitly cleared today's meals (Firebase removes empty arrays)
+                    console.log('🔄 Remote cleared today\'s meals');
+                    todaysMeals = [];
+                    localStorage.setItem('todaysMeals', JSON.stringify(todaysMeals));
+                    renderDayMeals();
+                    calculateDayTotals();
+                }
+                if (data.dailyGoals !== undefined && changed(data.dailyGoals, dailyGoals)) {
+                    dailyGoals = data.dailyGoals;
+                    localStorage.setItem('dailyGoals', JSON.stringify(dailyGoals));
+                    displayGoals();
+                    calculateDayTotals();
+                }
+                if (data.dayHistory && changed(data.dayHistory, dayHistory)) {
+                    dayHistory = data.dayHistory;
+                    localStorage.setItem('dayHistory', JSON.stringify(dayHistory));
+                    renderHistory();
+                    drawHistoryChart();
+                }
+                if (data.weightData && changed(data.weightData, weightData)) {
+                    weightData = data.weightData;
+                    localStorage.setItem('weightData', JSON.stringify(weightData));
+                    renderWeightTable();
+                    drawWeightChart();
+                }
+                if (data.mealPrepPlans && changed(data.mealPrepPlans, mealPrepPlans)) {
+                    mealPrepPlans = data.mealPrepPlans;
+                    localStorage.setItem('mealPrepPlans', JSON.stringify(mealPrepPlans));
+                }
+                localStorage.setItem('lastSync', data._lastSync.toString());
             });
         }
+
+        // Timestamps of writes this tab made, so the value listener can skip its own echo.
+        const ownSyncTimestamps = new Set();
 
         function syncToFirebase() {
             if (!userPin || !firebaseRef) return;
 
-            const timestamp = Date.now();
-            
+            const timestamp = newId();
+            const previousSync = localStorage.getItem('lastSync');
+
+            // Claim the timestamp BEFORE set(), because Firebase fires the local
+            // 'value' event synchronously — waiting for the .then() is too late.
+            ownSyncTimestamps.add(timestamp);
+            localStorage.setItem('lastSync', timestamp.toString());
+            if (ownSyncTimestamps.size > 50) {
+                ownSyncTimestamps.delete(ownSyncTimestamps.values().next().value);
+            }
+
             // Helper function to clean NaN values from objects
             const cleanNaN = (obj) => {
                 if (obj === null || obj === undefined) return obj;
@@ -1893,11 +2079,13 @@
                     weightData: weightData.length
                 },
                 _lastSync: timestamp
-            }).then(() => {
-                localStorage.setItem('lastSync', timestamp.toString());
             }).catch((error) => {
                 console.error('Sync error:', error);
-                alert('Sync failed: ' + error.message + '\n\nYour data is saved locally, but could not sync to cloud.');
+                // Roll the marker back so the next successful pull isn't skipped.
+                ownSyncTimestamps.delete(timestamp);
+                if (previousSync !== null) localStorage.setItem('lastSync', previousSync);
+                else localStorage.removeItem('lastSync');
+                showToast('Sync failed — saved locally only', 'error');
             });
         }
 
@@ -1966,6 +2154,7 @@
                 connectToFirebase();
             }
 
+            ensureFoodIds();
             applyDensitySeed(); // backfill volume<->weight data on existing foods
             renderFoodList();
             updateFoodSelectors();
@@ -2019,25 +2208,34 @@
 
         });
 
+        // Remember where you were on each tab, so switching away and back doesn't
+        // dump you at the top of a long page.
+        const pageScroll = {};
+        let currentPage = 'day';
+
         function showPage(pageName, tabEl) {
+            if (currentPage) pageScroll[currentPage] = window.scrollY;
+
             // Hide all pages
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
-            
+            document.querySelectorAll('.nav-tab').forEach(b => {
+                b.classList.remove('active');
+                b.setAttribute('aria-selected', 'false');
+            });
+
             // Show selected page
             document.getElementById(pageName + 'Page').classList.add('active');
-            
+            currentPage = pageName;
+
             // Activate clicked tab
-            if (tabEl) {
-                tabEl.classList.add('active');
-            } else {
-                const tab = document.getElementById('tab-' + pageName);
-                if (tab) tab.classList.add('active');
+            const tab = tabEl || document.getElementById('tab-' + pageName);
+            if (tab) {
+                tab.classList.add('active');
+                tab.setAttribute('aria-selected', 'true');
             }
-            
-            // Scroll to top
-            window.scrollTo(0, 0);
-            
+
+            window.scrollTo(0, pageScroll[pageName] || 0);
+
             // Redraw charts when switching to relevant pages
             if (pageName === 'weight') {
                 setTimeout(() => drawWeightChart(), 100);
@@ -2176,6 +2374,20 @@
         // Backfill volume<->weight data onto foods that don't already have a
         // density, matching by name. Idempotent and safe to call on any code
         // path that (re)loads foodDatabase, including cloud sync.
+        // Foods are addressed by id everywhere. Older rows (and CSV imports) may not
+        // have one, so backfill before anything renders.
+        function ensureFoodIds() {
+            let changed = false;
+            const seen = new Set();
+            foodDatabase.forEach(food => {
+                if (!food) return;
+                if (!food.id || seen.has(food.id)) { food.id = newId(); changed = true; }
+                seen.add(food.id);
+            });
+            if (changed) localStorage.setItem('foodDatabase', JSON.stringify(foodDatabase));
+            return changed;
+        }
+
         function applyDensitySeed() {
             let changed = false;
             foodDatabase.forEach(food => {
@@ -2238,39 +2450,44 @@
             };
 
             if (editingId !== '') {
-                // Update existing food by index
-                const foodIndex = parseInt(editingId);
-                if (foodIndex >= 0 && foodIndex < foodDatabase.length) {
+                // Update existing food by id — array positions shift as foods are
+                // added, imported or synced, so an index is not a stable handle.
+                const foodIndex = foodDatabase.findIndex(f => String(f.id) === String(editingId));
+                if (foodIndex >= 0) {
                     foodDatabase[foodIndex] = {
                         ...foodDatabase[foodIndex],
                         ...foodData
                     };
+                } else {
+                    showToast('That food no longer exists', 'error');
                 }
                 document.getElementById('submitFoodBtn').textContent = 'Add to Database';
                 document.getElementById('cancelEditBtn').style.display = 'none';
                 document.getElementById('editingFoodId').value = '';
+                showToast('Updated ' + foodData.name, 'success');
             } else {
                 // Add new food
                 const food = {
-                    id: Date.now(),
+                    id: newId(),
                     ...foodData
                 };
                 foodDatabase.push(food);
+                showToast('Added ' + foodData.name, 'success');
             }
 
             localStorage.setItem('foodDatabase', JSON.stringify(foodDatabase));
-            
+
             renderFoodList();
             updateFoodSelectors();
             syncToFirebase(); // Sync to cloud
             e.target.reset();
         }
 
-        function editFood(index) {
-            const food = foodDatabase[index];
+        function editFood(id) {
+            const food = foodDatabase.find(f => String(f.id) === String(id));
             if (!food) return;
 
-            document.getElementById('editingFoodId').value = index;
+            document.getElementById('editingFoodId').value = food.id;
             document.getElementById('foodName').value = food.name;
             document.getElementById('servingAmount').value = food.servingAmount;
             document.getElementById('servingUnit').value = food.servingUnit;
@@ -2316,13 +2533,17 @@
             document.getElementById('cancelEditBtn').style.display = 'none';
         }
 
-        function deleteFood(index) {
-            if (confirm('Are you sure you want to delete this food?')) {
+        function deleteFood(id) {
+            const index = foodDatabase.findIndex(f => String(f.id) === String(id));
+            if (index < 0) return;
+            const food = foodDatabase[index];
+            if (confirm(`Delete "${food.name}" from your food database?`)) {
                 foodDatabase.splice(index, 1);
                 localStorage.setItem('foodDatabase', JSON.stringify(foodDatabase));
                 renderFoodList();
                 updateFoodSelectors();
                 syncToFirebase(); // Sync to cloud
+                showToast('Deleted ' + food.name);
             }
         }
 
@@ -2359,20 +2580,18 @@
                     const volGrams = food.volEqGrams != null ? food.volEqGrams : +(food.density * VOLUME_TO_ML.cup).toFixed(1);
                     servingLabel += `<br><span style="font-size:11px; color:var(--accent-blue);">${volAmt} ${UNIT_LABELS[volUnit]} ≈ ${volGrams}g</span>`;
                 }
-                const dbIndex = foodDatabase.indexOf(food);
-
                 tableHTML += `
-                    <tr class="food-row" data-name="${food.name.toLowerCase()}">
-                        <td style="font-weight:600;">${food.name}</td>
+                    <tr class="food-row" data-name="${esc(food.name.toLowerCase())}">
+                        <td style="font-weight:600;">${esc(food.name)}</td>
                         <td style="text-align:center; color:var(--text-muted);">${servingLabel}</td>
                         <td class="protein-col">${food.protein}g</td>
                         <td class="carbs-col">${food.carbs}g</td>
                         <td class="fats-col">${food.fats}g</td>
                         <td style="text-align:center; color:var(--text-muted);">${food.fiber}g</td>
                         <td class="cal-col">${calories.toFixed(0)}</td>
-                        <td style="text-align:center;">
-                            <button class="btn-success btn-sm" onclick="editFood(${dbIndex})" style="margin-right:2px;">Edit</button>
-                            <button class="btn-danger btn-sm" onclick="deleteFood(${dbIndex})">Del</button>
+                        <td style="text-align:center; white-space:nowrap;">
+                            <button class="btn-success btn-sm" onclick="editFood(${jsArg(food.id)})" style="margin-right:2px;">Edit</button>
+                            <button class="btn-danger btn-sm" onclick="deleteFood(${jsArg(food.id)})">Del</button>
                         </td>
                     </tr>
                 `;
@@ -2430,7 +2649,7 @@
             }
             
             if (!foodName) {
-                alert('Please select or type a food name');
+                showToast('Pick or type a food name', 'error');
                 return;
             }
 
@@ -2501,7 +2720,7 @@
 
                 return `
                     <tr style="background: ${rowBg}; border-bottom: 1px solid var(--border);">
-                        <td style="padding: 10px; font-weight: 600; color: var(--text-primary);">${item.name}</td>
+                        <td style="padding: 10px; font-weight: 600; color: var(--text-primary);">${esc(item.name)}</td>
                         <td style="padding: 10px; text-align: center;">
                             <input type="number" value="${item.amount}" step="0.1" min="0.1" 
                                 style="width: 80px; padding: 6px; border: 2px solid #e0e0e0; border-radius: 6px; text-align: center;"
@@ -2637,7 +2856,7 @@
             } else {
                 // Create new meal
                 const meal = {
-                    id: Date.now(),
+                    id: newId(),
                     ...mealData
                 };
                 savedMeals.push(meal);
@@ -2698,7 +2917,7 @@
 
                 tableHTML += `
                     <tr>
-                        <td style="font-weight:600;">${meal.name}</td>
+                        <td style="font-weight:600;">${esc(meal.name)}</td>
                         <td style="text-align:center; color:var(--text-muted);">${meal.totalServings}</td>
                         <td class="protein-col">${meal.perServing.protein.toFixed(1)}g</td>
                         <td class="carbs-col">${meal.perServing.carbs.toFixed(1)}g</td>
@@ -2749,12 +2968,11 @@
             const searchValue = searchInput.value.toLowerCase().trim();
             
             // Filter foods
-            let matchingFoods = foodDatabase;
-            if (searchValue) {
-                matchingFoods = foodDatabase.filter(food => 
-                    food.name.toLowerCase().includes(searchValue)
-                );
-            }
+            // Copy before sorting — sorting foodDatabase in place silently reorders
+            // every other view that reads it.
+            let matchingFoods = foodDatabase.filter(food =>
+                !searchValue || food.name.toLowerCase().includes(searchValue)
+            );
             
             // Sort by relevance (starts with search term first, then alphabetically)
             matchingFoods.sort((a, b) => {
@@ -2781,11 +2999,11 @@
             dropdown.innerHTML = matchingFoods.map(food => {
                 const calories = food.calories || (food.protein * 4 + food.carbs * 4 + food.fats * 9);
                 return `
-                    <div onclick="selectMealFood('${food.name.replace(/'/g, "\\'")}')" 
+                    <div onclick="selectMealFood(${jsArg(food.name)})" 
                         class="dropdown-item"
                         onmouseover="this.style.background='rgba(255,255,255,0.15)'" 
                         onmouseout="this.style.background='transparent'">
-                        <div class="dropdown-item-name">${food.name}</div>
+                        <div class="dropdown-item-name">${esc(food.name)}</div>
                         <div class="dropdown-item-meta">
                             ${food.servingAmount} ${UNIT_LABELS[food.servingUnit]} • 
                             P: ${food.protein}g C: ${food.carbs}g F: ${food.fats}g • 
@@ -2826,12 +3044,10 @@
             const searchValue = searchInput.value.toLowerCase().trim();
             
             // Filter meals
-            let matchingMeals = savedMeals;
-            if (searchValue) {
-                matchingMeals = savedMeals.filter(meal => 
-                    meal.name.toLowerCase().includes(searchValue)
-                );
-            }
+            // Copy before sorting (see filterMealFoodDropdownCustom).
+            let matchingMeals = savedMeals.filter(meal =>
+                !searchValue || meal.name.toLowerCase().includes(searchValue)
+            );
             
             // Sort by relevance
             matchingMeals.sort((a, b) => {
@@ -2858,11 +3074,11 @@
             dropdown.innerHTML = matchingMeals.map(meal => {
                 const calories = meal.perServing.calories || (meal.perServing.protein * 4 + meal.perServing.carbs * 4 + meal.perServing.fats * 9);
                 return `
-                    <div onclick="selectDayMeal('${meal.name.replace(/'/g, "\\'")}')" 
+                    <div onclick="selectDayMeal(${jsArg(meal.name)})" 
                         class="dropdown-item"
                         onmouseover="this.style.background='rgba(255,255,255,0.15)'" 
                         onmouseout="this.style.background='transparent'">
-                        <div class="dropdown-item-name" style="color:var(--accent-blue);">${meal.name}</div>
+                        <div class="dropdown-item-name" style="color:var(--accent-blue);">${esc(meal.name)}</div>
                         <div class="dropdown-item-meta">
                             ${meal.totalServings} servings • 
                             P: ${meal.perServing.protein.toFixed(1)}g 
@@ -2905,12 +3121,11 @@
             const searchValue = searchInput.value.toLowerCase().trim();
             
             // Filter foods
-            let matchingFoods = foodDatabase;
-            if (searchValue) {
-                matchingFoods = foodDatabase.filter(food => 
-                    food.name.toLowerCase().includes(searchValue)
-                );
-            }
+            // Copy before sorting — sorting foodDatabase in place silently reorders
+            // every other view that reads it.
+            let matchingFoods = foodDatabase.filter(food =>
+                !searchValue || food.name.toLowerCase().includes(searchValue)
+            );
             
             // Sort by relevance
             matchingFoods.sort((a, b) => {
@@ -2937,7 +3152,7 @@
             dropdown.innerHTML = matchingFoods.map(food => {
                 const calories = food.calories || (food.protein * 4 + food.carbs * 4 + food.fats * 9);
                 return `
-                    <div onclick="selectDayFood('${food.name.replace(/'/g, "\\'")}')" 
+                    <div onclick="selectDayFood(${jsArg(food.name)})" 
                         class="dropdown-item"
                         onmouseover="this.style.background='rgba(255,255,255,0.15)'" 
                         onmouseout="this.style.background='transparent'">
@@ -3220,8 +3435,8 @@
 
             // Search meals
             if (showMeals) {
-                let meals = savedMeals;
-                if (query) meals = meals.filter(m => m.name.toLowerCase().includes(query));
+                // Copy before sorting — savedMeals must keep its own order.
+                let meals = savedMeals.filter(m => !query || m.name.toLowerCase().includes(query));
                 meals.sort((a, b) => {
                     const aS = a.name.toLowerCase().startsWith(query);
                     const bS = b.name.toLowerCase().startsWith(query);
@@ -3234,7 +3449,7 @@
                     results.push({
                         type: 'meal',
                         name: meal.name,
-                        html: `<div class="dropdown-item-name" style="color:var(--accent);">${meal.name}</div>
+                        html: `<div class="dropdown-item-name" style="color:var(--accent);">${esc(meal.name)}</div>
                                <div class="dropdown-item-meta">🍽 Meal · ${meal.totalServings} srv · P:${meal.perServing.protein.toFixed(0)}g C:${meal.perServing.carbs.toFixed(0)}g F:${meal.perServing.fats.toFixed(0)}g · ${cal.toFixed(0)} cal</div>`
                     });
                 });
@@ -3242,8 +3457,8 @@
 
             // Search foods
             if (showFoods) {
-                let foods = foodDatabase;
-                if (query) foods = foods.filter(f => f.name.toLowerCase().includes(query));
+                // Copy before sorting — foodDatabase must keep its own order.
+                let foods = foodDatabase.filter(f => !query || f.name.toLowerCase().includes(query));
                 foods.sort((a, b) => {
                     const aS = a.name.toLowerCase().startsWith(query);
                     const bS = b.name.toLowerCase().startsWith(query);
@@ -3256,7 +3471,7 @@
                     results.push({
                         type: 'food',
                         name: food.name,
-                        html: `<div class="dropdown-item-name">${food.name}</div>
+                        html: `<div class="dropdown-item-name">${esc(food.name)}</div>
                                <div class="dropdown-item-meta">🥄 Food · ${food.servingAmount} ${UNIT_LABELS[food.servingUnit]} · P:${food.protein}g C:${food.carbs}g F:${food.fats}g · ${cal.toFixed(0)} cal</div>`
                     });
                 });
@@ -3282,7 +3497,7 @@
             }
 
             dropdown.innerHTML = results.map(r => `
-                <div onclick="selectUnifiedItem('${r.type}', '${r.name.replace(/'/g, "\\'")}')"
+                <div onclick="selectUnifiedItem('${r.type}', ${jsArg(r.name)})"
                      class="dropdown-item">
                     ${r.html}
                 </div>
@@ -3621,7 +3836,7 @@
             let type = document.getElementById('selectedItemType').value;
 
             if (!name) {
-                alert('Please select a meal or food first');
+                showToast('Pick a meal or food first', 'error');
                 return;
             }
 
@@ -3630,7 +3845,7 @@
                 if (savedMeals.find(m => m.name === name)) type = 'meal';
                 else if (foodDatabase.find(f => f.name === name)) type = 'food';
                 else {
-                    alert('Item not found. Please select from the dropdown.');
+                    showToast('Not found — pick it from the dropdown', 'error');
                     return;
                 }
             }
@@ -3640,25 +3855,25 @@
 
             if (type === 'meal') {
                 const meal = savedMeals.find(m => m.name === name);
-                if (!meal) { alert('Meal not found'); return; }
+                if (!meal) { showToast('Meal not found', 'error'); return; }
 
                 todaysMeals.push({
-                    id: Date.now(),
+                    id: newId(),
                     type: 'meal',
                     mealId: meal.id,
                     mealName: meal.name,
                     amount: amount,
                     unit: unit,
-                    macros: meal.perServing
+                    macros: { ...meal.perServing } // snapshot: sharing the object made later meal edits rewrite history
                 });
             } else {
                 const food = foodDatabase.find(f => f.name === name);
-                if (!food) { alert('Food not found'); return; }
+                if (!food) { showToast('Food not found', 'error'); return; }
 
                 const multiplier = servingMultiplier(amount, unit, food.servingAmount, food.servingUnit, food.density);
 
                 todaysMeals.push({
-                    id: Date.now(),
+                    id: newId(),
                     type: 'food',
                     foodName: food.name,
                     amount: amount,
@@ -3683,12 +3898,16 @@
             calculateDayTotals();
             syncToFirebase();
 
+            showToast(`Added ${name}`, 'success');
+
             // Reset
             document.getElementById('searchItemForDay').value = '';
             document.getElementById('selectedItemName').value = '';
             document.getElementById('selectedItemType').value = '';
             document.getElementById('itemAmountForDay').value = '1';
             document.getElementById('dayUnifiedDropdown').style.display = 'none';
+            document.getElementById('macroPreview').style.display = 'none';
+            document.getElementById('searchItemForDay').blur();
         }
 
         function setDayAddType(type) {
@@ -3742,7 +3961,7 @@
         function addFoodToDay() {
             const foodName = document.getElementById('selectedFoodForDay').value || document.getElementById('searchFoodForDay').value.trim();
             if (!foodName) {
-                alert('Please select a food first');
+                showToast('Pick a food first', 'error');
                 return;
             }
 
@@ -3756,7 +3975,7 @@
             const multiplier = servingMultiplier(amount, unit, food.servingAmount, food.servingUnit, food.density);
 
             todaysMeals.push({
-                id: Date.now(),
+                id: newId(),
                 type: 'food',
                 foodName: food.name,
                 amount: amount,
@@ -3785,7 +4004,7 @@
         function addMealToDay() {
             const mealName = document.getElementById('selectedMealForDay').value || document.getElementById('searchMealForDay').value.trim();
             if (!mealName) {
-                alert('Please select a meal first');
+                showToast('Pick a meal first', 'error');
                 return;
             }
 
@@ -3796,13 +4015,13 @@
             const unit = document.getElementById('mealUnitForDay').value;
 
             todaysMeals.push({
-                id: Date.now(),
+                id: newId(),
                 type: 'meal',
                 mealId: meal.id,
                 mealName: meal.name,
                 amount: amount,
                 unit: unit,
-                macros: meal.perServing
+                macros: { ...meal.perServing } // snapshot: sharing the object made later meal edits rewrite history
             });
 
             localStorage.setItem('todaysMeals', JSON.stringify(todaysMeals));
@@ -3818,18 +4037,20 @@
         }
 
         function removeMealFromDay(id) {
-            todaysMeals = todaysMeals.filter(m => m.id !== id);
+            const removed = todaysMeals.find(m => String(m.id) === String(id));
+            todaysMeals = todaysMeals.filter(m => String(m.id) !== String(id));
             localStorage.setItem('todaysMeals', JSON.stringify(todaysMeals));
             renderDayMeals();
             calculateDayTotals();
             syncToFirebase(); // Sync to cloud
+            if (removed) showToast(`Removed ${removed.mealName || removed.foodName || removed.name || 'item'}`);
         }
 
-        function updateDayItemAmount(index, newAmount) {
-            const item = todaysMeals[index];
+        function updateDayItemAmount(id, newAmount) {
+            const item = todaysMeals.find(m => String(m.id) === String(id));
             if (!item) return;
             const amount = parseFloat(newAmount) || 0;
-            
+
             if (item.type === 'food') {
                 // Recalculate food macros from database
                 const foodName = item.foodName || item.name;
@@ -3870,10 +4091,10 @@
             syncToFirebase();
         }
 
-        function updateDayItemUnit(index, newUnit) {
-            const item = todaysMeals[index];
+        function updateDayItemUnit(id, newUnit) {
+            const item = todaysMeals.find(m => String(m.id) === String(id));
             if (!item) return;
-            
+
             if (item.type === 'food') {
                 const foodName = item.foodName || item.name;
                 const food = foodDatabase.find(f => f.name === foodName);
@@ -3903,14 +4124,8 @@
         }
 
         // Legacy compatibility wrappers
-        function updateDayMealAmount(id, amount) {
-            const index = todaysMeals.findIndex(m => m.id === id);
-            if (index >= 0) updateDayItemAmount(index, amount);
-        }
-        function updateDayMealUnit(id, unit) {
-            const index = todaysMeals.findIndex(m => m.id === id);
-            if (index >= 0) updateDayItemUnit(index, unit);
-        }
+        function updateDayMealAmount(id, amount) { updateDayItemAmount(id, amount); }
+        function updateDayMealUnit(id, unit) { updateDayItemUnit(id, unit); }
 
         function renderDayMeals() {
             const listDiv = document.getElementById('dayMealsList');
@@ -3921,96 +4136,63 @@
                 return;
             }
 
-            // Create table header
-            let tableHTML = `
-                <table style="width: 100%; border-collapse: collapse;">
-                    <thead>
-                        <tr style="background: rgba(255,255,255,0.15);">
-                            <th style="padding: 12px; text-align: left; border-radius: 8px 0 0 0;">Item</th>
-                            <th style="padding: 12px; text-align: center;">Amount</th>
-                            <th style="padding: 12px; text-align: center;">Protein</th>
-                            <th style="padding: 12px; text-align: center;">Carbs</th>
-                            <th style="padding: 12px; text-align: center;">Fats</th>
-                            <th style="padding: 12px; text-align: center;">Fiber</th>
-                            <th style="padding: 12px; text-align: center;">Calories</th>
-                            <th style="padding: 12px; text-align: center; border-radius: 0 8px 0 0;"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
+            // Card list instead of an 8-column table: at 390px the table needed
+            // sideways scrolling just to reach calories and the delete button.
+            const UNIT_OPTIONS = [
+                ['serving', 'srv'], ['g', 'g'], ['oz', 'oz'], ['lb', 'lb'],
+                ['cup', 'cup'], ['tbsp', 'tbsp'], ['tsp', 'tsp'], ['piece', 'pc']
+            ];
 
-            todaysMeals.forEach((item, index) => {
+            const cards = todaysMeals.map(item => {
                 // Handle legacy data and determine type
                 const itemType = item.type || 'meal';
                 const displayName = item.mealName || item.foodName || item.name || 'Unknown Item';
                 const amount = item.amount !== undefined ? item.amount : (item.servings || 1);
                 const unit = item.unit || 'serving';
-                
+
                 // For meals, apply multiplier; for foods, macros already calculated
-                const protein = itemType === 'meal' ? (item.macros.protein * amount).toFixed(1) : item.macros.protein.toFixed(1);
-                const carbs = itemType === 'meal' ? (item.macros.carbs * amount).toFixed(1) : item.macros.carbs.toFixed(1);
-                const fats = itemType === 'meal' ? (item.macros.fats * amount).toFixed(1) : item.macros.fats.toFixed(1);
-                const fiber = itemType === 'meal' ? (item.macros.fiber * amount).toFixed(1) : item.macros.fiber.toFixed(1);
-                
-                // Calculate calories
-                let calories;
-                if (itemType === 'food') {
-                    calories = item.macros.calories.toFixed(0);
-                } else {
-                    const calsFromMacros = (item.macros.protein * 4 + item.macros.carbs * 4 + item.macros.fats * 9) * amount;
-                    calories = (item.macros.calories ? item.macros.calories * amount : calsFromMacros).toFixed(0);
-                }
+                const mult = itemType === 'meal' ? amount : 1;
+                const protein = ((item.macros.protein || 0) * mult).toFixed(1);
+                const carbs = ((item.macros.carbs || 0) * mult).toFixed(1);
+                const fats = ((item.macros.fats || 0) * mult).toFixed(1);
+                const fiber = ((item.macros.fiber || 0) * mult).toFixed(1);
+                const calsFromMacros = (item.macros.protein || 0) * 4 + (item.macros.carbs || 0) * 4 + (item.macros.fats || 0) * 9;
+                const calories = ((item.macros.calories || calsFromMacros) * mult).toFixed(0);
 
-                // Type badge
-                const typeBadge = itemType === 'food' 
-                    ? '<span style="background: rgba(52,211,153,0.15); color: var(--accent-green); padding: 3px 8px; border-radius: 6px; font-size: 0.7rem; margin-left: 6px;">FOOD</span>'
-                    : '<span style="background: rgba(56,189,248,0.15); color: var(--accent-blue); padding: 3px 8px; border-radius: 6px; font-size: 0.7rem; margin-left: 6px;">MEAL</span>';
+                // A meal's amount is always servings — offering g/oz/cup here did
+                // nothing to the macros and just looked like it worked.
+                const options = itemType === 'meal' ? [['serving', 'srv']] : UNIT_OPTIONS;
+                const unitOptions = options.map(([value, label]) =>
+                    `<option value="${value}"${unit === value ? ' selected' : ''}>${label}</option>`
+                ).join('');
 
-                // Alternate row colors
-                const rowBg = 'transparent';
-
-                tableHTML += `
-                    <tr style="background: ${rowBg}; border-bottom: 1px solid var(--border);">
-                        <td style="padding: 12px; font-weight: 600; color: var(--text-primary);">
-                            ${displayName}${typeBadge}
-                        </td>
-                        <td style="padding: 12px; text-align: center;">
-                            <div style="display: flex; gap: 4px; justify-content: center; align-items: center;">
-                                <input type="number" value="${amount}" step="0.1" min="0.1" 
-                                    style="width: 60px; padding: 4px; border: 1px solid var(--border); border-radius: 4px; text-align: center;"
-                                    onchange="updateDayItemAmount(${index}, this.value)">
-                                <select onchange="updateDayItemUnit(${index}, this.value)" 
-                                    style="padding: 4px; border: 1px solid var(--border); border-radius: 4px; font-size: 0.85rem;">
-                                    <option value="serving" ${unit === 'serving' ? 'selected' : ''}>srv</option>
-                                    <option value="g" ${unit === 'g' ? 'selected' : ''}>g</option>
-                                    <option value="oz" ${unit === 'oz' ? 'selected' : ''}>oz</option>
-                                    <option value="lb" ${unit === 'lb' ? 'selected' : ''}>lb</option>
-                                    <option value="cup" ${unit === 'cup' ? 'selected' : ''}>cup</option>
-                                    <option value="tbsp" ${unit === 'tbsp' ? 'selected' : ''}>tbsp</option>
-                                    <option value="tsp" ${unit === 'tsp' ? 'selected' : ''}>tsp</option>
-                                    <option value="piece" ${unit === 'piece' ? 'selected' : ''}>pc</option>
-                                </select>
-                            </div>
-                        </td>
-                        <td style="padding: 12px; text-align: center; font-weight: 600; color: var(--protein);">${protein}g</td>
-                        <td style="padding: 12px; text-align: center; font-weight: 600; color: var(--carbs);">${carbs}g</td>
-                        <td style="padding: 12px; text-align: center; font-weight: 600; color: var(--accent-green);">${fats}g</td>
-                        <td style="padding: 12px; text-align: center; color: var(--text-muted);">${fiber}g</td>
-                        <td style="padding: 12px; text-align: center; font-weight: 700; font-size: 1.1rem; color: var(--text-primary);">${calories}</td>
-                        <td style="padding: 12px; text-align: center;">
-                            <button class="btn btn-danger" onclick="removeMealFromDay(${item.id})" 
-                                style="padding: 6px 12px; font-size: 0.8rem;">✕</button>
-                        </td>
-                    </tr>
+                return `
+                    <div class="day-item">
+                        <div class="day-item-name">
+                            <span>${esc(displayName)}</span>
+                            <span class="day-item-badge ${itemType === 'food' ? 'food' : 'meal'}">${itemType === 'food' ? 'FOOD' : 'MEAL'}</span>
+                        </div>
+                        <button class="btn btn-danger day-item-remove" aria-label="Remove ${esc(displayName)}"
+                            onclick="removeMealFromDay(${jsArg(item.id)})">✕</button>
+                        <div class="day-item-macros">
+                            <span style="color:var(--calories);"><b>${calories}</b> cal</span>
+                            <span style="color:var(--protein);"><b>${protein}</b>g P</span>
+                            <span style="color:var(--carbs);"><b>${carbs}</b>g C</span>
+                            <span style="color:var(--fats);"><b>${fats}</b>g F</span>
+                            <span style="color:var(--text-muted);"><b>${fiber}</b>g fiber</span>
+                        </div>
+                        <div class="day-item-controls">
+                            <input type="number" value="${amount}" step="0.1" min="0.1" inputmode="decimal"
+                                aria-label="Amount of ${esc(displayName)}"
+                                onchange="updateDayItemAmount(${jsArg(item.id)}, this.value)">
+                            <select aria-label="Unit for ${esc(displayName)}"
+                                onchange="updateDayItemUnit(${jsArg(item.id)}, this.value)">${unitOptions}</select>
+                        </div>
+                    </div>
                 `;
-            });
+            }).join('');
 
-            tableHTML += `
-                    </tbody>
-                </table>
-            `;
-
-            listDiv.innerHTML = tableHTML;
+            listDiv.innerHTML = `<div class="day-items">${cards}</div>`;
             calculateDayTotals();
         }
 
@@ -4134,7 +4316,7 @@
         // Export saved meals to CSV
         function exportSavedMeals() {
             if (savedMeals.length === 0) {
-                alert('No saved meals to export!');
+                showToast('No saved meals to export', 'error');
                 return;
             }
 
@@ -4230,7 +4412,7 @@
                                 meals.push(currentMeal);
                             }
                             currentMeal = {
-                                id: Date.now() + Math.random(),
+                                id: newId(),
                                 name: mealName,
                                 totalServings: parseFloat(totalServings) || 1,
                                 foods: []
@@ -4336,7 +4518,7 @@
         function exportFoodDatabase() {
             const foods = foodDatabase;
             if (foods.length === 0) {
-                alert('No foods to export!');
+                showToast('No foods to export', 'error');
                 return;
             }
 
@@ -4581,7 +4763,7 @@
             const fiber = document.getElementById('goalFiber').value ? parseFloat(document.getElementById('goalFiber').value) : null;
             
             if (!protein || !calories) {
-                alert('Please set at least Protein and Calorie goals');
+                showToast('Set at least protein and calorie goals', 'error');
                 return;
             }
             
@@ -4661,7 +4843,7 @@
             // Get selected date or use today
             const selectedDate = document.getElementById('closeOutDate').value;
             if (!selectedDate) {
-                alert('Please select a date for this close out');
+                showToast('Pick a date to close out', 'error');
                 return;
             }
 
@@ -4692,7 +4874,7 @@
             });
 
             if (totalCalories === 0) {
-                alert('No meals tracked today. Add some meals before closing out.');
+                showToast('Nothing tracked today yet', 'error');
                 return;
             }
 
@@ -4729,7 +4911,7 @@
             renderHistory();
             drawHistoryChart();
             
-            alert(`Day closed out for ${selectedDate}! Data saved to history.`);
+            showToast(`Day closed out for ${selectedDate}`, 'success');
         }
 
         // Render history table
@@ -5860,7 +6042,7 @@
 
             // Check if new date already exists (and it's not the same entry)
             if (newDate !== oldDate && dayHistory.some((e, i) => e.date === newDate && i !== index)) {
-                alert('An entry already exists for that date!');
+                showToast('An entry already exists for that date', 'error');
                 return;
             }
 
@@ -5895,7 +6077,7 @@
         // Export history to CSV
         function exportHistory() {
             if (dayHistory.length === 0) {
-                alert('No history to export!');
+                showToast('No history to export', 'error');
                 return;
             }
 
@@ -6031,12 +6213,12 @@
             const notes = document.getElementById('weightNotes').value.trim();
 
             if (!date) {
-                alert('Please select a date');
+                showToast('Pick a date', 'error');
                 return;
             }
 
             if (!morningWeight) {
-                alert('Please enter morning weight');
+                showToast('Enter a morning weight', 'error');
                 return;
             }
 
@@ -6132,7 +6314,7 @@
                         <td style="padding: 8px; text-align: center; color: var(--protein); font-weight: 600;">${entry.morningWeight ? entry.morningWeight + ' lb' : '-'}</td>
                         <td style="padding: 8px; text-align: center; color: var(--accent-green); font-weight: 600;">${avgDisplay}</td>
                         <td style="padding: 8px; text-align: center;">${changeText}</td>
-                        <td style="padding: 8px; font-size: 0.8rem; color: var(--text-muted);">${entry.notes || ''}</td>
+                        <td style="padding: 8px; font-size: 0.8rem; color: var(--text-muted);">${esc(entry.notes || '')}</td>
                         <td style="padding: 8px; text-align: center;">
                             <button onclick="deleteWeightEntry('${entry.date}')" style="background: var(--accent-red); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 0.75rem;">Del</button>
                         </td>
@@ -6542,7 +6724,7 @@
 
         function exportWeightData() {
             if (weightData.length === 0) {
-                alert('No weight data to export!');
+                showToast('No weight data to export', 'error');
                 return;
             }
 
@@ -6799,7 +6981,7 @@
         function setGoalWeight() {
             const goal = parseFloat(document.getElementById('goalWeight').value);
             if (!goal || goal <= 0) {
-                alert('Please enter a valid goal weight');
+                showToast('Enter a valid goal weight', 'error');
                 return;
             }
 
@@ -6934,7 +7116,7 @@
                 return `
                     <div class="food-item" style="display:flex; justify-content:space-between; align-items:center; padding:12px; border-bottom:1px solid var(--border);">
                         <div style="flex:1;">
-                            <div style="font-weight:600;">${plan.name}</div>
+                            <div style="font-weight:600;">${esc(plan.name)}</div>
                             <div style="font-size:0.8rem; color:var(--text-muted);">
                                 ${plan.items.length} items · ${Math.round(totals.calories)} cal · ${totals.protein.toFixed(0)}g P
                             </div>
@@ -7027,7 +7209,7 @@
                         type: 'meal',
                         name: meal.name,
                         data: meal,
-                        html: `<div class="dropdown-item-name" style="color:var(--accent);">${meal.name}</div>
+                        html: `<div class="dropdown-item-name" style="color:var(--accent);">${esc(meal.name)}</div>
                                <div class="dropdown-item-meta">🍽 Meal · P:${meal.perServing.protein.toFixed(0)}g C:${meal.perServing.carbs.toFixed(0)}g F:${meal.perServing.fats.toFixed(0)}g · ${cal.toFixed(0)} cal</div>`
                     });
                 });
@@ -7040,7 +7222,7 @@
                         type: 'food',
                         name: food.name,
                         data: food,
-                        html: `<div class="dropdown-item-name">${food.name}</div>
+                        html: `<div class="dropdown-item-name">${esc(food.name)}</div>
                                <div class="dropdown-item-meta">🥄 ${food.servingAmount} ${UNIT_LABELS[food.servingUnit]} · P:${food.protein}g · ${cal.toFixed(0)} cal</div>`
                     });
                 });
@@ -7052,7 +7234,7 @@
             }
             
             dropdown.innerHTML = results.map(r => `
-                <div onclick="addItemToPrepPlan('${r.type}', '${r.name.replace(/'/g, "\\'")}')" class="dropdown-item">
+                <div onclick="addItemToPrepPlan('${r.type}', ${jsArg(r.name)})" class="dropdown-item">
                     ${r.html}
                 </div>
             `).join('');
@@ -7117,7 +7299,7 @@
             tbody.innerHTML = currentPrepPlan.items.map((item, index) => `
                 <tr>
                     <td style="text-align:left;">
-                        <div style="font-weight:500; font-size:0.9rem;">${item.name}</div>
+                        <div style="font-weight:500; font-size:0.9rem;">${esc(item.name)}</div>
                         <div style="font-size:0.75rem; color:var(--text-muted);">${item.type === 'meal' ? '🍽 Meal' : '🥄 Food'}</div>
                     </td>
                     <td>
