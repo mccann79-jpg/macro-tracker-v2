@@ -821,75 +821,89 @@
         }
 
         /* ===== TODAY'S MEALS — CARD LIST (mobile) / TABLE (desktop) ===== */
-        .day-items { display: flex; flex-direction: column; gap: 10px; }
+        .day-items { display: flex; flex-direction: column; gap: 6px; }
         .day-item {
             display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 8px 10px;
-            padding: 12px 14px;
-            background: rgba(255, 255, 255, 0.45);
+            grid-template-columns: 1fr auto auto;
+            grid-template-areas:
+                "name   amount remove"
+                "macros macros macros";
+            align-items: center;
+            gap: 5px 8px;
+            padding: 9px 10px 9px 12px;
+            background: rgba(255, 255, 255, 0.40);
             border: 1px solid var(--border);
             border-top-color: var(--glass-border-top);
             border-radius: var(--radius-sm);
-            box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.35);
         }
         .day-item-name {
+            grid-area: name;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
+            line-height: 1.25;
             color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex-wrap: wrap;
             min-width: 0;
             overflow-wrap: anywhere;
         }
         .day-item-badge {
-            padding: 2px 7px;
-            border-radius: 6px;
-            font-size: 0.62rem;
+            display: inline-block;
+            margin-left: 6px;
+            padding: 1px 5px;
+            border-radius: 5px;
+            font-size: 0.58rem;
             font-weight: 700;
             letter-spacing: 0.05em;
-            flex: none;
+            vertical-align: 2px;
+            white-space: nowrap;
         }
-        .day-item-badge.food { background: rgba(22, 163, 74, 0.14); color: var(--accent-green); }
-        .day-item-badge.meal { background: rgba(13, 148, 136, 0.14); color: var(--accent-blue); }
+        .day-item-badge.food { background: rgba(22, 163, 74, 0.13); color: var(--accent-green); }
+        .day-item-badge.meal { background: rgba(13, 148, 136, 0.13); color: var(--accent-blue); }
         .day-item-remove {
-            grid-column: 2;
-            grid-row: 1;
+            grid-area: remove;
             align-self: start;
-            width: 34px;
-            height: 34px;
+            width: 28px;
+            height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 0;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             line-height: 1;
-            border-radius: 10px;
+            border-radius: 8px;
+            flex: none;
         }
         .day-item-macros {
-            grid-column: 1 / -1;
+            grid-area: macros;
             display: flex;
             flex-wrap: wrap;
-            gap: 4px 12px;
-            font-size: 0.8rem;
+            align-items: baseline;
+            gap: 2px 10px;
+            font-size: 0.72rem;
             font-weight: 600;
-            color: var(--text-secondary);
+            color: var(--text-muted);
         }
-        .day-item-macros b { font-weight: 700; }
+        .day-item-macros b { font-weight: 700; font-size: 0.8rem; }
         .day-item-controls {
-            grid-column: 1 / -1;
+            grid-area: amount;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 4px;
         }
-        .day-item-controls input[type="number"] {
-            width: 76px;
-            padding: 8px 10px;
+        /* Solid, obviously-tappable controls — on the glass background the default
+           translucent inputs read as plain text rather than fields. */
+        .day-item-controls input[type="number"],
+        .day-item-controls select {
+            padding: 5px 6px;
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid var(--border-strong);
+            border-radius: 8px;
             text-align: center;
+            box-shadow: none;
         }
-        .day-item-controls select { width: auto; padding: 8px 26px 8px 10px; }
+        /* Still 16px: anything smaller and iOS zooms the page when it gets focus. */
+        .day-item-controls input[type="number"] { width: 50px; font-size: 16px; }
+        /* A select opens a picker instead of a keyboard, so it can be smaller safely. */
+        .day-item-controls select { width: auto; padding-right: 4px; font-size: 0.8rem; text-align-last: center; }
         @media (min-width: 860px) {
             .day-items { display: grid; grid-template-columns: 1fr 1fr; }
         }
@@ -950,12 +964,9 @@
             .macro-grid-5 { grid-template-columns: repeat(3, 1fr) !important; gap: 14px 8px !important; }
         }
 
-        @media (max-width: 430px) {
-            .totals-grid { grid-template-columns: repeat(2, 1fr); gap: 14px 8px; }
-            .total-value { font-size: 1.6rem; }
-            /* 4-up borders look wrong once it wraps to 2-up */
-            .total-item { border-right: none; }
-            .total-item:nth-child(odd) { border-right: 1px solid var(--border); }
+        @media (max-width: 380px) {
+            .totals-grid { grid-template-columns: repeat(2, 1fr); }
+            .total-value { font-size: 1.5rem; }
         }
         
         /* Standalone mode (added to home screen) */
@@ -4168,25 +4179,22 @@
 
                 return `
                     <div class="day-item">
-                        <div class="day-item-name">
-                            <span>${esc(displayName)}</span>
-                            <span class="day-item-badge ${itemType === 'food' ? 'food' : 'meal'}">${itemType === 'food' ? 'FOOD' : 'MEAL'}</span>
-                        </div>
+                        <div class="day-item-name">${esc(displayName)}<span class="day-item-badge ${itemType === 'food' ? 'food' : 'meal'}">${itemType === 'food' ? 'FOOD' : 'MEAL'}</span></div>
                         <button class="btn btn-danger day-item-remove" aria-label="Remove ${esc(displayName)}"
                             onclick="removeMealFromDay(${jsArg(item.id)})">✕</button>
-                        <div class="day-item-macros">
-                            <span style="color:var(--calories);"><b>${calories}</b> cal</span>
-                            <span style="color:var(--protein);"><b>${protein}</b>g P</span>
-                            <span style="color:var(--carbs);"><b>${carbs}</b>g C</span>
-                            <span style="color:var(--fats);"><b>${fats}</b>g F</span>
-                            <span style="color:var(--text-muted);"><b>${fiber}</b>g fiber</span>
-                        </div>
                         <div class="day-item-controls">
                             <input type="number" value="${amount}" step="0.1" min="0.1" inputmode="decimal"
                                 aria-label="Amount of ${esc(displayName)}"
                                 onchange="updateDayItemAmount(${jsArg(item.id)}, this.value)">
                             <select aria-label="Unit for ${esc(displayName)}"
                                 onchange="updateDayItemUnit(${jsArg(item.id)}, this.value)">${unitOptions}</select>
+                        </div>
+                        <div class="day-item-macros">
+                            <span style="color:var(--calories);"><b>${calories}</b> cal</span>
+                            <span style="color:var(--protein);"><b>${protein}</b> P</span>
+                            <span style="color:var(--carbs);"><b>${carbs}</b> C</span>
+                            <span style="color:var(--fats);"><b>${fats}</b> F</span>
+                            <span><b>${fiber}</b> fib</span>
                         </div>
                     </div>
                 `;
