@@ -14,8 +14,8 @@
     <meta name="apple-mobile-web-app-title" content="Macros">
     
     <!-- Theme Colors -->
-    <meta name="theme-color" content="#e0e7ff">
-    <meta name="msapplication-TileColor" content="#0d9488">
+    <meta name="theme-color" content="#f8fafc">
+    <meta name="msapplication-TileColor" content="#4b6584">
     
     <!-- Favicons -->
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png?v=2">
@@ -38,46 +38,46 @@
         :root {
             /* Glass foundations */
             --bg-primary: transparent;
-            --bg-secondary: rgba(255, 255, 255, 0.55);
-            --bg-card: rgba(255, 255, 255, 0.45);
-            --bg-card-solid: rgba(255, 255, 255, 0.72);
-            --bg-input: rgba(255, 255, 255, 0.35);
-            --bg-elevated: rgba(255, 255, 255, 0.25);
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --bg-card-solid: #ffffff;
+            --bg-input: #ffffff;
+            --bg-elevated: #f8fafc;
             /* Luminous borders */
-            --border: rgba(255, 255, 255, 0.30);
-            --border-strong: rgba(255, 255, 255, 0.45);
-            --border-focus: #0d9488;
+            --border: #e2e8f0;
+            --border-strong: #cbd5e1;
+            --border-focus: #4b6584;
             /* Text — darkened for glass readability */
             --text-primary: #1e293b;
             --text-secondary: #475569;
             --text-muted: #64748b;
             /* Accents */
-            --accent: #0d9488;
-            --accent-light: rgba(204, 251, 241, 0.50);
-            --accent-glow: rgba(13, 148, 136, 0.22);
-            --accent-text: #0f766e;
-            --accent-blue: #0d9488;
+            --accent: #4b6584;
+            --accent-light: #f1f5f9;
+            --accent-glow: rgba(75, 101, 132, 0.15);
+            --accent-text: #3a5169;
+            --accent-blue: #4b6584;
             --accent-green: #16a34a;
             --accent-amber: #d97706;
             --accent-red: #dc2626;
             --accent-purple: #7c3aed;
             /* Macro colors */
-            --protein: #3b82f6;
+            --protein: #5b84b1;
             --carbs: #d97706;
             --fats: #16a34a;
             --calories: #ea580c;
             /* Softer, deeper shadows */
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03);
-            --shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+            --shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
             /* Rounder radii */
-            --radius: 20px;
-            --radius-sm: 12px;
+            --radius: 12px;
+            --radius-sm: 8px;
             /* Glass tokens */
             --glass-blur: 24px;
-            --glass-border-top: rgba(255, 255, 255, 0.60);
-            --glass-border-bottom: rgba(255, 255, 255, 0.15);
-            --glass-inner-glow: inset 0 1px 0 0 rgba(255, 255, 255, 0.50);
-            --glass-outer-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            --glass-border-top: #e2e8f0;
+            --glass-border-bottom: #e2e8f0;
+            --glass-inner-glow: none;
+            --glass-outer-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
             /* Safe areas */
             --safe-top: env(safe-area-inset-top, 0px);
             --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -87,6 +87,7 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        button, input, select, textarea { font-family: inherit; }
         
         html, body {
             overflow-x: hidden;
@@ -99,16 +100,7 @@
 
         body {
             font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
-            background: fixed linear-gradient(
-                135deg,
-                #e0e7ff 0%,
-                #ede9fe 20%,
-                #fce7f3 40%,
-                #e0f2fe 60%,
-                #ccfbf1 80%,
-                #e0e7ff 100%
-            );
-            background-attachment: fixed;
+            background: #f1f5f9;
             color: var(--text-primary);
             min-height: 100vh;
             min-height: 100dvh;
@@ -120,26 +112,23 @@
         /* ===== SCROLLBAR ===== */
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.40); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
 
         /* ===== HEADER ===== */
         .app-header {
-            padding: 20px 20px 18px;
+            padding: 12px 16px 10px;
             text-align: center;
-            background: rgba(13, 148, 136, 0.15);
-            -webkit-backdrop-filter: blur(32px) saturate(1.5);
-            backdrop-filter: blur(32px) saturate(1.5);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.30);
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
             box-shadow:
-                inset 0 1px 0 0 rgba(255, 255, 255, 0.40),
-                0 4px 16px rgba(13, 148, 136, 0.10);
+                0 1px 2px rgba(15, 23, 42, 0.08);
         }
         .app-header h1 {
-            font-size: 1.4rem;
+            font-size: 1.1rem;
             font-weight: 600;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.08em;
             text-transform: uppercase;
-            color: #0f766e;
+            color: #0f172a;
         }
 
         /* ===== BOTTOM TAB NAVIGATION ===== */
@@ -150,13 +139,10 @@
             right: 0;
             height: calc(var(--nav-height) + var(--safe-bottom));
             padding-bottom: var(--safe-bottom);
-            background: rgba(255, 255, 255, 0.55);
-            -webkit-backdrop-filter: blur(32px) saturate(1.4);
-            backdrop-filter: blur(32px) saturate(1.4);
+            background: #ffffff;
             border-top: 1px solid var(--glass-border-top);
             box-shadow:
-                inset 0 1px 0 0 rgba(255, 255, 255, 0.50),
-                0 -4px 16px rgba(0, 0, 0, 0.05);
+                0 -1px 2px rgba(15, 23, 42, 0.04);
             display: flex;
             z-index: 9000;
         }
@@ -229,7 +215,6 @@
             padding: 20px;
             margin-bottom: 12px;
             box-shadow:
-                var(--glass-inner-glow),
                 var(--glass-outer-shadow);
         }
         .card h2 {
@@ -252,6 +237,17 @@
         /* ===== FORMS ===== */
         .form-group { margin-bottom: 14px; }
         .form-group:has(.autocomplete-dropdown) { position: relative; z-index: 10; }
+        .vol-eq {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr auto 1fr 1.1fr;
+            gap: 8px;
+            align-items: center;
+        }
+        .vol-eq-word { color: var(--text-muted); font-weight: 600; font-size: 0.85rem; }
+        @media (max-width: 480px) {
+            .vol-eq { grid-template-columns: 1fr 1fr; }
+            .vol-eq-word { grid-column: 1 / -1; margin: -2px 0; }
+        }
         .form-row {
             display: grid;
             grid-template-columns: 2fr 1fr;
@@ -272,8 +268,6 @@
             width: 100%;
             padding: 10px 12px;
             background: rgba(255, 255, 255, 0.30);
-            -webkit-backdrop-filter: blur(12px);
-            backdrop-filter: blur(12px);
             border: 1.5px solid var(--border);
             border-radius: var(--radius-sm);
             color: var(--text-primary);
@@ -288,8 +282,7 @@
             outline: none;
             border-color: var(--border-focus);
             box-shadow:
-                0 0 0 3px var(--accent-glow),
-                inset 0 1px 0 0 rgba(255, 255, 255, 0.40);
+                0 0 0 3px var(--accent-glow);
             background: rgba(255, 255, 255, 0.45);
         }
         input::placeholder { color: var(--text-muted); }
@@ -299,11 +292,9 @@
 
         /* ===== BUTTONS ===== */
         .btn {
-            background: linear-gradient(135deg, rgba(13, 148, 136, 0.90), rgba(15, 118, 110, 0.95));
-            -webkit-backdrop-filter: blur(8px);
-            backdrop-filter: blur(8px);
+            background: var(--accent);
             color: white;
-            border: 1px solid rgba(255, 255, 255, 0.20);
+            border: 1px solid #e2e8f0;
             padding: 11px 20px;
             border-radius: var(--radius-sm);
             font-size: 0.9rem;
@@ -314,25 +305,20 @@
             width: 100%;
             -webkit-tap-highlight-color: transparent;
             box-shadow:
-                inset 0 1px 0 0 rgba(255, 255, 255, 0.25),
-                0 4px 12px rgba(13, 148, 136, 0.20);
+                0 1px 2px rgba(15, 23, 42, 0.08);
         }
         .btn:hover {
             box-shadow:
-                inset 0 1px 0 0 rgba(255, 255, 255, 0.30),
-                0 6px 20px rgba(13, 148, 136, 0.30);
+                0 1px 2px rgba(15, 23, 42, 0.08);
             transform: translateY(-1px);
         }
         .btn:active {
             transform: scale(0.97);
             box-shadow:
-                inset 0 1px 0 0 rgba(255, 255, 255, 0.15),
-                0 2px 8px rgba(13, 148, 136, 0.15);
+                0 1px 2px rgba(15, 23, 42, 0.08);
         }
         .btn-danger {
             background: rgba(254, 226, 226, 0.50);
-            -webkit-backdrop-filter: blur(12px);
-            backdrop-filter: blur(12px);
             color: var(--accent-red);
             border: 1px solid rgba(252, 165, 165, 0.40);
             padding: 6px 12px;
@@ -342,8 +328,6 @@
         }
         .btn-success {
             background: rgba(255, 255, 255, 0.35);
-            -webkit-backdrop-filter: blur(12px);
-            backdrop-filter: blur(12px);
             color: var(--text-primary);
             border: 1px solid var(--border);
             padding: 7px 14px;
@@ -353,8 +337,6 @@
         }
         .btn-ghost {
             background: rgba(255, 255, 255, 0.15);
-            -webkit-backdrop-filter: blur(8px);
-            backdrop-filter: blur(8px);
             border: 1.5px solid var(--border);
             color: var(--text-secondary);
             padding: 7px 14px;
@@ -377,7 +359,6 @@
             margin-bottom: 12px;
             text-align: center;
             box-shadow:
-                var(--glass-inner-glow),
                 var(--glass-outer-shadow);
         }
         .totals-hero h2 {
@@ -497,7 +478,7 @@
         td {
             padding: 10px 8px;
             text-align: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.20);
+            border-bottom: 1px solid #e2e8f0;
             white-space: nowrap;
         }
         td:first-child { text-align: left; font-weight: 600; }
@@ -508,15 +489,36 @@
         .cal-col { color: var(--calories); font-weight: 700; }
 
         /* ===== FOOD LIST ===== */
-        .food-list { max-height: 500px; overflow-y: auto; }
+        .food-list { max-height: 65vh; overflow-y: auto; }
+        .food-table, .weight-log-table { min-width: 0 !important; }
+        .food-table thead th { position: sticky; top: 0; background: #f8fafc; z-index: 1; }
+        .food-table td, .food-table th { padding: 10px 6px; }
+        .food-table td { white-space: normal; }
+        .food-name-cell { width: 100%; }
+        .food-name { font-weight: 600; font-size: 0.9rem; line-height: 1.25; }
+        .food-sub { font-weight: 400; font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; line-height: 1.3; }
+        .food-actions { white-space: nowrap !important; text-align: right !important; }
+        .icon-btn {
+            width: 34px; height: 34px;
+            background: transparent; border: 1px solid var(--border);
+            border-radius: 8px; color: var(--text-secondary);
+            font-size: 0.95rem; font-family: inherit; cursor: pointer;
+        }
+        .icon-btn:hover { background: var(--bg-elevated); }
+        .icon-btn.danger { color: var(--accent-red); }
+        .icon-btn + .icon-btn { margin-left: 4px; }
+        @media (max-width: 768px) {
+            .food-table-wrap { margin: 0; padding: 0; }
+            .food-table th, .food-table td { padding: 8px 3px; }
+            .food-table th:last-child { width: 80px; }
+        }
 
         /* ===== SEARCH INPUT ===== */
+        .search-wrap .search-input,
         .search-input {
             width: 100%;
-            padding: 10px 12px 10px 36px;
+            padding: 10px 12px 10px 38px !important;
             background: rgba(255, 255, 255, 0.30);
-            -webkit-backdrop-filter: blur(12px);
-            backdrop-filter: blur(12px);
             border: 1.5px solid var(--border);
             border-radius: var(--radius-sm);
             color: var(--text-primary);
@@ -530,8 +532,7 @@
             border-color: var(--border-focus);
             background: rgba(255, 255, 255, 0.45);
             box-shadow:
-                0 0 0 3px var(--accent-glow),
-                inset 0 1px 0 0 rgba(255, 255, 255, 0.40);
+                0 0 0 3px var(--accent-glow);
         }
         .search-wrap {
             position: relative;
@@ -568,11 +569,11 @@
         .dropdown-item {
             padding: 10px 12px;
             cursor: pointer;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+            border-bottom: 1px solid #e2e8f0;
             transition: background 0.15s ease;
         }
         .dropdown-item:active, .dropdown-item:hover {
-            background: rgba(204, 251, 241, 0.40);
+            background: var(--accent-light);
         }
         .dropdown-item-name { font-weight: 600; font-size: 0.9rem; }
         .dropdown-item-meta { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
@@ -598,8 +599,6 @@
             display: flex;
             gap: 4px;
             background: rgba(255, 255, 255, 0.20);
-            -webkit-backdrop-filter: blur(12px);
-            backdrop-filter: blur(12px);
             padding: 4px;
             border-radius: var(--radius-sm);
             margin-bottom: 14px;
@@ -620,13 +619,10 @@
             transition: all 0.25s ease;
         }
         .toggle-btn.active {
-            background: rgba(13, 148, 136, 0.85);
-            -webkit-backdrop-filter: blur(8px);
-            backdrop-filter: blur(8px);
+            background: var(--accent);
             color: white;
             box-shadow:
-                inset 0 1px 0 0 rgba(255, 255, 255, 0.25),
-                0 2px 8px rgba(13, 148, 136, 0.25);
+                0 1px 2px rgba(15, 23, 42, 0.08);
         }
 
         /* ===== GOALS DISPLAY ===== */
@@ -660,8 +656,6 @@
             gap: 6px;
             padding: 6px 10px;
             background: rgba(255, 255, 255, 0.30);
-            -webkit-backdrop-filter: blur(8px);
-            backdrop-filter: blur(8px);
             border: 1px solid var(--border);
             border-radius: var(--radius-sm);
             cursor: pointer;
@@ -684,14 +678,11 @@
             align-items: end;
         }
         .goal-weight-section {
-            background: rgba(139, 92, 246, 0.08);
-            -webkit-backdrop-filter: blur(16px);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(139, 92, 246, 0.20);
-            padding: 18px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            padding: 12px 14px;
             border-radius: var(--radius);
-            margin-bottom: 18px;
-            box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.30);
+            margin-bottom: 12px;
         }
         .projection-box {
             padding: 16px;
@@ -713,8 +704,6 @@
         .edit-row-content {
             padding: 12px;
             background: rgba(255, 255, 255, 0.25);
-            -webkit-backdrop-filter: blur(12px);
-            backdrop-filter: blur(12px);
             border-radius: var(--radius-sm);
             border: 1px solid var(--border);
         }
@@ -731,16 +720,12 @@
             position: fixed;
             inset: 0;
             background: rgba(0, 0, 0, 0.20);
-            -webkit-backdrop-filter: blur(16px) saturate(1.2);
-            backdrop-filter: blur(16px) saturate(1.2);
             z-index: 9999;
             align-items: center;
             justify-content: center;
         }
         .pin-card {
             background: rgba(255, 255, 255, 0.70);
-            -webkit-backdrop-filter: blur(40px) saturate(1.5);
-            backdrop-filter: blur(40px) saturate(1.5);
             border: 1px solid var(--glass-border-top);
             padding: 36px 28px;
             border-radius: 24px;
@@ -748,7 +733,6 @@
             width: 90%;
             text-align: center;
             box-shadow:
-                inset 0 1px 0 0 rgba(255, 255, 255, 0.60),
                 0 24px 48px rgba(0, 0, 0, 0.12),
                 0 8px 16px rgba(0, 0, 0, 0.06);
         }
@@ -806,8 +790,6 @@
             position: absolute;
             display: none;
             background: rgba(255, 255, 255, 0.75);
-            -webkit-backdrop-filter: blur(24px) saturate(1.3);
-            backdrop-filter: blur(24px) saturate(1.3);
             color: var(--text-primary);
             padding: 8px 12px;
             border-radius: var(--radius-sm);
@@ -816,7 +798,6 @@
             z-index: 1000;
             border: 1px solid var(--glass-border-top);
             box-shadow:
-                inset 0 1px 0 0 rgba(255, 255, 255, 0.40),
                 0 8px 24px rgba(0, 0, 0, 0.10);
         }
 
@@ -857,7 +838,7 @@
             white-space: nowrap;
         }
         .day-item-badge.food { background: rgba(22, 163, 74, 0.13); color: var(--accent-green); }
-        .day-item-badge.meal { background: rgba(13, 148, 136, 0.13); color: var(--accent-blue); }
+        .day-item-badge.meal { background: rgba(75, 101, 132, 0.10); color: var(--accent-blue); }
         .day-item-remove {
             grid-area: remove;
             align-self: start;
@@ -975,13 +956,11 @@
             text-align: center;
             color: #fff;
             background: rgba(30, 41, 59, 0.92);
-            -webkit-backdrop-filter: blur(16px);
-            backdrop-filter: blur(16px);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
             animation: toastIn 0.18s ease;
         }
         .toast.error { background: rgba(185, 28, 28, 0.94); }
-        .toast.success { background: rgba(15, 118, 110, 0.94); }
+        .toast.success { background: #0f172a; }
         .toast.leaving { animation: toastOut 0.22s ease forwards; }
         @keyframes toastIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
         @keyframes toastOut { to { opacity: 0; transform: translateY(10px); } }
@@ -1004,6 +983,20 @@
             .weight-entry-grid { grid-template-columns: 1fr 1fr; }
             .weight-entry-grid > div:last-child { grid-column: 1 / -1; }
             .projection-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .app-header { padding-top: calc(10px + 0px); }
+            .card { padding: 14px; margin-bottom: 10px; }
+            .card h2 { margin-bottom: 12px; }
+            .card-header { margin-bottom: 12px; }
+            .form-group { margin-bottom: 10px; }
+            .chart-toggles { gap: 6px; margin-bottom: 10px; }
+            .chart-toggle { padding: 6px 9px; min-height: 34px; font-size: 0.76rem; }
+            .totals-actions { margin-top: 12px; gap: 6px; flex-wrap: nowrap; }
+            .totals-actions input[type="date"] { flex: 1; min-width: 0; }
+            .totals-actions .btn-sm { white-space: nowrap; padding: 8px 10px; }
+            .weight-log-table td, .weight-log-table th { padding: 8px 4px; }
         }
 
         @media (max-width: 380px) {
@@ -1078,7 +1071,7 @@
                 <div class="form-group">
                     <label>Serving Size</label>
                     <div class="form-row">
-                        <input type="number" id="servingAmount" step="0.1" required min="0.1" placeholder="1">
+                        <input type="number" id="servingAmount" step="any" required min="0" inputmode="decimal" placeholder="1">
                         <select id="servingUnit" required>
                             <option value="g">g</option>
                             <option value="oz">oz</option>
@@ -1096,41 +1089,45 @@
                 </div>
                 <div class="form-group">
                     <label>Volume ↔ Weight <span style="color:var(--text-muted)">(optional — for accurate cup/tbsp/tsp logging)</span></label>
-                    <div class="form-row" style="align-items:center; gap:6px;">
-                        <input type="number" id="volEqAmount" step="0.1" min="0.1" placeholder="1" style="max-width:70px;">
-                        <select id="volEqUnit" style="max-width:90px;">
+                    <div class="vol-eq">
+                        <input type="number" id="volEqAmount" step="any" min="0" inputmode="decimal" placeholder="1" aria-label="Volume amount">
+                        <select id="volEqUnit" aria-label="Volume unit">
                             <option value="cup">cup</option>
                             <option value="tbsp">tbsp</option>
                             <option value="tsp">tsp</option>
                             <option value="ml">ml</option>
                             <option value="fl_oz">fl oz</option>
                         </select>
-                        <span style="color:var(--text-muted); font-weight:600;">weighs</span>
-                        <input type="number" id="volEqGrams" step="0.1" min="0" placeholder="120" style="max-width:80px;">
-                        <span style="color:var(--text-muted); font-weight:600;">g</span>
+                        <span class="vol-eq-word">weighs</span>
+                        <input type="number" id="volEqGrams" step="any" min="0" inputmode="decimal" placeholder="120" aria-label="Weight amount">
+                        <select id="volEqWeightUnit" aria-label="Weight unit">
+                            <option value="g">g</option>
+                            <option value="oz">oz</option>
+                            <option value="lb">lb</option>
+                        </select>
                     </div>
-                    <small>e.g. "1 cup weighs 120 g". Lets you log this food by volume and get accurate weight.</small>
+                    <small>e.g. "1 cup weighs 120 g" (or 4.2 oz). Lets you log this food by volume and get accurate weight.</small>
                 </div>
                 <div class="form-group">
                     <label for="calories">Calories <span style="color:var(--text-muted)">(auto if blank)</span></label>
-                    <input type="number" id="calories" step="1" min="0" placeholder="(P×4)+(C×4)+(F×9)">
+                    <input type="number" inputmode="decimal" id="calories" step="any" min="0" placeholder="(P×4)+(C×4)+(F×9)">
                 </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:8px;">
                     <div class="form-group">
-                        <label for="fats">Fat (g)</label>
-                        <input type="number" id="fats" step="0.1" required min="0">
+                        <label for="protein">Protein</label>
+                        <input type="number" id="protein" step="any" required min="0" inputmode="decimal" placeholder="g">
                     </div>
                     <div class="form-group">
-                        <label for="carbs">Carbs (g)</label>
-                        <input type="number" id="carbs" step="0.1" required min="0">
+                        <label for="carbs">Carbs</label>
+                        <input type="number" id="carbs" step="any" required min="0" inputmode="decimal" placeholder="g">
                     </div>
                     <div class="form-group">
-                        <label for="protein">Protein (g)</label>
-                        <input type="number" id="protein" step="0.1" required min="0">
+                        <label for="fats">Fat</label>
+                        <input type="number" id="fats" step="any" required min="0" inputmode="decimal" placeholder="g">
                     </div>
                     <div class="form-group">
-                        <label for="fiber">Fiber (g) <span style="color:var(--text-muted)">(opt)</span></label>
-                        <input type="number" id="fiber" step="0.1" min="0" value="0">
+                        <label for="fiber">Fiber</label>
+                        <input type="number" id="fiber" step="any" min="0" inputmode="decimal" placeholder="g">
                     </div>
                 </div>
                 <button type="submit" class="btn" id="submitFoodBtn">Add to Database</button>
@@ -1140,7 +1137,7 @@
 
         <div class="card">
             <div class="card-header">
-                <h2>My Foods</h2>
+                <h2>My Foods <span id="foodCount" style="font-weight:500; color:var(--text-muted);"></span></h2>
                 <div style="display:flex; gap:6px;">
                     <button class="btn-success btn-sm" onclick="exportFoodDatabase()">⬇ Export</button>
                     <button class="btn-success btn-sm" onclick="document.getElementById('importFileInput').click()">⬆ Import</button>
@@ -1149,10 +1146,10 @@
             </div>
             <div class="form-group" style="margin-bottom:12px;">
                 <div class="search-wrap">
-                    <input type="text" id="foodSearchInput" class="search-input" placeholder="Search foods..." onkeyup="filterFoodList()">
+                    <input type="text" id="foodSearchInput" class="search-input" placeholder="Search foods..." oninput="filterFoodList()" autocomplete="off">
                 </div>
             </div>
-            <div class="table-wrap">
+            <div class="table-wrap food-table-wrap">
                 <div class="food-list" id="foodList"></div>
             </div>
         </div>
@@ -1170,7 +1167,7 @@
                 </div>
                 <div class="form-group" style="margin-bottom:0;">
                     <label for="totalServings">Servings</label>
-                    <input type="number" id="totalServings" min="1" step="1" value="1">
+                    <input type="number" id="totalServings" min="0" step="any" inputmode="decimal" value="1">
                 </div>
             </div>
 
@@ -1232,6 +1229,7 @@
 
             <div style="display:flex; gap:8px;">
                 <button type="button" class="btn" id="saveMealBtn" style="flex:1;">Save Meal</button>
+                <button type="button" class="btn btn-ghost" id="saveMealAsBtn" style="flex:1; display:none; width:100%;" onclick="saveMeal(true)">Save as New</button>
                 <button type="button" class="btn btn-ghost" id="cancelMealEditBtn" style="flex:1; display:none; width:100%;" onclick="cancelMealEdit()">Cancel</button>
             </div>
         </div>
@@ -1305,23 +1303,23 @@
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
                     <div class="form-group" style="margin-bottom:0;">
                         <label for="goalProtein">Protein (g) *</label>
-                        <input type="number" id="goalProtein" min="0" step="1" placeholder="150">
+                        <input type="number" inputmode="numeric" id="goalProtein" min="0" step="1" placeholder="150">
                     </div>
                     <div class="form-group" style="margin-bottom:0;">
                         <label for="goalCalories">Calories *</label>
-                        <input type="number" id="goalCalories" min="0" step="1" placeholder="2000">
+                        <input type="number" inputmode="numeric" id="goalCalories" min="0" step="1" placeholder="2000">
                     </div>
                     <div class="form-group" style="margin-bottom:0;">
                         <label for="goalCarbs">Carbs (g) <span style="color:var(--text-muted)">opt</span></label>
-                        <input type="number" id="goalCarbs" min="0" step="1" placeholder="—">
+                        <input type="number" inputmode="numeric" id="goalCarbs" min="0" step="1" placeholder="—">
                     </div>
                     <div class="form-group" style="margin-bottom:0;">
                         <label for="goalFats">Fats (g) <span style="color:var(--text-muted)">opt</span></label>
-                        <input type="number" id="goalFats" min="0" step="1" placeholder="—">
+                        <input type="number" inputmode="numeric" id="goalFats" min="0" step="1" placeholder="—">
                     </div>
                     <div class="form-group" style="margin-bottom:0;">
                         <label for="goalFiber">Fiber (g) <span style="color:var(--text-muted)">opt</span></label>
-                        <input type="number" id="goalFiber" min="0" step="1" placeholder="—">
+                        <input type="number" inputmode="numeric" id="goalFiber" min="0" step="1" placeholder="—">
                     </div>
                 </div>
                 <div style="display:flex; gap:8px;">
@@ -1341,12 +1339,12 @@
         <!-- Add to Day -->
         <div class="card">
             <h2>Add to Today</h2>
-            <div style="display:flex; gap:12px; margin-bottom:12px;">
+            <div style="display:flex; gap:8px; margin-bottom:10px;">
                 <label class="chart-toggle" style="margin:0;"><input type="checkbox" id="filterMeals" checked onchange="filterUnifiedDropdown()"> Meals</label>
                 <label class="chart-toggle" style="margin:0;"><input type="checkbox" id="filterFoods" checked onchange="filterUnifiedDropdown()"> Foods</label>
             </div>
 
-            <div class="form-group" style="position:relative;">
+            <div class="form-group" id="itemSearchGroup" style="position:relative;">
                 <label for="searchItemForDay">Search meals & foods</label>
                 <input type="text" id="searchItemForDay" placeholder="Type to search..."
                     onfocus="filterUnifiedDropdown()"
@@ -1359,10 +1357,10 @@
             
             <!-- Input Mode Toggle -->
             <div class="form-group">
-                <label style="margin-bottom:8px; display:block;">Input Mode</label>
-                <div style="display:flex; gap:8px; margin-bottom:12px;">
+                <div style="display:flex; gap:8px; margin-bottom:4px;">
                     <button type="button" class="btn btn-sm" id="modeAmountBtn" onclick="setInputMode('amount')" style="flex:1; background:var(--accent); color:white;">By Amount</button>
-                    <button type="button" class="btn btn-sm btn-ghost" id="modeTargetBtn" onclick="setInputMode('target')" style="flex:1;">By Target Macro</button>
+                    <button type="button" class="btn btn-sm btn-ghost" id="modeTargetBtn" onclick="setInputMode('target')" style="flex:1;">By Target</button>
+                    <button type="button" class="btn btn-sm btn-ghost" id="modeCustomBtn" onclick="setInputMode('custom')" style="flex:1;">Custom</button>
                 </div>
             </div>
             
@@ -1371,7 +1369,7 @@
                 <div class="form-group">
                     <label>Amount</label>
                     <div class="form-row">
-                        <input type="number" id="itemAmountForDay" min="0.1" step="0.1" value="1" oninput="updateMacroPreview()">
+                        <input type="number" inputmode="decimal" id="itemAmountForDay" min="0" step="any" value="1" oninput="updateMacroPreview()">
                         <select id="itemUnitForDay" onchange="updateMacroPreview()">
                             <option value="serving">servings</option>
                             <option value="g">g</option>
@@ -1393,7 +1391,7 @@
                 <div class="form-group">
                     <label>I want this much:</label>
                     <div class="form-row">
-                        <input type="number" id="targetMacroValue" min="0.1" step="0.1" placeholder="30" oninput="calculateFromTargetMacro()">
+                        <input type="number" inputmode="decimal" id="targetMacroValue" min="0.1" step="any" placeholder="30" oninput="calculateFromTargetMacro()">
                         <select id="targetMacroType" onchange="calculateFromTargetMacro()">
                             <option value="protein">g Protein</option>
                             <option value="calories">Calories</option>
@@ -1422,6 +1420,37 @@
                 </div>
             </div>
             
+            <!-- Custom Macros Mode -->
+            <div id="customModeInputs" style="display:none;">
+                <div class="form-group">
+                    <label for="customName">Name <span id="customNameHint" style="color:var(--text-muted)">(optional)</span></label>
+                    <input type="text" id="customName" placeholder="e.g., Restaurant burrito" autocomplete="off">
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+                    <div class="form-group">
+                        <label for="customCalories">Calories <span style="color:var(--text-muted)">(auto)</span></label>
+                        <input type="number" id="customCalories" step="any" min="0" inputmode="decimal" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="customProtein">Protein (g)</label>
+                        <input type="number" id="customProtein" step="any" min="0" inputmode="decimal" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="customCarbs">Carbs (g)</label>
+                        <input type="number" id="customCarbs" step="any" min="0" inputmode="decimal" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="customFats">Fat (g)</label>
+                        <input type="number" id="customFats" step="any" min="0" inputmode="decimal" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="customFiber">Fiber (g)</label>
+                        <input type="number" id="customFiber" step="any" min="0" inputmode="decimal" placeholder="0">
+                    </div>
+                </div>
+                <label class="chart-toggle" style="margin:0 0 12px;"><input type="checkbox" id="customSaveFood" onchange="document.getElementById('customNameHint').textContent = this.checked ? '(required to save)' : '(optional)'"> Also save to My Foods (as 1 serving)</label>
+            </div>
+
             <!-- Macro Preview -->
             <div id="macroPreview" style="display:none; margin-bottom:12px;">
                 <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow-sm);">
@@ -1510,7 +1539,7 @@
                 </div>
             </div>
             <div class="table-wrap">
-                <table>
+                <table class="weight-log-table">
                     <thead>
                         <tr>
                             <th style="text-align:left;">Date</th><th>Cal</th><th>Goal</th><th>Protein</th><th>Goal</th><th>Carbs</th><th>Fats</th><th>Fiber</th><th></th>
@@ -1541,16 +1570,17 @@
                 </div>
                 <div class="form-group" style="margin-bottom:0;">
                     <label for="morningWeight">Weight (lb)</label>
-                    <input type="number" id="morningWeight" step="0.1" placeholder="196.5" required>
+                    <input type="number" inputmode="decimal" id="morningWeight" step="0.1" placeholder="196.5" required>
                 </div>
                 <div style="display:flex; align-items:flex-end;">
-                    <button class="btn" onclick="addWeightEntry()" style="padding:10px 16px;">+ Add</button>
+                    <button class="btn" id="weightSubmitBtn" onclick="addWeightEntry()" style="padding:10px 16px;">+ Add</button>
                 </div>
             </div>
             <div class="form-group" style="margin-top:10px; margin-bottom:0;">
                 <label for="weightNotes">Notes <span style="color:var(--text-muted)">(optional)</span></label>
                 <input type="text" id="weightNotes" placeholder="e.g., creatine loading">
             </div>
+            <button class="btn btn-ghost" id="weightCancelEditBtn" onclick="cancelWeightEdit()" style="display:none; margin-top:10px; width:100%;">Cancel Edit</button>
         </div>
 
         <div class="card">
@@ -1558,7 +1588,7 @@
             <div class="goal-weight-section">
                 <label style="font-weight:700; color:var(--accent-purple); margin-bottom:10px; display:block;">Goal Weight</label>
                 <div style="display:flex; gap:8px; align-items:stretch; flex-wrap:wrap;">
-                    <input type="number" id="goalWeight" step="0.1" placeholder="e.g., 185" style="flex:1; min-width:120px;">
+                    <input type="number" inputmode="decimal" id="goalWeight" step="0.1" placeholder="e.g., 185" style="flex:1; min-width:120px;">
                     <button class="btn" onclick="setGoalWeight()" style="padding:10px 18px; width:auto;">Set</button>
                     <button class="btn btn-danger" onclick="clearGoalWeight()" style="padding:10px 14px;">Clear</button>
                 </div>
@@ -1582,19 +1612,28 @@
                 <label class="chart-toggle"><input type="checkbox" id="showTrendLine" checked onchange="drawWeightChart()"> <span style="color:var(--accent-red);">Trend</span></label>
                 <label class="chart-toggle"><input type="checkbox" id="showCalories" onchange="drawWeightChart()"> <span style="color:var(--accent-amber);">Calories</span></label>
             </div>
-            <div class="chart-cell">
-                <canvas id="weightChart" style="cursor:crosshair; width:100%;"></canvas>
+            <div class="chart-toggles" style="margin-bottom:8px; flex-wrap:nowrap;">
+                <button class="btn-ghost btn-sm" onclick="weightRangeDays(30)">1M</button>
+                <button class="btn-ghost btn-sm" onclick="weightRangeDays(90)">3M</button>
+                <button class="btn-ghost btn-sm" onclick="weightRangeDays(180)">6M</button>
+                <button class="btn-ghost btn-sm" onclick="weightRangeDays(0)">All</button>
+                <button class="btn-ghost btn-sm" onclick="zoomWeightChart(0.6)" aria-label="Zoom in">＋</button>
+                <button class="btn-ghost btn-sm" onclick="zoomWeightChart(1/0.6)" aria-label="Zoom out">－</button>
             </div>
+            <div class="chart-cell">
+                <canvas id="weightChart" style="cursor:crosshair; width:100%; touch-action:pan-y; user-select:none; -webkit-user-select:none;"></canvas>
+            </div>
+            <small style="display:block; margin-top:6px;">Drag to pan · pinch to zoom · double-tap to reset</small>
             <div id="weightChartTooltip" class="chart-tooltip"></div>
         </div>
 
         <div class="card">
             <h2>Weight Log</h2>
             <div class="table-wrap">
-                <table>
+                <table class="weight-log-table">
                     <thead>
                         <tr>
-                            <th style="text-align:left;">Date</th><th>Weight</th><th>7d Avg</th><th>Change</th><th style="text-align:left;">Notes</th><th></th>
+                            <th style="text-align:left;">Date</th><th>Weight</th><th>7d Avg</th><th>Change</th><th></th>
                         </tr>
                     </thead>
                     <tbody id="weightTableBody"></tbody>
@@ -1702,6 +1741,12 @@
         const database = firebase.database();
         let userPin = localStorage.getItem('userPin') || null;
         let firebaseRef = null;
+
+        // Select a number field's contents on focus so typing replaces the old value
+        document.addEventListener('focusin', e => {
+            const t = e.target;
+            if (t && t.tagName === 'INPUT' && t.type === 'number') setTimeout(() => { try { t.select(); } catch (_) {} }, 0);
+        });
 
         // Unit conversion constants (to grams or ml)
         const UNIT_CONVERSIONS = {
@@ -1920,6 +1965,8 @@
                         foodDatabase = data.foodDatabase;
                         ensureFoodIds();
                         applyDensitySeed(); // backfill volume<->weight data
+                        applyRecipeSeed();
+                        applyRecipeMealSeed();
                         localStorage.setItem('foodDatabase', JSON.stringify(foodDatabase));
                         loadedFromCloud = true;
                     }
@@ -2209,6 +2256,7 @@
 
             ensureFoodIds();
             applyDensitySeed(); // backfill volume<->weight data on existing foods
+            if (applyRecipeSeed() | applyRecipeMealSeed()) syncToFirebase();
             renderFoodList();
             updateFoodSelectors();
             renderSavedMeals();
@@ -2230,7 +2278,7 @@
             // Event listeners
             document.getElementById('addFoodForm').addEventListener('submit', addFood);
             document.getElementById('addToMealBuilder').addEventListener('click', addFoodToMealBuilder);
-            document.getElementById('saveMealBtn').addEventListener('click', saveMeal);
+            document.getElementById('saveMealBtn').addEventListener('click', () => saveMeal());
             document.getElementById('addItemToDay').addEventListener('click', addItemToDay);
             document.getElementById('totalServings').addEventListener('input', calculateMealTotals);
             
@@ -2460,6 +2508,102 @@
             return changed;
         }
 
+        // Ingredients for the farro chicken meatball soup. Added once, and only if
+        // no food with the same name (or an alias) is already in My Foods. Nutrition
+        // is per the listed serving (USDA reference values).
+        const RECIPE_SEED = [
+            { name: "Garlic", servingAmount: 1, servingUnit: "piece", protein: 0.2, carbs: 1, fats: 0, fiber: 0.1, calories: 4, aliases: ['garlic clove', 'garlic cloves', 'garlic (raw)'] },
+            { name: "Tomato Paste", servingAmount: 100, servingUnit: "g", protein: 4.3, carbs: 18.9, fats: 0.5, fiber: 4.1, calories: 82, vol: { a: 1, u: 'tbsp', g: 16 } },
+            { name: "Farro (dry)", servingAmount: 47, servingUnit: "g", protein: 6, carbs: 34, fats: 1, fiber: 5, calories: 170, vol: { a: 1, u: 'cup', g: 190 }, aliases: ['farro'] },
+            { name: "Low-Sodium Chicken Broth", servingAmount: 1, servingUnit: "cup", protein: 1, carbs: 1, fats: 0.5, fiber: 0, calories: 10, vol: { a: 1, u: 'cup', g: 240 }, aliases: ['chicken broth', 'chicken stock'] },
+            { name: "Parmesan (grated)", servingAmount: 28, servingUnit: "g", protein: 10.9, carbs: 1.1, fats: 8.1, fiber: 0, calories: 122, vol: { a: 1, u: 'cup', g: 100 }, aliases: ['parmesan', 'parmesan cheese', 'grated parmesan', 'parmigiano reggiano'] },
+            { name: "Ground Chicken (raw)", servingAmount: 100, servingUnit: "g", protein: 17.4, carbs: 0, fats: 8.1, fiber: 0, calories: 143, aliases: ['ground chicken', 'ground chicken (dark meat)'] },
+            { name: "Frozen Peas", servingAmount: 100, servingUnit: "g", protein: 5.2, carbs: 13.6, fats: 0.4, fiber: 4.5, calories: 77, vol: { a: 1, u: 'cup', g: 134 }, aliases: ['peas (frozen)'] },
+            { name: "Olive Oil", servingAmount: 1, servingUnit: "tbsp", protein: 0, carbs: 0, fats: 14, fiber: 0, calories: 119, vol: { a: 1, u: 'tbsp', g: 13.5 }, aliases: ['extra-virgin olive oil', 'extra virgin olive oil', 'evoo'] },
+            { name: "Carrots (raw)", servingAmount: 100, servingUnit: "g", protein: 0.9, carbs: 9.6, fats: 0.2, fiber: 2.8, calories: 41, vol: { a: 1, u: 'cup', g: 128 }, aliases: ['carrot', 'carrots'] },
+            { name: "Egg", servingAmount: 1, servingUnit: "piece", protein: 6, carbs: 0.6, fats: 5, fiber: 0, calories: 78, aliases: ['eggs', 'large egg', 'egg (large)'] },
+            { name: "Panko", servingAmount: 28, servingUnit: "g", protein: 3, carbs: 21, fats: 0.5, fiber: 1, calories: 100, vol: { a: 1, u: 'cup', g: 50 }, aliases: ['panko bread crumbs', 'panko breadcrumbs'] }
+        ];
+
+        // Add any RECIPE_SEED food that isn't already present. Names already seeded
+        // are remembered so a food the user later deletes is not re-added.
+        function applyRecipeSeed() {
+            let seeded = [];
+            try { seeded = JSON.parse(localStorage.getItem('seededFoods')) || []; } catch (e) {}
+            const have = new Set(foodDatabase.map(f => (f && f.name || '').trim().toLowerCase()));
+            let added = 0;
+            RECIPE_SEED.forEach(seed => {
+                if (seeded.includes(seed.name)) return;
+                seeded.push(seed.name);
+                const names = [seed.name, ...(seed.aliases || [])].map(n => n.toLowerCase());
+                if (names.some(n => have.has(n))) return;
+                const { aliases, vol, ...food } = seed;
+                food.id = newId();
+                food.customCalories = true;
+                if (vol) {
+                    food.density = vol.g / (vol.a * VOLUME_TO_ML[vol.u]);
+                    food.volEqAmount = vol.a;
+                    food.volEqUnit = vol.u;
+                    food.volEqGrams = vol.g;
+                }
+                foodDatabase.push(food);
+                have.add(seed.name.toLowerCase());
+                added++;
+            });
+            localStorage.setItem('seededFoods', JSON.stringify(seeded));
+            if (added) localStorage.setItem('foodDatabase', JSON.stringify(foodDatabase));
+            return added;
+        }
+
+        // Saved meal built from the seeded ingredients above. Added once by name.
+        const RECIPE_MEALS = [
+            {
+                name: "NYT- Farro Stew With Chicken Meatballs and Peas",
+                totalServings: 4,
+                items: [
+                    ["Olive Oil", 2, "tbsp"], ["Carrots (raw)", 0.5, "cup"], ["Garlic", 5, "piece"],
+                    ["Tomato Paste", 2, "tbsp"], ["Farro (dry)", 0.75, "cup"], ["Low-Sodium Chicken Broth", 4, "cup"],
+                    ["Egg", 1, "piece"], ["Panko", 0.5, "cup"], ["Parmesan (grated)", 0.75, "cup"],
+                    ["Ground Chicken (raw)", 454, "g"], ["Frozen Peas", 1, "cup"]
+                ]
+            }
+        ];
+
+        function applyRecipeMealSeed() {
+            let seeded = [];
+            try { seeded = JSON.parse(localStorage.getItem('seededMeals')) || []; } catch (e) {}
+            let added = 0;
+            RECIPE_MEALS.forEach(def => {
+                if (seeded.includes(def.name)) return;
+                if (savedMeals.some(m => (m.name || '').toLowerCase() === def.name.toLowerCase())) { seeded.push(def.name); return; }
+                const foods = [];
+                for (const [seedName, amount, unit] of def.items) {
+                    const seed = RECIPE_SEED.find(r => r.name === seedName);
+                    const names = [seedName, ...((seed && seed.aliases) || [])].map(n => n.toLowerCase());
+                    const food = foodDatabase.find(f => f && names.includes((f.name || '').trim().toLowerCase()));
+                    if (!food) return; // ingredient missing; retry on a later load
+                    foods.push({ ...food, builderId: newId(), amount, unit });
+                }
+                const tot = { protein: 0, carbs: 0, fats: 0, fiber: 0, calories: 0 };
+                foods.forEach(item => {
+                    const m = servingMultiplier(item.amount, item.unit, item.servingAmount, item.servingUnit, item.density);
+                    const cal = item.calories !== undefined ? item.calories : (item.protein * 4 + item.carbs * 4 + item.fats * 9);
+                    tot.protein += item.protein * m; tot.carbs += item.carbs * m; tot.fats += item.fats * m;
+                    tot.fiber += (item.fiber || 0) * m; tot.calories += cal * m;
+                });
+                const n = def.totalServings;
+                savedMeals.push({
+                    id: newId(), name: def.name, totalServings: n, foods,
+                    perServing: { protein: tot.protein / n, carbs: tot.carbs / n, fats: tot.fats / n, fiber: tot.fiber / n, calories: tot.calories / n }
+                });
+                seeded.push(def.name);
+                added++;
+            });
+            localStorage.setItem('seededMeals', JSON.stringify(seeded));
+            if (added) localStorage.setItem('savedMeals', JSON.stringify(savedMeals));
+            return added;
+        }
+
         function addFood(e) {
             e.preventDefault();
             
@@ -2479,7 +2623,8 @@
             // Optional volume<->weight equivalence -> density (grams per ml)
             const volEqAmount = parseFloat(document.getElementById('volEqAmount').value);
             const volEqUnit = document.getElementById('volEqUnit').value;
-            const volEqGrams = parseFloat(document.getElementById('volEqGrams').value);
+            const volEqWUnit = document.getElementById('volEqWeightUnit').value;
+            const volEqGrams = parseFloat(document.getElementById('volEqGrams').value) * (WEIGHT_TO_G[volEqWUnit] || 1);
             let density = null;
             const volEqMl = (volEqAmount > 0 && VOLUME_TO_ML[volEqUnit]) ? volEqAmount * VOLUME_TO_ML[volEqUnit] : 0;
             if (volEqMl > 0 && volEqGrams > 0) {
@@ -2499,7 +2644,8 @@
                 density: density, // grams per ml, or null if not provided
                 volEqAmount: density ? volEqAmount : null,
                 volEqUnit: density ? volEqUnit : null,
-                volEqGrams: density ? volEqGrams : null
+                volEqGrams: density ? volEqGrams : null,
+                volEqWeightUnit: density ? volEqWUnit : null
             };
 
             if (editingId !== '') {
@@ -2553,15 +2699,19 @@
             if (food.density && food.volEqGrams) {
                 document.getElementById('volEqAmount').value = food.volEqAmount || 1;
                 document.getElementById('volEqUnit').value = food.volEqUnit || 'cup';
-                document.getElementById('volEqGrams').value = food.volEqGrams;
+                const wu = food.volEqWeightUnit || 'g';
+                document.getElementById('volEqWeightUnit').value = wu;
+                document.getElementById('volEqGrams').value = +(food.volEqGrams / WEIGHT_TO_G[wu]).toFixed(2);
             } else if (food.density) {
                 // Older/derived density with no stored basis: show it as "1 cup = Xg"
                 document.getElementById('volEqAmount').value = 1;
                 document.getElementById('volEqUnit').value = 'cup';
+                document.getElementById('volEqWeightUnit').value = 'g';
                 document.getElementById('volEqGrams').value = +(food.density * VOLUME_TO_ML.cup).toFixed(1);
             } else {
                 document.getElementById('volEqAmount').value = '';
                 document.getElementById('volEqUnit').value = 'cup';
+                document.getElementById('volEqWeightUnit').value = 'g';
                 document.getElementById('volEqGrams').value = '';
             }
 
@@ -2602,7 +2752,9 @@
 
         function renderFoodList() {
             const listDiv = document.getElementById('foodList');
-            
+            const countEl = document.getElementById('foodCount');
+            if (countEl) countEl.textContent = foodDatabase.length ? `(${foodDatabase.length})` : '';
+
             if (foodDatabase.length === 0) {
                 listDiv.innerHTML = '<div class="empty-state">No foods added yet</div>';
                 return;
@@ -2611,40 +2763,40 @@
             // Sort alphabetically by name
             const sortedFoods = [...foodDatabase].sort((a, b) => a.name.localeCompare(b.name));
 
-            // Create table
             let tableHTML = `
-                <table>
+                <table class="food-table">
                     <thead>
                         <tr>
                             <th style="text-align:left;">Food</th>
-                            <th>Serving</th>
-                            <th>P</th><th>C</th><th>F</th><th>Fiber</th><th>Cal</th><th></th>
+                            <th>P</th><th>C</th><th>F</th><th>Cal</th><th></th>
                         </tr>
                     </thead>
                     <tbody>
             `;
 
-            sortedFoods.forEach((food, index) => {
+            sortedFoods.forEach(food => {
                 const calories = food.calories !== undefined ? food.calories : (food.protein * 4 + food.carbs * 4 + food.fats * 9);
-                let servingLabel = `${food.servingAmount} ${UNIT_LABELS[food.servingUnit]}`;
+                let sub = `${food.servingAmount} ${UNIT_LABELS[food.servingUnit]}`;
+                if (food.fiber) sub += ` · ${food.fiber}g fiber`;
                 if (food.density) {
                     const volAmt = food.volEqAmount || 1;
                     const volUnit = food.volEqUnit || 'cup';
                     const volGrams = food.volEqGrams != null ? food.volEqGrams : +(food.density * VOLUME_TO_ML.cup).toFixed(1);
-                    servingLabel += `<br><span style="font-size:11px; color:var(--accent-blue);">${volAmt} ${UNIT_LABELS[volUnit]} ≈ ${volGrams}g</span>`;
+                    sub += ` · ${volAmt} ${UNIT_LABELS[volUnit]} ≈ ${volGrams}g`;
                 }
                 tableHTML += `
                     <tr class="food-row" data-name="${esc(food.name.toLowerCase())}">
-                        <td style="font-weight:600;">${esc(food.name)}</td>
-                        <td style="text-align:center; color:var(--text-muted);">${servingLabel}</td>
-                        <td class="protein-col">${food.protein}g</td>
-                        <td class="carbs-col">${food.carbs}g</td>
-                        <td class="fats-col">${food.fats}g</td>
-                        <td style="text-align:center; color:var(--text-muted);">${food.fiber}g</td>
+                        <td class="food-name-cell">
+                            <div class="food-name">${esc(food.name)}</div>
+                            <div class="food-sub">${sub}</div>
+                        </td>
+                        <td class="protein-col">${food.protein}</td>
+                        <td class="carbs-col">${food.carbs}</td>
+                        <td class="fats-col">${food.fats}</td>
                         <td class="cal-col">${calories.toFixed(0)}</td>
-                        <td style="text-align:center; white-space:nowrap;">
-                            <button class="btn-success btn-sm" onclick="editFood(${jsArg(food.id)})" style="margin-right:2px;">Edit</button>
-                            <button class="btn-danger btn-sm" onclick="deleteFood(${jsArg(food.id)})">Del</button>
+                        <td class="food-actions">
+                            <button class="icon-btn" aria-label="Edit ${esc(food.name)}" onclick="editFood(${jsArg(food.id)})">✎</button>
+                            <button class="icon-btn danger" aria-label="Delete ${esc(food.name)}" onclick="deleteFood(${jsArg(food.id)})">✕</button>
                         </td>
                     </tr>
                 `;
@@ -2653,23 +2805,23 @@
             tableHTML += `
                     </tbody>
                 </table>
+                <div class="empty-state" id="foodNoResults" style="display:none;">No matching foods</div>
             `;
 
             listDiv.innerHTML = tableHTML;
+            filterFoodList(); // keep an active search applied after edits/deletes/sync
         }
 
         function filterFoodList() {
-            const searchInput = document.getElementById('foodSearchInput').value.toLowerCase();
-            const rows = document.querySelectorAll('.food-row');
-            
-            rows.forEach(row => {
-                const foodName = row.getAttribute('data-name');
-                if (foodName.includes(searchInput)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
+            const q = document.getElementById('foodSearchInput').value.trim().toLowerCase();
+            let shown = 0;
+            document.querySelectorAll('.food-row').forEach(row => {
+                const match = row.getAttribute('data-name').includes(q);
+                row.style.display = match ? '' : 'none';
+                if (match) shown++;
             });
+            const none = document.getElementById('foodNoResults');
+            if (none) none.style.display = shown === 0 ? '' : 'none';
         }
 
         function updateFoodSelectors() {
@@ -2775,7 +2927,7 @@
                     <tr style="background: ${rowBg}; border-bottom: 1px solid var(--border);">
                         <td style="padding: 10px; font-weight: 600; color: var(--text-primary);">${esc(item.name)}</td>
                         <td style="padding: 10px; text-align: center;">
-                            <input type="number" value="${item.amount}" step="0.1" min="0.1" 
+                            <input type="number" value="${item.amount}" step="any" min="0" inputmode="decimal" 
                                 style="width: 80px; padding: 6px; border: 2px solid #e0e0e0; border-radius: 6px; text-align: center;"
                                 onchange="updateBuilderItem(${item.builderId}, 'amount', this.value)">
                         </td>
@@ -2856,14 +3008,18 @@
             document.getElementById('perServingPCalTable').textContent = perServingPCal;
         }
 
-        function saveMeal() {
+        function saveMeal(asNew = false) {
             const mealName = document.getElementById('mealName').value.trim();
             if (!mealName || currentMealBuilder.length === 0) {
                 return; // Silent fail if validation fails
             }
 
             const totalServings = parseFloat(document.getElementById('totalServings').value) || 1;
-            const editingId = document.getElementById('editingMealId').value;
+            const editingId = asNew ? '' : document.getElementById('editingMealId').value;
+            if (asNew && savedMeals.some(m => m.name.trim().toLowerCase() === mealName.toLowerCase())) {
+                showToast('Rename the meal first - that name is already saved', 'error');
+                return;
+            }
 
             // Calculate totals
             let totalProtein = 0;
@@ -2887,7 +3043,7 @@
             const mealData = {
                 name: mealName,
                 totalServings: totalServings,
-                foods: currentMealBuilder,
+                foods: asNew ? JSON.parse(JSON.stringify(currentMealBuilder)) : currentMealBuilder,
                 perServing: {
                     protein: totalProtein / totalServings,
                     carbs: totalCarbs / totalServings,
@@ -2979,6 +3135,7 @@
                         <td class="cal-col">${calories.toFixed(0)}</td>
                         <td style="text-align:center;">
                             <button class="btn-success btn-sm" onclick="editMeal(${meal.id})" style="margin-right:2px;">Edit</button>
+                            <button class="btn-sm" onclick="duplicateMeal(${meal.id})" style="margin-right:2px;">Dup</button>
                             <button class="btn-danger btn-sm" onclick="deleteMeal(${meal.id})">Del</button>
                         </td>
                     </tr>
@@ -3596,7 +3753,26 @@
             const targetInputs = document.getElementById('targetModeInputs');
             const amountBtn = document.getElementById('modeAmountBtn');
             const targetBtn = document.getElementById('modeTargetBtn');
-            
+            const customBtn = document.getElementById('modeCustomBtn');
+            const customInputs = document.getElementById('customModeInputs');
+            const isCustom = mode === 'custom';
+
+            customInputs.style.display = isCustom ? 'block' : 'none';
+            document.getElementById('itemSearchGroup').style.display = isCustom ? 'none' : '';
+            document.getElementById('addItemToDay').textContent = isCustom ? 'Add Custom Entry' : 'Add to Day';
+            customBtn.style.background = isCustom ? 'var(--accent)' : '';
+            customBtn.style.color = isCustom ? 'white' : '';
+            customBtn.classList.toggle('btn-ghost', !isCustom);
+
+            if (isCustom) {
+                amountInputs.style.display = 'none';
+                targetInputs.style.display = 'none';
+                document.getElementById('macroPreview').style.display = 'none';
+                amountBtn.style.background = ''; amountBtn.style.color = ''; amountBtn.classList.add('btn-ghost');
+                targetBtn.style.background = ''; targetBtn.style.color = ''; targetBtn.classList.add('btn-ghost');
+                return;
+            }
+
             if (mode === 'amount') {
                 amountInputs.style.display = 'block';
                 targetInputs.style.display = 'none';
@@ -3884,7 +4060,65 @@
             document.getElementById('itemUnitForDay').value = newUnit;
         }
 
+        function addCustomToDay() {
+            const num = id => parseFloat(document.getElementById(id).value) || 0;
+            const name = document.getElementById('customName').value.trim();
+            const save = document.getElementById('customSaveFood').checked;
+            const protein = num('customProtein'), carbs = num('customCarbs'), fats = num('customFats'), fiber = num('customFiber');
+            const calInput = document.getElementById('customCalories').value;
+            const calories = calInput !== '' ? num('customCalories') : (protein * 4 + carbs * 4 + fats * 9);
+
+            if (!(calories > 0 || protein > 0 || carbs > 0 || fats > 0)) {
+                showToast('Enter calories or at least one macro', 'error');
+                return;
+            }
+            if (save && !name) {
+                showToast('Enter a name to save this food', 'error');
+                return;
+            }
+            if (save && foodDatabase.some(f => f.name.toLowerCase() === name.toLowerCase())) {
+                showToast(`"${name}" is already in My Foods — pick a different name`, 'error');
+                return;
+            }
+
+            const displayName = name || 'Custom entry';
+            todaysMeals.push({
+                id: newId(),
+                type: 'food',
+                custom: true,
+                foodName: displayName,
+                amount: 1,
+                unit: 'serving',
+                macros: { protein, carbs, fats, fiber, calories }
+            });
+
+            if (save) {
+                foodDatabase.push({
+                    id: newId(),
+                    name: displayName,
+                    servingAmount: 1,
+                    servingUnit: 'serving',
+                    protein, carbs, fats, fiber, calories,
+                    customCalories: calInput !== '',
+                    density: null, volEqAmount: null, volEqUnit: null, volEqGrams: null
+                });
+                localStorage.setItem('foodDatabase', JSON.stringify(foodDatabase));
+                renderFoodList();
+            }
+
+            localStorage.setItem('todaysMeals', JSON.stringify(todaysMeals));
+            renderDayMeals();
+            calculateDayTotals();
+            syncToFirebase();
+            showToast(save ? `Added and saved ${displayName}` : `Added ${displayName}`, 'success');
+
+            ['customName', 'customCalories', 'customProtein', 'customCarbs', 'customFats', 'customFiber'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('customSaveFood').checked = false;
+            document.getElementById('customNameHint').textContent = '(optional)';
+        }
+
         function addItemToDay() {
+            if (currentInputMode === 'custom') { addCustomToDay(); return; }
             const name = document.getElementById('selectedItemName').value || document.getElementById('searchItemForDay').value.trim();
             let type = document.getElementById('selectedItemType').value;
 
@@ -3989,11 +4223,29 @@
             document.getElementById('mealBuilderTitle').textContent = 'Edit Meal';
             document.getElementById('saveMealBtn').textContent = 'Update Meal';
             document.getElementById('cancelMealEditBtn').style.display = 'block';
+            document.getElementById('saveMealAsBtn').style.display = 'block';
             
             renderMealBuilder();
             calculateMealTotals();
             
             // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Load a copy of a saved meal into the builder as a new, unsaved meal so it
+        // can be adjusted and saved without touching the original.
+        function duplicateMeal(id) {
+            const meal = savedMeals.find(m => m.id === id);
+            if (!meal) return;
+            showPage('meals');
+            cancelMealEdit();
+            document.getElementById('mealName').value = meal.name + ' (copy)';
+            document.getElementById('totalServings').value = meal.totalServings;
+            currentMealBuilder = meal.foods.map(food => ({ ...food, builderId: newId() }));
+            document.getElementById('mealBuilderTitle').textContent = 'New Meal (copy)';
+            document.getElementById('cancelMealEditBtn').style.display = 'block';
+            renderMealBuilder();
+            calculateMealTotals();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -4006,6 +4258,7 @@
             document.getElementById('mealBuilderTitle').textContent = 'Build Your Meal';
             document.getElementById('saveMealBtn').textContent = 'Save Meal';
             document.getElementById('cancelMealEditBtn').style.display = 'none';
+            document.getElementById('saveMealAsBtn').style.display = 'none';
             
             renderMealBuilder();
             calculateMealTotals();
@@ -4105,9 +4358,9 @@
             const amount = parseFloat(newAmount) || 0;
 
             if (item.type === 'food') {
-                // Recalculate food macros from database
+                // Recalculate food macros from database (custom entries scale their own macros)
                 const foodName = item.foodName || item.name;
-                const food = foodDatabase.find(f => f.name === foodName);
+                const food = item.custom ? null : foodDatabase.find(f => f.name === foodName);
                 if (food) {
                     const unit = item.unit || food.servingUnit || 'g';
                     const multiplier = servingMultiplier(amount, unit, food.servingAmount, food.servingUnit, food.density);
@@ -4150,7 +4403,7 @@
 
             if (item.type === 'food') {
                 const foodName = item.foodName || item.name;
-                const food = foodDatabase.find(f => f.name === foodName);
+                const food = item.custom ? null : foodDatabase.find(f => f.name === foodName);
                 if (food) {
                     const amount = item.amount || 1;
                     const multiplier = servingMultiplier(amount, newUnit, food.servingAmount, food.servingUnit, food.density);
@@ -4214,18 +4467,18 @@
 
                 // A meal's amount is always servings — offering g/oz/cup here did
                 // nothing to the macros and just looked like it worked.
-                const options = itemType === 'meal' ? [['serving', 'srv']] : UNIT_OPTIONS;
+                const options = (itemType === 'meal' || item.custom) ? [['serving', 'srv']] : UNIT_OPTIONS;
                 const unitOptions = options.map(([value, label]) =>
                     `<option value="${value}"${unit === value ? ' selected' : ''}>${label}</option>`
                 ).join('');
 
                 return `
                     <div class="day-item">
-                        <div class="day-item-name">${esc(displayName)}<span class="day-item-badge ${itemType === 'food' ? 'food' : 'meal'}">${itemType === 'food' ? 'FOOD' : 'MEAL'}</span></div>
+                        <div class="day-item-name">${esc(displayName)}<span class="day-item-badge ${itemType === 'food' ? 'food' : 'meal'}">${item.custom ? 'CUSTOM' : itemType === 'food' ? 'FOOD' : 'MEAL'}</span></div>
                         <button class="btn btn-danger day-item-remove" aria-label="Remove ${esc(displayName)}"
                             onclick="removeMealFromDay(${jsArg(item.id)})">✕</button>
                         <div class="day-item-controls">
-                            <input type="number" value="${amount}" step="0.1" min="0.1" inputmode="decimal"
+                            <input type="number" value="${amount}" step="any" min="0" inputmode="decimal"
                                 aria-label="Amount of ${esc(displayName)}"
                                 onchange="updateDayItemAmount(${jsArg(item.id)}, this.value)">
                             <select aria-label="Unit for ${esc(displayName)}"
@@ -4995,16 +5248,16 @@
 
                 return `
                     <tr style="background: ${rowBg}; border-bottom: 1px solid var(--border);" id="historyRow${index}">
-                        <td style="padding: 8px; font-weight: 600;">${entry.date}</td>
+                        <td style="padding: 8px; font-weight: 600;">${entry.date}${entry.notes ? `<div style="font-weight:400; font-size:0.72rem; color:var(--text-muted); white-space:normal; max-width:110px;">${esc(entry.notes)}</div>` : ''}</td>
                         <td style="padding: 8px; text-align: center;">${entry.calories}</td>
                         <td style="padding: 8px; text-align: center;">
                             ${entry.calorieGoal || '-'}
-                            ${calDiff !== null ? `<br><span style="font-size: 0.75rem; color: ${calDiff >= 0 ? '#dc2626' : '#10b981'};">${calDiff > 0 ? '+' : ''}${calDiff.toFixed(0)}</span>` : ''}
+                            ${calDiff !== null ? `<br><span style="font-size: 0.75rem; color: ${calDiff >= 0 ? '#dc2626' : '#16a34a'};">${calDiff > 0 ? '+' : ''}${calDiff.toFixed(0)}</span>` : ''}
                         </td>
                         <td style="padding: 8px; text-align: center; color: var(--protein); font-weight: 600;">${entry.protein}g</td>
                         <td style="padding: 8px; text-align: center;">
                             ${entry.proteinGoal ? entry.proteinGoal + 'g' : '-'}
-                            ${proteinDiff !== null ? `<br><span style="font-size: 0.75rem; color: ${proteinDiff >= 0 ? '#10b981' : '#dc2626'};">${proteinDiff > 0 ? '+' : ''}${proteinDiff.toFixed(0)}g</span>` : ''}
+                            ${proteinDiff !== null ? `<br><span style="font-size: 0.75rem; color: ${proteinDiff >= 0 ? '#16a34a' : '#dc2626'};">${proteinDiff > 0 ? '+' : ''}${proteinDiff.toFixed(0)}g</span>` : ''}
                         </td>
                         <td style="padding: 8px; text-align: center; color: var(--carbs); font-weight: 600;">${entry.carbs}g</td>
                         <td style="padding: 8px; text-align: center; color: var(--accent-green); font-weight: 600;">${entry.fats}g</td>
@@ -5023,23 +5276,23 @@
                                 </div>
                                 <div>
                                     <label style="display: block; font-size: 0.85rem; margin-bottom: 4px; font-weight: 600;">Calories</label>
-                                    <input type="number" id="editCalories${index}" value="${entry.calories}" step="0.1" style="width: 100%; padding: 6px; border: 2px solid #f59e0b; border-radius: 4px;">
+                                    <input type="number" inputmode="decimal" id="editCalories${index}" value="${entry.calories}" step="any" style="width: 100%; padding: 6px; border: 2px solid #f59e0b; border-radius: 4px;">
                                 </div>
                                 <div>
                                     <label style="display: block; font-size: 0.85rem; margin-bottom: 4px; font-weight: 600;">Protein (g)</label>
-                                    <input type="number" id="editProtein${index}" value="${entry.protein}" step="0.1" style="width: 100%; padding: 6px; border: 2px solid #f59e0b; border-radius: 4px;">
+                                    <input type="number" inputmode="decimal" id="editProtein${index}" value="${entry.protein}" step="any" style="width: 100%; padding: 6px; border: 2px solid #f59e0b; border-radius: 4px;">
                                 </div>
                                 <div>
                                     <label style="display: block; font-size: 0.85rem; margin-bottom: 4px; font-weight: 600;">Carbs (g)</label>
-                                    <input type="number" id="editCarbs${index}" value="${entry.carbs}" step="0.1" style="width: 100%; padding: 6px; border: 2px solid #f59e0b; border-radius: 4px;">
+                                    <input type="number" inputmode="decimal" id="editCarbs${index}" value="${entry.carbs}" step="any" style="width: 100%; padding: 6px; border: 2px solid #f59e0b; border-radius: 4px;">
                                 </div>
                                 <div>
                                     <label style="display: block; font-size: 0.85rem; margin-bottom: 4px; font-weight: 600;">Fats (g)</label>
-                                    <input type="number" id="editFats${index}" value="${entry.fats}" step="0.1" style="width: 100%; padding: 6px; border: 2px solid #f59e0b; border-radius: 4px;">
+                                    <input type="number" inputmode="decimal" id="editFats${index}" value="${entry.fats}" step="any" style="width: 100%; padding: 6px; border: 2px solid #f59e0b; border-radius: 4px;">
                                 </div>
                                 <div>
                                     <label style="display: block; font-size: 0.85rem; margin-bottom: 4px; font-weight: 600;">Fiber (g)</label>
-                                    <input type="number" id="editFiber${index}" value="${fiberVal}" step="0.1" style="width: 100%; padding: 6px; border: 2px solid #f59e0b; border-radius: 4px;">
+                                    <input type="number" inputmode="decimal" id="editFiber${index}" value="${fiberVal}" step="any" style="width: 100%; padding: 6px; border: 2px solid #f59e0b; border-radius: 4px;">
                                 </div>
                             </div>
                             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
@@ -5152,7 +5405,7 @@
             // Draw goal line (if enabled)
             const hasProteinGoal = dailyGoals && dailyGoals.protein;
             if (showGoalLine && hasProteinGoal) {
-                ctx.strokeStyle = '#93c5fd';
+                ctx.strokeStyle = '#a9bccf';
                 ctx.lineWidth = 2;
                 ctx.setLineDash([5, 5]);
                 ctx.beginPath();
@@ -5163,7 +5416,7 @@
                 ctx.setLineDash([]);
                 
                 // Goal label
-                ctx.fillStyle = '#3b82f6';
+                ctx.fillStyle = '#5b84b1';
                 ctx.font = 'bold 11px Arial';
                 ctx.textAlign = 'left';
                 ctx.fillText(`Goal: ${dailyGoals.protein}g`, padding + 5, goalY - 5);
@@ -5171,7 +5424,7 @@
 
             // Draw 7-day average line (if enabled)
             if (show7DayAvg) {
-                ctx.strokeStyle = '#10b981';
+                ctx.strokeStyle = '#4b6584';
                 ctx.lineWidth = 3;
                 ctx.beginPath();
                 recentData.forEach((entry, i) => {
@@ -5191,7 +5444,7 @@
                     const y = getY(entry.protein);
                     const height = H - padding - y;
                     
-                    ctx.fillStyle = entry.protein >= (entry.proteinGoal || 0) ? '#3b82f6' : '#93c5fd';
+                    ctx.fillStyle = entry.protein >= (entry.proteinGoal || 0) ? '#5b84b1' : '#a9bccf';
                     ctx.fillRect(x - barWidth / 2, y, barWidth, height);
                 });
             }
@@ -5201,7 +5454,7 @@
                 recentData.forEach((entry, i) => {
                     const x = getX(i);
                     const y = getY(entry.protein7DayAvg);
-                    ctx.fillStyle = '#10b981';
+                    ctx.fillStyle = '#4b6584';
                     ctx.beginPath();
                     ctx.arc(x, y, 4, 0, Math.PI * 2);
                     ctx.fill();
@@ -5225,14 +5478,14 @@
             ctx.textAlign = 'left';
             
             if (showDailyBars) {
-                ctx.fillStyle = '#3b82f6';
+                ctx.fillStyle = '#5b84b1';
                 ctx.fillRect(padding, 10, 15, 10);
                 ctx.fillStyle = '#1e293b';
                 ctx.fillText('Daily', padding + 20, 18);
             }
             
             if (show7DayAvg) {
-                ctx.strokeStyle = '#10b981';
+                ctx.strokeStyle = '#4b6584';
                 ctx.lineWidth = 3;
                 ctx.beginPath();
                 ctx.moveTo(padding + 80, 15);
@@ -5261,7 +5514,7 @@
                     </div>
                     <div>
                         <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Difference</div>
-                        <div style="font-size: 1.3rem; font-weight: 700; color: ${avgDiff >= 0 ? '#10b981' : '#dc2626'};">
+                        <div style="font-size: 1.3rem; font-weight: 700; color: ${avgDiff >= 0 ? '#16a34a' : '#dc2626'};">
                             ${avgDiff >= 0 ? '+' : ''}${avgDiff.toFixed(1)}g
                         </div>
                     </div>
@@ -5452,7 +5705,7 @@
                     </div>
                     <div>
                         <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Difference</div>
-                        <div style="font-size: 1.3rem; font-weight: 700; color: ${avgDiff >= -goal * 0.1 && avgDiff <= goal * 0.1 ? '#10b981' : '#dc2626'};">
+                        <div style="font-size: 1.3rem; font-weight: 700; color: ${avgDiff >= -goal * 0.1 && avgDiff <= goal * 0.1 ? '#16a34a' : '#dc2626'};">
                             ${avgDiff >= 0 ? '+' : ''}${Math.round(avgDiff)}
                         </div>
                     </div>
@@ -5654,7 +5907,7 @@
                     ${hasGoal ? `
                     <div>
                         <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Difference</div>
-                        <div style="font-size: 1.3rem; font-weight: 700; color: ${avgDiff >= -goal * 0.1 && avgDiff <= goal * 0.1 ? '#10b981' : '#dc2626'};">
+                        <div style="font-size: 1.3rem; font-weight: 700; color: ${avgDiff >= -goal * 0.1 && avgDiff <= goal * 0.1 ? '#16a34a' : '#dc2626'};">
                             ${avgDiff >= 0 ? '+' : ''}${avgDiff.toFixed(1)}g
                         </div>
                     </div>
@@ -5749,7 +6002,7 @@
                 ctx.stroke();
                 ctx.setLineDash([]);
                 
-                ctx.fillStyle = '#10b981';
+                ctx.fillStyle = '#4b6584';
                 ctx.font = 'bold 11px Arial';
                 ctx.textAlign = 'left';
                 ctx.fillText(`Goal: ${dailyGoals.fats}g`, padding + 5, goalY - 5);
@@ -5778,7 +6031,7 @@
                     const height = H - padding - y;
                     
                     const withinGoal = hasGoal && Math.abs(entry.fats - dailyGoals.fats) <= dailyGoals.fats * 0.1;
-                    ctx.fillStyle = withinGoal ? '#10b981' : '#6ee7b7';
+                    ctx.fillStyle = withinGoal ? '#4b6584' : '#a9bccf';
                     ctx.fillRect(x - barWidth / 2, y, barWidth, height);
                 });
             }
@@ -5812,7 +6065,7 @@
             ctx.textAlign = 'left';
             
             if (showDailyBars) {
-                ctx.fillStyle = '#10b981';
+                ctx.fillStyle = '#4b6584';
                 ctx.fillRect(padding, 10, 15, 10);
                 ctx.fillStyle = '#1e293b';
                 ctx.fillText('Daily', padding + 20, 18);
@@ -5849,7 +6102,7 @@
                     ${hasGoal ? `
                     <div>
                         <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Difference</div>
-                        <div style="font-size: 1.3rem; font-weight: 700; color: ${avgDiff >= -goal * 0.1 && avgDiff <= goal * 0.1 ? '#10b981' : '#dc2626'};">
+                        <div style="font-size: 1.3rem; font-weight: 700; color: ${avgDiff >= -goal * 0.1 && avgDiff <= goal * 0.1 ? '#16a34a' : '#dc2626'};">
                             ${avgDiff >= 0 ? '+' : ''}${avgDiff.toFixed(1)}g
                         </div>
                     </div>
@@ -6046,7 +6299,7 @@
                     ${hasGoal ? `
                     <div>
                         <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Difference</div>
-                        <div style="font-size: 1.3rem; font-weight: 700; color: ${avgDiff >= -goal * 0.1 && avgDiff <= goal * 0.1 ? '#10b981' : '#dc2626'};">
+                        <div style="font-size: 1.3rem; font-weight: 700; color: ${avgDiff >= -goal * 0.1 && avgDiff <= goal * 0.1 ? '#16a34a' : '#dc2626'};">
                             ${avgDiff >= 0 ? '+' : ''}${avgDiff.toFixed(1)}g
                         </div>
                     </div>
@@ -6274,6 +6527,7 @@
 
             // Check if entry for this date already exists
             const existingIndex = weightData.findIndex(entry => entry.date === date);
+            const editingDate = editingWeightDate;
 
             const entry = {
                 date: date,
@@ -6281,7 +6535,12 @@
                 notes: notes || null
             };
 
-            if (existingIndex >= 0) {
+            if (editingDate) {
+                // Editing: replace the original row; only confirm if moving onto another day's entry
+                if (existingIndex >= 0 && date !== editingDate && !confirm('Entry for that date already exists. Replace it?')) return;
+                weightData = weightData.filter(e => e.date !== editingDate && e.date !== date);
+                weightData.push(entry);
+            } else if (existingIndex >= 0) {
                 if (confirm('Entry for this date already exists. Update it?')) {
                     weightData[existingIndex] = entry;
                 } else {
@@ -6290,6 +6549,7 @@
             } else {
                 weightData.push(entry);
             }
+            if (editingDate) { showToast('Weight updated', 'success'); }
 
             // Sort by date (newest first)
             weightData.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -6301,9 +6561,34 @@
             drawWeightChart();
 
             // Clear form
+            cancelWeightEdit();
             document.getElementById('weightDate').value = getLocalDateString();
             document.getElementById('morningWeight').value = '';
             document.getElementById('weightNotes').value = '';
+        }
+
+        let editingWeightDate = null;
+
+        function editWeightEntry(date) {
+            const entry = weightData.find(e => e.date === date);
+            if (!entry) return;
+            editingWeightDate = date;
+            document.getElementById('weightDate').value = entry.date;
+            document.getElementById('morningWeight').value = entry.morningWeight ?? '';
+            document.getElementById('weightNotes').value = entry.notes || '';
+            document.getElementById('weightSubmitBtn').textContent = 'Save';
+            document.getElementById('weightCancelEditBtn').style.display = 'block';
+            document.getElementById('weightDate').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById('morningWeight').focus();
+        }
+
+        function cancelWeightEdit() {
+            editingWeightDate = null;
+            document.getElementById('weightSubmitBtn').textContent = '+ Add';
+            document.getElementById('weightCancelEditBtn').style.display = 'none';
+            document.getElementById('morningWeight').value = '';
+            document.getElementById('weightNotes').value = '';
+            document.getElementById('weightDate').value = getLocalDateString();
         }
 
         function renderWeightTable() {
@@ -6350,7 +6635,7 @@
                     
                     if (currentWeight && prevWeight) {
                         const change = currentWeight - prevWeight;
-                        const changeColor = change < 0 ? '#10b981' : change > 0 ? '#dc2626' : '#666';
+                        const changeColor = change < 0 ? '#16a34a' : change > 0 ? '#dc2626' : '#666';
                         changeText = `<span style="color: ${changeColor}; font-weight: 600;">${change > 0 ? '+' : ''}${change.toFixed(1)} lb</span>`;
                     }
                 }
@@ -6364,9 +6649,9 @@
                         <td style="padding: 8px; text-align: center; color: var(--protein); font-weight: 600;">${entry.morningWeight ? entry.morningWeight + ' lb' : '-'}</td>
                         <td style="padding: 8px; text-align: center; color: var(--accent-green); font-weight: 600;">${avgDisplay}</td>
                         <td style="padding: 8px; text-align: center;">${changeText}</td>
-                        <td style="padding: 8px; font-size: 0.8rem; color: var(--text-muted);">${esc(entry.notes || '')}</td>
-                        <td style="padding: 8px; text-align: center;">
-                            <button onclick="deleteWeightEntry('${entry.date}')" style="background: var(--accent-red); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 0.75rem;">Del</button>
+                        <td style="padding: 8px; text-align: right; white-space: nowrap;">
+                            <button class="icon-btn" aria-label="Edit ${entry.date}" onclick="editWeightEntry('${entry.date}')" style="margin-right:4px;">✎</button>
+                            <button class="icon-btn danger" aria-label="Delete ${entry.date}" onclick="deleteWeightEntry('${entry.date}')">✕</button>
                         </td>
                     </tr>
                 `;
@@ -6374,6 +6659,47 @@
 
             // Recalculate projection after table renders
             calculateProjection();
+        }
+
+        // Zoom/pan window over the weight chart (fractional indices into date-sorted data).
+        // null = show everything.
+        let weightView = null;
+
+        function weightChartCount() { return weightData.length; }
+
+        function setWeightView(lo, hi) {
+            const n = weightChartCount();
+            if (n < 2) { weightView = null; drawWeightChart(); return; }
+            const minSpan = Math.min(n - 1, 4);              // never zoom tighter than ~5 points
+            let span = Math.max(minSpan, Math.min(hi - lo, n - 1));
+            lo = Math.max(0, Math.min(lo, n - 1 - span));
+            hi = lo + span;
+            weightView = (lo <= 0.001 && hi >= n - 1.001) ? null : { lo, hi };
+            drawWeightChart();
+        }
+
+        function currentWeightView() {
+            const n = weightChartCount();
+            return weightView ? { ...weightView } : { lo: 0, hi: Math.max(0, n - 1) };
+        }
+
+        function zoomWeightChart(factor, anchor = 0.5) {
+            const v = currentWeightView();
+            const span = v.hi - v.lo;
+            const newSpan = span * factor;
+            const focus = v.lo + span * anchor;
+            setWeightView(focus - newSpan * anchor, focus + newSpan * (1 - anchor));
+        }
+
+        function weightRangeDays(days) {
+            const sorted = [...weightData].sort((a, b) => new Date(a.date) - new Date(b.date));
+            if (sorted.length < 2) return;
+            if (!days) { setWeightView(0, sorted.length - 1); return; }
+            const cutoff = new Date(sorted[sorted.length - 1].date + 'T00:00:00');
+            cutoff.setDate(cutoff.getDate() - days);
+            let lo = sorted.findIndex(e => new Date(e.date + 'T00:00:00') >= cutoff);
+            if (lo < 0) lo = 0;
+            setWeightView(lo, sorted.length - 1);
         }
 
         function drawWeightChart() {
@@ -6419,6 +6745,17 @@
                 entry.calories = historyEntry ? historyEntry.calories : null;
             });
 
+            // Visible window (zoom/pan) over the sorted data, in fractional indices
+            const n = sortedData.length;
+            let viewLo = 0, viewHi = n - 1;
+            if (weightView && n > 1) {
+                viewLo = Math.max(0, Math.min(weightView.lo, n - 1));
+                viewHi = Math.max(viewLo, Math.min(weightView.hi, n - 1));
+            }
+            const viewSpan = (viewHi - viewLo) || 1;
+            const firstVis = Math.max(0, Math.ceil(viewLo - 1e-9));
+            const lastVis = Math.min(n - 1, Math.floor(viewHi + 1e-9));
+
             // Chart dimensions — responsive padding for mobile
             const isMobile = W < 500;
             const padding = isMobile ? 40 : 60;
@@ -6428,7 +6765,8 @@
 
             // Find min/max weights
             let allWeights = [];
-            sortedData.forEach(entry => {
+            sortedData.forEach((entry, i) => {
+                if (i < firstVis - 1 || i > lastVis + 1) return; // axis fits what's on screen
                 if (showMorning && entry.morningWeight) allWeights.push(entry.morningWeight);
                 if (showWeekly && entry.calculated7DayAvg) allWeights.push(entry.calculated7DayAvg);
             });
@@ -6523,8 +6861,14 @@
 
             // Function to get X coordinate for index
             const getX = (index) => {
-                return padding + (chartWidth / (sortedData.length - 1)) * index;
+                return padding + ((index - viewLo) / viewSpan) * chartWidth;
             };
+
+            // Clip data drawing to the plot area so zoomed lines don't spill over the axes
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(padding, padding - 8, chartWidth, chartHeight + 16);
+            ctx.clip();
 
             // Draw calorie bars (behind lines)
             if (showCalories) {
@@ -6533,7 +6877,7 @@
                     if (entry.calories) {
                         const x = getX(i);
                         const y = getCalorieY(entry.calories);
-                        const barWidth = chartWidth / sortedData.length * 0.6;
+                        const barWidth = chartWidth / (viewSpan + 1) * 0.6;
                         ctx.fillRect(x - barWidth/2, y, barWidth, H - padding - y);
                     }
                 });
@@ -6545,7 +6889,7 @@
 
             // Draw morning weight line (skip blanks)
             if (showMorning) {
-                ctx.strokeStyle = '#3b82f6';
+                ctx.strokeStyle = '#5b84b1';
                 ctx.lineWidth = lineWidth;
                 ctx.beginPath();
                 let firstPoint = true;
@@ -6566,7 +6910,7 @@
                 ctx.stroke();
 
                 // Draw points
-                ctx.fillStyle = '#3b82f6';
+                ctx.fillStyle = '#5b84b1';
                 sortedData.forEach((entry, i) => {
                     if (entry.morningWeight) {
                         const x = getX(i);
@@ -6580,7 +6924,7 @@
 
             // Draw 7-day average line (skip blanks)
             if (showWeekly) {
-                ctx.strokeStyle = '#10b981';
+                ctx.strokeStyle = '#4b6584';
                 ctx.lineWidth = lineWidth;
                 ctx.beginPath();
                 let firstPoint = true;
@@ -6601,7 +6945,7 @@
                 ctx.stroke();
 
                 // Draw points
-                ctx.fillStyle = '#10b981';
+                ctx.fillStyle = '#4b6584';
                 sortedData.forEach((entry, i) => {
                     if (entry.calculated7DayAvg) {
                         const x = getX(i);
@@ -6617,7 +6961,7 @@
             if (showTrendLine) {
                 const validWeights = sortedData
                     .map((e, index) => ({ weight: e.morningWeight, index }))
-                    .filter(e => e.weight);
+                    .filter(e => e.weight && e.index >= firstVis && e.index <= lastVis); // fit only the visible period
 
                 if (validWeights.length >= 2) {
                     const regression = calculateLinearRegression(validWeights);
@@ -6663,15 +7007,18 @@
                 ctx.fillText(`Goal: ${goalWeight} lb`, padding + 6, goalY - 5);
             }
 
+            ctx.restore();
+
             // Draw date labels (show every nth date to avoid crowding)
             ctx.fillStyle = '#94a3b8';
             ctx.font = isMobile ? '9px Arial' : '11px Arial';
             ctx.textAlign = 'center';
             const maxLabels = isMobile ? 5 : 10;
-            const labelInterval = Math.max(1, Math.floor(sortedData.length / maxLabels));
+            const labelInterval = Math.max(1, Math.floor((lastVis - firstVis + 1) / maxLabels));
             
             sortedData.forEach((entry, i) => {
-                if (i % labelInterval === 0 || i === sortedData.length - 1) {
+                if (i < firstVis || i > lastVis) return;
+                if (i % labelInterval === 0 || i === lastVis) {
                     const x = getX(i);
                     const dateLabel = new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                     ctx.fillText(dateLabel, x, H - padding + 20);
@@ -6680,6 +7027,9 @@
 
             // Add interactive hover (store data for tooltip)
             canvas._chartData = sortedData;
+            canvas._padding = padding;
+            canvas._plotRight = W - rightPadding;
+            canvas._view = { lo: viewLo, hi: viewHi, n };
             canvas._getX = getX;
             canvas._getY = getY;
             canvas._getCalorieY = getCalorieY;
@@ -6695,57 +7045,127 @@
             const canvas = document.getElementById('weightChart');
             const tooltip = document.getElementById('weightChartTooltip');
 
-            canvas.addEventListener('mousemove', function(e) {
+            function showTip(clientX, clientY) {
                 if (!canvas._chartData || canvas._chartData.length === 0) return;
-
                 const rect = canvas.getBoundingClientRect();
-                const mouseX = e.clientX - rect.left;
-                const mouseY = e.clientY - rect.top;
+                const mouseX = clientX - rect.left;
+                const mouseY = clientY - rect.top;
+                const reach = 24;
 
-                // Find closest data point
                 let closestDist = Infinity;
                 let closestEntry = null;
 
                 canvas._chartData.forEach((entry, i) => {
                     const x = canvas._getX(i);
-                    
+                    if (x < canvas._padding - 4 || x > canvas._plotRight + 4) return;
+
                     if (canvas._showMorning && entry.morningWeight) {
                         const y = canvas._getY(entry.morningWeight);
-                        const dist = Math.sqrt((mouseX - x) ** 2 + (mouseY - y) ** 2);
-                        if (dist < closestDist && dist < 20) {
-                            closestDist = dist;
-                            closestEntry = { ...entry, type: 'morning' };
-                        }
+                        const dist = Math.hypot(mouseX - x, mouseY - y);
+                        if (dist < closestDist && dist < reach) { closestDist = dist; closestEntry = { ...entry, type: 'morning' }; }
                     }
-                    
                     if (canvas._showWeekly && entry.calculated7DayAvg) {
                         const y = canvas._getY(entry.calculated7DayAvg);
-                        const dist = Math.sqrt((mouseX - x) ** 2 + (mouseY - y) ** 2);
-                        if (dist < closestDist && dist < 20) {
-                            closestDist = dist;
-                            closestEntry = { ...entry, type: 'weekly' };
-                        }
+                        const dist = Math.hypot(mouseX - x, mouseY - y);
+                        if (dist < closestDist && dist < reach) { closestDist = dist; closestEntry = { ...entry, type: 'weekly' }; }
                     }
                 });
 
                 if (closestEntry) {
                     const weight = closestEntry.type === 'morning' ? closestEntry.morningWeight : closestEntry.calculated7DayAvg;
                     const typeLabel = closestEntry.type === 'morning' ? 'Morning' : '7-Day Avg';
-                    const color = closestEntry.type === 'morning' ? '#3b82f6' : '#10b981';
-                    
+                    const color = closestEntry.type === 'morning' ? '#5b84b1' : '#64748b';
                     tooltip.innerHTML = `
-                        <div><strong>${closestEntry.date}</strong></div>
+                        <div><strong>${esc(closestEntry.date)}</strong></div>
                         <div style="color: ${color};">${typeLabel}: ${weight} lb</div>
                         ${closestEntry.calories ? `<div style="color: var(--carbs);">Calories: ${closestEntry.calories}</div>` : ''}
-                        ${closestEntry.notes ? `<div style="font-size: 0.75rem; margin-top: 4px;">${closestEntry.notes}</div>` : ''}
+                        ${closestEntry.notes ? `<div style="font-size: 0.75rem; margin-top: 4px;">${esc(closestEntry.notes)}</div>` : ''}
                     `;
                     tooltip.style.display = 'block';
-                    tooltip.style.left = (e.clientX + 10) + 'px';
-                    tooltip.style.top = (e.clientY - 10) + 'px';
+                    tooltip.style.left = Math.min(clientX + 10, window.innerWidth - 180) + 'px';
+                    tooltip.style.top = (clientY - 10) + 'px';
                 } else {
                     tooltip.style.display = 'none';
                 }
+            }
+
+            // --- pointer interactions: drag = pan, two fingers = pinch zoom, tap = tooltip ---
+            const pointers = new Map();
+            let dragStart = null, pinchStart = null, moved = false;
+
+            const plotFrac = clientX => {
+                const rect = canvas.getBoundingClientRect();
+                const pad = canvas._padding || 0, right = canvas._plotRight || rect.width;
+                return Math.max(0, Math.min(1, (clientX - rect.left - pad) / Math.max(1, right - pad)));
+            };
+
+            canvas.addEventListener('pointerdown', e => {
+                canvas.setPointerCapture(e.pointerId);
+                pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+                tooltip.style.display = 'none';
+                moved = false;
+                if (pointers.size === 1) {
+                    dragStart = { x: e.clientX, view: currentWeightView() };
+                } else if (pointers.size === 2) {
+                    const [p, q] = [...pointers.values()];
+                    pinchStart = { dist: Math.hypot(p.x - q.x, p.y - q.y) || 1, view: currentWeightView(), anchor: plotFrac((p.x + q.x) / 2) };
+                    dragStart = null;
+                }
             });
+
+            canvas.addEventListener('pointermove', e => {
+                if (!pointers.has(e.pointerId)) {
+                    if (e.pointerType === 'mouse') showTip(e.clientX, e.clientY);   // hover
+                    return;
+                }
+                pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+                if (pointers.size === 2 && pinchStart) {
+                    const [p, q] = [...pointers.values()];
+                    const ratio = pinchStart.dist / (Math.hypot(p.x - q.x, p.y - q.y) || 1);
+                    const v = pinchStart.view, span = (v.hi - v.lo) * ratio;
+                    const focus = v.lo + (v.hi - v.lo) * pinchStart.anchor;
+                    moved = true;
+                    setWeightView(focus - span * pinchStart.anchor, focus + span * (1 - pinchStart.anchor));
+                } else if (pointers.size === 1 && dragStart) {
+                    const dx = e.clientX - dragStart.x;
+                    if (Math.abs(dx) > 4) moved = true;
+                    if (!moved) return;
+                    const plotW = Math.max(1, canvas._plotRight - canvas._padding);
+                    const v = dragStart.view, shift = -dx / plotW * (v.hi - v.lo);
+                    tooltip.style.display = 'none';
+                    setWeightView(v.lo + shift, v.hi + shift);
+                }
+            });
+
+            const endPointer = e => {
+                const wasTap = pointers.size === 1 && !moved && e.type === 'pointerup';
+                pointers.delete(e.pointerId);
+                if (pointers.size === 1 && pinchStart) {          // pinch -> continue as pan
+                    const [p] = [...pointers.values()];
+                    dragStart = { x: p.x, view: currentWeightView() };
+                    pinchStart = null;
+                } else if (pointers.size === 0) {
+                    dragStart = null; pinchStart = null;
+                    if (wasTap && e.pointerType !== 'mouse') showTip(e.clientX, e.clientY);
+                }
+            };
+            canvas.addEventListener('pointerup', endPointer);
+            canvas.addEventListener('pointercancel', endPointer);
+
+            canvas.addEventListener('dblclick', () => setWeightView(0, weightChartCount() - 1));
+
+            // Trackpad pinch / Ctrl|⌘ + wheel = zoom; horizontal scroll = pan; plain vertical wheel scrolls the page
+            canvas.addEventListener('wheel', e => {
+                if (e.ctrlKey || e.metaKey) {
+                    e.preventDefault();
+                    zoomWeightChart(Math.exp(e.deltaY * 0.01), plotFrac(e.clientX));
+                } else if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+                    e.preventDefault();
+                    const v = currentWeightView(), plotW = Math.max(1, canvas._plotRight - canvas._padding);
+                    const shift = e.deltaX / plotW * (v.hi - v.lo);
+                    setWeightView(v.lo + shift, v.hi + shift);
+                }
+            }, { passive: false });
 
             canvas.addEventListener('mouseleave', function() {
                 tooltip.style.display = 'none';
@@ -7133,7 +7553,7 @@
                 month: 'short', 
                 day: 'numeric' 
             });
-            document.getElementById('projectedDate').style.color = '#10b981';
+            document.getElementById('projectedDate').style.color = '#16a34a';
             
             const daysFromNow = Math.round((projectedDate - new Date()) / (1000 * 60 * 60 * 24));
             document.getElementById('projectedDays').textContent = daysFromNow + ' days';
@@ -7353,7 +7773,7 @@
                         <div style="font-size:0.75rem; color:var(--text-muted);">${item.type === 'meal' ? '🍽 Meal' : '🥄 Food'}</div>
                     </td>
                     <td>
-                        <input type="number" value="${item.amount}" min="0.1" step="0.1" 
+                        <input type="number" inputmode="decimal" value="${item.amount}" min="0" step="any" 
                             style="width:60px; padding:4px; text-align:center; border:1px solid var(--border); border-radius:4px;"
                             onchange="updatePrepItemAmount(${index}, this.value)">
                         <div style="font-size:0.7rem; color:var(--text-muted);">${item.unit}</div>
