@@ -1228,17 +1228,59 @@
                 <button type="button" class="btn btn-ghost btn-sm" id="mealCustomToggle" style="margin-top:10px; width:100%;" onclick="toggleMealCustomFood()">+ Create New Food</button>
                 <div id="mealCustomFood" style="display:none; margin-top:12px;">
                     <div class="form-group">
-                        <label for="mealCustomName">Name</label>
-                        <input type="text" id="mealCustomName" placeholder="e.g., Homemade granola" autocomplete="off">
+                        <label for="mealCustomName">Food Name</label>
+                        <input type="text" id="mealCustomName" placeholder="e.g., Chicken Breast" autocomplete="off">
                     </div>
-                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(80px, 1fr)); gap:8px;">
-                        <div class="form-group"><label for="mealCustomCalories">Calories <span style="color:var(--text-muted)">(auto)</span></label><input type="number" id="mealCustomCalories" step="any" min="0" inputmode="decimal" placeholder="0"></div>
-                        <div class="form-group"><label for="mealCustomProtein">Protein (g)</label><input type="number" id="mealCustomProtein" step="any" min="0" inputmode="decimal" placeholder="0"></div>
-                        <div class="form-group"><label for="mealCustomCarbs">Carbs (g)</label><input type="number" id="mealCustomCarbs" step="any" min="0" inputmode="decimal" placeholder="0"></div>
-                        <div class="form-group"><label for="mealCustomFats">Fat (g)</label><input type="number" id="mealCustomFats" step="any" min="0" inputmode="decimal" placeholder="0"></div>
-                        <div class="form-group"><label for="mealCustomFiber">Fiber (g)</label><input type="number" id="mealCustomFiber" step="any" min="0" inputmode="decimal" placeholder="0"></div>
+                    <div class="form-group">
+                        <label>Serving Size</label>
+                        <div class="form-row">
+                            <input type="number" id="mealCustomServingAmount" step="any" min="0" inputmode="decimal" placeholder="1">
+                            <select id="mealCustomServingUnit">
+                                <option value="g">g</option>
+                                <option value="oz">oz</option>
+                                <option value="lb">lb</option>
+                                <option value="cup">cup</option>
+                                <option value="tbsp">tbsp</option>
+                                <option value="tsp">tsp</option>
+                                <option value="ml">ml</option>
+                                <option value="fl_oz">fl oz</option>
+                                <option value="piece">piece</option>
+                                <option value="serving" selected>serving</option>
+                            </select>
+                        </div>
+                        <small>Nutrition facts per this serving size</small>
                     </div>
-                    <button type="button" class="btn" style="width:100%;" onclick="createFoodForMeal()">Save to My Foods &amp; Add to Meal (1 serving)</button>
+                    <div class="form-group">
+                        <label>Volume ↔ Weight <span style="color:var(--text-muted)">(optional)</span></label>
+                        <div class="vol-eq">
+                            <input type="number" id="mealCustomVolEqAmount" step="any" min="0" inputmode="decimal" placeholder="1" aria-label="Volume amount">
+                            <select id="mealCustomVolEqUnit" aria-label="Volume unit">
+                                <option value="cup">cup</option>
+                                <option value="tbsp">tbsp</option>
+                                <option value="tsp">tsp</option>
+                                <option value="ml">ml</option>
+                                <option value="fl_oz">fl oz</option>
+                            </select>
+                            <span class="vol-eq-word">weighs</span>
+                            <input type="number" id="mealCustomVolEqGrams" step="any" min="0" inputmode="decimal" placeholder="120" aria-label="Weight amount">
+                            <select id="mealCustomVolEqWeightUnit" aria-label="Weight unit">
+                                <option value="g">g</option>
+                                <option value="oz">oz</option>
+                                <option value="lb">lb</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="mealCustomCalories">Calories <span style="color:var(--text-muted)">(auto if blank)</span></label>
+                        <input type="number" id="mealCustomCalories" step="any" min="0" inputmode="decimal" placeholder="(P×4)+(C×4)+(F×9)">
+                    </div>
+                    <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:8px;">
+                        <div class="form-group"><label for="mealCustomProtein">Protein</label><input type="number" id="mealCustomProtein" step="any" min="0" inputmode="decimal" placeholder="g"></div>
+                        <div class="form-group"><label for="mealCustomCarbs">Carbs</label><input type="number" id="mealCustomCarbs" step="any" min="0" inputmode="decimal" placeholder="g"></div>
+                        <div class="form-group"><label for="mealCustomFats">Fat</label><input type="number" id="mealCustomFats" step="any" min="0" inputmode="decimal" placeholder="g"></div>
+                        <div class="form-group"><label for="mealCustomFiber">Fiber</label><input type="number" id="mealCustomFiber" step="any" min="0" inputmode="decimal" placeholder="g"></div>
+                    </div>
+                    <button type="button" class="btn" style="width:100%;" onclick="createFoodForMeal()">Save to My Foods &amp; Add to Meal</button>
                 </div>
             </div>
 
@@ -2923,25 +2965,42 @@
                 return;
             }
 
+            const servingAmount = parseFloat(document.getElementById('mealCustomServingAmount').value);
+            const servingUnit = document.getElementById('mealCustomServingUnit').value;
+            if (!(servingAmount > 0)) { showToast('Enter a serving size', 'error'); return; }
+
+            const volEqAmount = parseFloat(document.getElementById('mealCustomVolEqAmount').value);
+            const volEqUnit = document.getElementById('mealCustomVolEqUnit').value;
+            const volEqWUnit = document.getElementById('mealCustomVolEqWeightUnit').value;
+            const volEqGrams = parseFloat(document.getElementById('mealCustomVolEqGrams').value) * (WEIGHT_TO_G[volEqWUnit] || 1);
+            const volEqMl = (volEqAmount > 0 && VOLUME_TO_ML[volEqUnit]) ? volEqAmount * VOLUME_TO_ML[volEqUnit] : 0;
+            const density = (volEqMl > 0 && volEqGrams > 0) ? volEqGrams / volEqMl : null;
+
             const food = {
                 id: newId(),
                 name,
-                servingAmount: 1,
-                servingUnit: 'serving',
+                servingAmount,
+                servingUnit,
                 protein, carbs, fats, fiber, calories,
                 customCalories: calInput !== '',
-                density: null, volEqAmount: null, volEqUnit: null, volEqGrams: null
+                density,
+                volEqAmount: density ? volEqAmount : null,
+                volEqUnit: density ? volEqUnit : null,
+                volEqGrams: density ? volEqGrams : null,
+                volEqWeightUnit: density ? volEqWUnit : null
             };
             foodDatabase.push(food);
             localStorage.setItem('foodDatabase', JSON.stringify(foodDatabase));
             renderFoodList();
+            updateFoodSelectors();
             syncToFirebase();
 
-            currentMealBuilder.push({ ...food, builderId: Date.now(), amount: 1, unit: 'serving' });
+            currentMealBuilder.push({ ...food, builderId: Date.now(), amount: servingAmount, unit: servingUnit });
             renderMealBuilder();
             calculateMealTotals();
 
-            ['mealCustomName', 'mealCustomCalories', 'mealCustomProtein', 'mealCustomCarbs', 'mealCustomFats', 'mealCustomFiber'].forEach(id => document.getElementById(id).value = '');
+            ['mealCustomName', 'mealCustomServingAmount', 'mealCustomVolEqAmount', 'mealCustomVolEqGrams', 'mealCustomCalories', 'mealCustomProtein', 'mealCustomCarbs', 'mealCustomFats', 'mealCustomFiber'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('mealCustomServingUnit').value = 'serving';
             toggleMealCustomFood();
             showToast(`Saved and added ${name}`, 'success');
         }
