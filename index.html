@@ -1225,6 +1225,21 @@
                         <button type="button" class="btn" id="addToMealBuilder" style="width:100%;">+ Add</button>
                     </div>
                 </div>
+                <button type="button" class="btn btn-ghost btn-sm" id="mealCustomToggle" style="margin-top:10px; width:100%;" onclick="toggleMealCustomFood()">+ Create New Food</button>
+                <div id="mealCustomFood" style="display:none; margin-top:12px;">
+                    <div class="form-group">
+                        <label for="mealCustomName">Name</label>
+                        <input type="text" id="mealCustomName" placeholder="e.g., Homemade granola" autocomplete="off">
+                    </div>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(80px, 1fr)); gap:8px;">
+                        <div class="form-group"><label for="mealCustomCalories">Calories <span style="color:var(--text-muted)">(auto)</span></label><input type="number" id="mealCustomCalories" step="any" min="0" inputmode="decimal" placeholder="0"></div>
+                        <div class="form-group"><label for="mealCustomProtein">Protein (g)</label><input type="number" id="mealCustomProtein" step="any" min="0" inputmode="decimal" placeholder="0"></div>
+                        <div class="form-group"><label for="mealCustomCarbs">Carbs (g)</label><input type="number" id="mealCustomCarbs" step="any" min="0" inputmode="decimal" placeholder="0"></div>
+                        <div class="form-group"><label for="mealCustomFats">Fat (g)</label><input type="number" id="mealCustomFats" step="any" min="0" inputmode="decimal" placeholder="0"></div>
+                        <div class="form-group"><label for="mealCustomFiber">Fiber (g)</label><input type="number" id="mealCustomFiber" step="any" min="0" inputmode="decimal" placeholder="0"></div>
+                    </div>
+                    <button type="button" class="btn" style="width:100%;" onclick="createFoodForMeal()">Save to My Foods &amp; Add to Meal (1 serving)</button>
+                </div>
             </div>
 
             <div style="display:flex; gap:8px;">
@@ -2522,7 +2537,8 @@
             { name: "Olive Oil", servingAmount: 1, servingUnit: "tbsp", protein: 0, carbs: 0, fats: 14, fiber: 0, calories: 119, vol: { a: 1, u: 'tbsp', g: 13.5 }, aliases: ['extra-virgin olive oil', 'extra virgin olive oil', 'evoo'] },
             { name: "Carrots (raw)", servingAmount: 100, servingUnit: "g", protein: 0.9, carbs: 9.6, fats: 0.2, fiber: 2.8, calories: 41, vol: { a: 1, u: 'cup', g: 128 }, aliases: ['carrot', 'carrots'] },
             { name: "Egg", servingAmount: 1, servingUnit: "piece", protein: 6, carbs: 0.6, fats: 5, fiber: 0, calories: 78, aliases: ['eggs', 'large egg', 'egg (large)'] },
-            { name: "Panko", servingAmount: 28, servingUnit: "g", protein: 3, carbs: 21, fats: 0.5, fiber: 1, calories: 100, vol: { a: 1, u: 'cup', g: 50 }, aliases: ['panko bread crumbs', 'panko breadcrumbs'] }
+            { name: "Panko", servingAmount: 28, servingUnit: "g", protein: 3, carbs: 21, fats: 0.5, fiber: 1, calories: 100, vol: { a: 1, u: 'cup', g: 50 }, aliases: ['panko bread crumbs', 'panko breadcrumbs'] },
+            { name: "Whole Foods Oven Roasted Turkey", servingAmount: 56, servingUnit: "g", protein: 11, carbs: 1, fats: 1, fiber: 0, calories: 60, aliases: ['oven roasted turkey', 'oven roasted turkey breast'] }
         ];
 
         // Add any RECIPE_SEED food that isn't already present. Names already seeded
@@ -2880,6 +2896,54 @@
             document.getElementById('searchFoodForMeal').value = '';
             document.getElementById('selectedFoodForMeal').value = '';
             document.getElementById('mealFoodDropdown').style.display = 'none';
+        }
+
+        function toggleMealCustomFood() {
+            const box = document.getElementById('mealCustomFood');
+            const show = box.style.display === 'none';
+            box.style.display = show ? 'block' : 'none';
+            document.getElementById('mealCustomToggle').textContent = show ? 'Cancel New Food' : '+ Create New Food';
+            if (show) document.getElementById('mealCustomName').focus();
+        }
+
+        function createFoodForMeal() {
+            const num = id => parseFloat(document.getElementById(id).value) || 0;
+            const name = document.getElementById('mealCustomName').value.trim();
+            const protein = num('mealCustomProtein'), carbs = num('mealCustomCarbs'), fats = num('mealCustomFats'), fiber = num('mealCustomFiber');
+            const calInput = document.getElementById('mealCustomCalories').value;
+            const calories = calInput !== '' ? num('mealCustomCalories') : (protein * 4 + carbs * 4 + fats * 9);
+
+            if (!name) { showToast('Enter a name for the food', 'error'); return; }
+            if (!(calories > 0 || protein > 0 || carbs > 0 || fats > 0)) {
+                showToast('Enter calories or at least one macro', 'error');
+                return;
+            }
+            if (foodDatabase.some(f => f.name.toLowerCase() === name.toLowerCase())) {
+                showToast(`"${name}" is already in My Foods — pick a different name`, 'error');
+                return;
+            }
+
+            const food = {
+                id: newId(),
+                name,
+                servingAmount: 1,
+                servingUnit: 'serving',
+                protein, carbs, fats, fiber, calories,
+                customCalories: calInput !== '',
+                density: null, volEqAmount: null, volEqUnit: null, volEqGrams: null
+            };
+            foodDatabase.push(food);
+            localStorage.setItem('foodDatabase', JSON.stringify(foodDatabase));
+            renderFoodList();
+            syncToFirebase();
+
+            currentMealBuilder.push({ ...food, builderId: Date.now(), amount: 1, unit: 'serving' });
+            renderMealBuilder();
+            calculateMealTotals();
+
+            ['mealCustomName', 'mealCustomCalories', 'mealCustomProtein', 'mealCustomCarbs', 'mealCustomFats', 'mealCustomFiber'].forEach(id => document.getElementById(id).value = '');
+            toggleMealCustomFood();
+            showToast(`Saved and added ${name}`, 'success');
         }
 
         function removeFoodFromBuilder(builderId) {
