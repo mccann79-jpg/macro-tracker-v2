@@ -404,6 +404,13 @@
             line-height: 1.2;
             margin-bottom: 8px;
         }
+        .total-pct {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-top: 6px;
+            white-space: nowrap;
+        }
         .total-sub {
             font-size: 0.72rem;
             margin-top: 4px;
@@ -1321,18 +1328,21 @@
                     <div class="total-value" id="dayProtein">0</div>
                     <div class="total-remaining" id="remainingProtein"></div>
                     <div class="progress-bar-container"><div class="progress-bar-fill" id="proteinBar" style="background:var(--protein); width:0%;"></div></div>
+                    <div class="total-pct" id="pctProtein"></div>
                 </div>
                 <div class="total-item">
                     <div class="total-label">Carbs (g)</div>
                     <div class="total-value" id="dayCarbs">0</div>
                     <div class="total-remaining" id="remainingCarbs"></div>
                     <div class="progress-bar-container"><div class="progress-bar-fill" id="carbsBar" style="background:var(--carbs); width:0%;"></div></div>
+                    <div class="total-pct" id="pctCarbs"></div>
                 </div>
                 <div class="total-item">
                     <div class="total-label">Fats (g)</div>
                     <div class="total-value" id="dayFats">0</div>
                     <div class="total-remaining" id="remainingFats"></div>
                     <div class="progress-bar-container"><div class="progress-bar-fill" id="fatsBar" style="background:var(--fats); width:0%;"></div></div>
+                    <div class="total-pct" id="pctFats"></div>
                 </div>
                 <div class="total-item">
                     <div class="total-label">Calories</div>
@@ -4745,6 +4755,14 @@
             const proteinPct = totalCalories > 0 ? ((totalProtein * 4 / totalCalories) * 100).toFixed(0) : 0;
             const carbsPct = totalCalories > 0 ? ((totalCarbs * 4 / totalCalories) * 100).toFixed(0) : 0;
             const fatsPct = totalCalories > 0 ? ((totalFats * 9 / totalCalories) * 100).toFixed(0) : 0;
+
+            // Share of calories from each macro, next to the goal's share when goals are set
+            const goalPct = (g, kcal) => (dailyGoals && g && dailyGoals.calories) ? Math.round(g * kcal / dailyGoals.calories * 100) : null;
+            [['Protein', proteinPct, dailyGoals && goalPct(dailyGoals.protein, 4)],
+             ['Carbs', carbsPct, dailyGoals && goalPct(dailyGoals.carbs, 4)],
+             ['Fats', fatsPct, dailyGoals && goalPct(dailyGoals.fats, 9)]].forEach(([name, pct, goal]) => {
+                document.getElementById('pct' + name).textContent = pct + '% of cal' + (goal !== null && goal !== undefined ? ' · goal ' + goal + '%' : '');
+            });
 
             document.getElementById('dayProtein').textContent = Math.round(totalProtein);
             document.getElementById('dayCarbs').textContent = Math.round(totalCarbs);
