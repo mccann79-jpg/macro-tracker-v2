@@ -5118,26 +5118,30 @@
             }
 
             if (confirm('Clear all meals from today? You can undo this action.')) {
-                // Backup current meals for undo
-                clearedMealsBackup = JSON.parse(JSON.stringify(todaysMeals));
-                
-                // Clear the day
-                todaysMeals = [];
-                localStorage.setItem('todaysMeals', JSON.stringify(todaysMeals));
-                syncToFirebase(); // Sync to cloud
-                
-                // Show undo button
-                document.getElementById('undoClearBtn').style.display = 'block';
-                
-                // Hide undo button after 10 seconds
-                setTimeout(() => {
-                    document.getElementById('undoClearBtn').style.display = 'none';
-                    clearedMealsBackup = null;
-                }, 10000);
-                
-                renderDayMeals();
-                calculateDayTotals();
+                performClearDay();
             }
+        }
+
+        function performClearDay() {
+            // Backup current meals for undo
+            clearedMealsBackup = JSON.parse(JSON.stringify(todaysMeals));
+
+            // Clear the day
+            todaysMeals = [];
+            localStorage.setItem('todaysMeals', JSON.stringify(todaysMeals));
+            syncToFirebase(); // Sync to cloud
+
+            // Show undo button
+            document.getElementById('undoClearBtn').style.display = 'block';
+
+            // Hide undo button after 10 seconds
+            setTimeout(() => {
+                document.getElementById('undoClearBtn').style.display = 'none';
+                clearedMealsBackup = null;
+            }, 10000);
+
+            renderDayMeals();
+            calculateDayTotals();
         }
 
         function undoClear() {
@@ -5337,6 +5341,9 @@
             renderHistory();
             drawHistoryChart();
             
+            // Automatically clear the day (undo remains available)
+            performClearDay();
+
             showToast(`Day closed out for ${selectedDate}`, 'success');
         }
 
