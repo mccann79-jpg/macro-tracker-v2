@@ -1179,7 +1179,7 @@
                             <th style="text-align:left; min-width:160px;">Food</th>
                             <th style="min-width:70px;">Amt</th>
                             <th style="min-width:60px;">Unit</th>
-                            <th>P</th><th>C</th><th>F</th><th>Fib</th><th>Cal</th><th>P/Cal</th><th style="width:40px;"></th>
+                            <th>P</th><th>C</th><th>F</th><th>Fib</th><th>Cal</th><th>P%</th><th style="width:40px;"></th>
                         </tr>
                     </thead>
                     <tbody id="mealBuilderTableBody"></tbody>
@@ -1191,7 +1191,7 @@
                             <td class="fats-col" id="totalFatsTable">0g</td>
                             <td id="totalFiberTable">0g</td>
                             <td class="cal-col" id="totalCaloriesTable">0</td>
-                            <td id="totalPCalTable">0</td>
+                            <td id="totalPCalTable">0%</td>
                             <td></td>
                         </tr>
                         <tr style="opacity:0.7;">
@@ -1201,7 +1201,7 @@
                             <td class="fats-col" id="perServingFatsTable">0g</td>
                             <td id="perServingFiberTable">0g</td>
                             <td class="cal-col" id="perServingCaloriesTable">0</td>
-                            <td id="perServingPCalTable">0</td>
+                            <td id="perServingPCalTable">0%</td>
                             <td></td>
                         </tr>
                     </tfoot>
@@ -1985,15 +1985,71 @@
             }
         }
 
+        // Rolling local backups, taken before any cloud data overwrites local data, so a
+        // bad sync can always be undone. Console: listBackups(), restoreBackup(i).
+        const BACKUP_KEYS = ['foodDatabase', 'savedMeals', 'todaysMeals', 'dailyGoals', 'dayHistory', 'weightData', 'mealPrepPlans'];
+
+        function snapshotLocalData(reason) {
+            try {
+                const snap = { time: Date.now(), reason, data: {} };
+                BACKUP_KEYS.forEach(k => { snap.data[k] = localStorage.getItem(k); });
+                const backups = JSON.parse(localStorage.getItem('dataBackups') || '[]');
+                const last = backups[0];
+                if (last && JSON.stringify(last.data) === JSON.stringify(snap.data)) return;
+                backups.unshift(snap);
+                backups.length = Math.min(backups.length, 8);
+                localStorage.setItem('dataBackups', JSON.stringify(backups));
+            } catch (e) { console.warn('Backup failed', e); }
+        }
+
+        function listBackups() {
+            const backups = JSON.parse(localStorage.getItem('dataBackups') || '[]');
+            backups.forEach((b, i) => {
+                const n = k => { try { return (JSON.parse(b.data[k]) || []).length; } catch (e) { return 0; } };
+                console.log(i, new Date(b.time).toLocaleString(), b.reason, `foods ${n('foodDatabase')}, meals ${n('savedMeals')}, history ${n('dayHistory')}`);
+            });
+            return backups.length;
+        }
+
+        function restoreBackup(i = 0) {
+            const b = (JSON.parse(localStorage.getItem('dataBackups') || '[]'))[i];
+            if (!b) { alert('No such backup'); return; }
+            snapshotLocalData('before restore');
+            BACKUP_KEYS.forEach(k => { if (b.data[k] !== null) localStorage.setItem(k, b.data[k]); });
+            localStorage.setItem('lastSync', '0');
+            syncToFirebase();
+            location.reload();
+        }
+
+        // Union two lists so neither side's items are dropped (matched by id, else key()).
+        function mergeLists(local, remote, key) {
+            const out = [...(local || [])];
+            const seen = new Set(out.map(x => x && (x.id != null ? 'id:' + x.id : key(x))));
+            (remote || []).forEach(x => {
+                if (!x) return;
+                const k = x.id != null ? 'id:' + x.id : key(x);
+                const nameK = key(x);
+                if (seen.has(k) || out.some(o => o && key(o) === nameK)) return;
+                out.push(x);
+                seen.add(k);
+            });
+            return out;
+        }
+
         function connectToFirebase() {
             if (!userPin) return;
 
             // Reference to this user's data in Firebase
             firebaseRef = database.ref(userPin);
 
+            // Never upload until the cloud copy has been read and merged. Uploading a
+            // stale local copy first (e.g. from startup seeding) overwrote newer cloud data.
+            cloudReady = false;
+
             // Load data from Firebase
             firebaseRef.once('value', (snapshot) => {
                 const data = snapshot.val();
+                backupCloudDaily(data);
                 
                 console.log('📡 Firebase data loaded:', data ? 'has data' : 'empty');
                 
@@ -2014,12 +2070,14 @@
                     console.log('☁️ Cloud has:', {foods: cloudFoods, meals: cloudMeals, today: cloudToday, history: cloudHistory, weight: cloudWeight});
                     console.log('💾 Local has:', {foods: localFoods, meals: localMeals, today: localToday, history: localHistory, weight: localWeight});
                     
-                    // Only load from cloud if cloud has more data than local
+                    // Merge cloud and local (union) so items that exist on only one side survive.
+                    snapshotLocalData('before cloud load');
                     let loadedFromCloud = false;
+                    const nameKey = x => (x.name || '').trim().toLowerCase();
                     
-                    if (cloudFoods > localFoods && data.foodDatabase) {
-                        console.log('⬇️ Loading foods from cloud');
-                        foodDatabase = data.foodDatabase;
+                    if (data.foodDatabase && mergeLists(foodDatabase, data.foodDatabase, nameKey).length !== localFoods) {
+                        console.log('⬇️ Merging foods from cloud');
+                        foodDatabase = mergeLists(foodDatabase, data.foodDatabase, nameKey);
                         ensureFoodIds();
                         applyDensitySeed(); // backfill volume<->weight data
                         applyRecipeSeed();
@@ -2028,9 +2086,9 @@
                         loadedFromCloud = true;
                     }
                     
-                    if (cloudMeals > localMeals && data.savedMeals) {
-                        console.log('⬇️ Loading meals from cloud');
-                        savedMeals = data.savedMeals;
+                    if (data.savedMeals && mergeLists(savedMeals, data.savedMeals, nameKey).length !== localMeals) {
+                        console.log('⬇️ Merging meals from cloud');
+                        savedMeals = mergeLists(savedMeals, data.savedMeals, nameKey);
                         localStorage.setItem('savedMeals', JSON.stringify(savedMeals));
                         loadedFromCloud = true;
                     }
@@ -2051,16 +2109,17 @@
                         }
                     }
                     
-                    if (cloudHistory > localHistory && data.dayHistory) {
-                        console.log('⬇️ Loading history from cloud');
-                        dayHistory = data.dayHistory;
+                    if (data.dayHistory && mergeLists(dayHistory, data.dayHistory, x => x.date).length !== localHistory) {
+                        console.log('⬇️ Merging history from cloud');
+                        dayHistory = mergeLists(dayHistory, data.dayHistory, x => x.date)
+                            .sort((a, b) => new Date(b.date) - new Date(a.date));
                         localStorage.setItem('dayHistory', JSON.stringify(dayHistory));
                         loadedFromCloud = true;
                     }
                     
-                    if (cloudWeight > localWeight && data.weightData) {
-                        console.log('⬇️ Loading weight data from cloud');
-                        weightData = data.weightData;
+                    if (data.weightData && mergeLists(weightData, data.weightData, x => x.date).length !== localWeight) {
+                        console.log('⬇️ Merging weight data from cloud');
+                        weightData = mergeLists(weightData, data.weightData, x => x.date);
                         localStorage.setItem('weightData', JSON.stringify(weightData));
                         loadedFromCloud = true;
                     }
@@ -2070,7 +2129,7 @@
                         localStorage.setItem('mealPrepPlans', JSON.stringify(mealPrepPlans));
                     }
                     
-                    if (data.dailyGoals) {
+                    if (data.dailyGoals && (!dailyGoals || data._lastSync > parseInt(localStorage.getItem('lastSync') || '0'))) {
                         dailyGoals = data.dailyGoals;
                         localStorage.setItem('dailyGoals', JSON.stringify(dailyGoals));
                     }
@@ -2089,6 +2148,7 @@
                         drawHistoryChart();
                         renderWeightTable();
                         drawWeightChart();
+                        syncToFirebase(); // push the merged result so both sides agree
                     } else if (localFoods > 0 || localMeals > 0 || localWeight > 0) {
                         // Local has more data - sync it to cloud
                         console.log('⬆️ Local has more data - syncing to cloud');
@@ -2101,6 +2161,15 @@
                         syncToFirebase();
                     }
                 }
+
+                cloudReady = true;
+                if (pendingSync) {
+                    pendingSync = false;
+                    syncToFirebase();
+                }
+            }, (error) => {
+                console.error('Cloud load failed:', error);
+                showToast('Could not reach cloud — changes saved locally, not synced', 'error');
             });
 
             // Listen for changes from other devices
@@ -2119,6 +2188,7 @@
                 if (data._lastSync <= localLastSync) return;
 
                 console.log('🔄 Remote data is newer - updating local');
+                snapshotLocalData('before remote update');
 
                 // Only re-render a section when its data actually changed. Rebuilding a
                 // list steals focus from inputs inside it, so do it as rarely as possible.
@@ -2181,8 +2251,29 @@
         // Timestamps of writes this tab made, so the value listener can skip its own echo.
         const ownSyncTimestamps = new Set();
 
+        let cloudReady = false;
+        let pendingSync = false;
+
+        // Keep one dated copy of the cloud record per day (last 7 days) as an undo point.
+        function backupCloudDaily(data) {
+            try {
+                if (!data || !data._lastSync) return;
+                const day = new Date().toISOString().slice(0, 10);
+                if (localStorage.getItem('lastCloudBackup') === day) return;
+                const ref = database.ref('backups_' + userPin);
+                ref.child(day).set(data).then(() => {
+                    localStorage.setItem('lastCloudBackup', day);
+                    ref.once('value', snap => {
+                        const keys = Object.keys(snap.val() || {}).sort();
+                        keys.slice(0, Math.max(0, keys.length - 7)).forEach(k => ref.child(k).remove());
+                    });
+                }).catch(e => console.warn('Cloud backup failed', e));
+            } catch (e) { console.warn('Cloud backup failed', e); }
+        }
+
         function syncToFirebase() {
             if (!userPin || !firebaseRef) return;
+            if (!cloudReady) { pendingSync = true; return; }
 
             const timestamp = newId();
             const previousSync = localStorage.getItem('lastSync');
@@ -3041,8 +3132,8 @@
                 const baseCalories = item.calories !== undefined ? item.calories : (item.protein * 4 + item.carbs * 4 + item.fats * 9);
                 const calories = (baseCalories * multiplier).toFixed(0);
                 
-                // Calculate P/Cal ratio: (protein * 10) / calories
-                const pCalRatio = calories > 0 ? ((parseFloat(protein) * 10) / parseFloat(calories)).toFixed(1) : 0;
+                // % of calories from protein: (protein * 4) / calories
+                const pCalRatio = calories > 0 ? Math.round((parseFloat(protein) * 4 * 100) / parseFloat(calories)) + '%' : '0%';
 
                 const rowBg = 'transparent';
 
@@ -3111,9 +3202,9 @@
             const perServingFiber = totalFiber / totalServings;
             const perServingCalories = totalCalories / totalServings;
 
-            // Calculate P/Cal ratios
-            const totalPCal = totalCalories > 0 ? ((totalProtein * 10) / totalCalories).toFixed(1) : 0;
-            const perServingPCal = perServingCalories > 0 ? ((perServingProtein * 10) / perServingCalories).toFixed(1) : 0;
+            // % of calories from protein
+            const totalPCal = totalCalories > 0 ? Math.round((totalProtein * 4 * 100) / totalCalories) + '%' : '0%';
+            const perServingPCal = perServingCalories > 0 ? Math.round((perServingProtein * 4 * 100) / perServingCalories) + '%' : '0%';
 
             // Update table totals
             document.getElementById('totalProteinTable').textContent = totalProtein.toFixed(1) + 'g';
