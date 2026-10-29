@@ -3339,7 +3339,7 @@
                 <table>
                     <thead>
                         <tr>
-                            <th style="text-align:left;">Meal</th><th>Srv</th><th>P/srv</th><th>C/srv</th><th>F/srv</th><th>Fib</th><th>Cal/srv</th><th></th>
+                            <th style="text-align:left;">Meal</th><th>Srv</th><th>P/srv</th><th>C/srv</th><th>F/srv</th><th>Fib</th><th>Cal/srv</th><th>P% cal</th><th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -3357,6 +3357,7 @@
                         <td class="fats-col">${meal.perServing.fats.toFixed(1)}g</td>
                         <td style="text-align:center; color:var(--text-muted);">${meal.perServing.fiber.toFixed(1)}g</td>
                         <td class="cal-col">${calories.toFixed(0)}</td>
+                        <td class="protein-col">${calories > 0 ? Math.round(meal.perServing.protein * 4 / calories * 100) : 0}%</td>
                         <td style="text-align:center;">
                             <button class="btn-success btn-sm" onclick="editMeal(${meal.id})" style="margin-right:2px;">Edit</button>
                             <button class="btn-sm" onclick="duplicateMeal(${meal.id})" style="margin-right:2px;">Dup</button>
