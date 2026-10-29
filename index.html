@@ -1006,6 +1006,14 @@
             .totals-actions input[type="date"] { flex: 1; min-width: 0; }
             .totals-actions .btn-sm { white-space: nowrap; padding: 8px 10px; }
             .weight-log-table td, .weight-log-table th { padding: 8px 4px; }
+            /* Full-bleed cards: use the whole screen width on mobile */
+            .container { padding: 0; }
+            .card, .totals-hero {
+                border-left: none;
+                border-right: none;
+                border-radius: 0;
+            }
+            .table-wrap { margin: 0 -14px; padding: 0 14px; }
         }
 
         @media (max-width: 380px) {
