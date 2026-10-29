@@ -468,6 +468,18 @@
         @media (max-width: 859px) {
             table { min-width: 520px; }
         }
+        .meal-actions-inline { display: none; }
+        /* Saved meals on mobile: wrap names, put actions under the name, fit without side-scrolling */
+        @media (max-width: 859px) {
+            .saved-meals-table { min-width: 0; font-size: 0.72rem; }
+            .saved-meals-table th, .saved-meals-table td { padding: 8px 3px; }
+            .saved-meals-table th { font-size: 0.6rem; letter-spacing: 0; }
+            .saved-meals-table td { white-space: nowrap; }
+            .saved-meals-table .meal-name-cell { white-space: normal; overflow-wrap: anywhere; min-width: 90px; }
+            .saved-meals-table .meal-actions-cell { display: none; }
+            .saved-meals-table .meal-actions-inline { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 6px; }
+            .saved-meals-table .meal-actions-inline .btn-sm { margin: 0 !important; padding: 4px 6px; min-height: 26px; font-size: 0.66rem; width: auto; white-space: nowrap; }
+        }
         thead tr {
             background: rgba(255, 255, 255, 0.25);
         }
@@ -3344,10 +3356,10 @@
 
             // Create table
             let tableHTML = `
-                <table>
+                <table class="saved-meals-table">
                     <thead>
                         <tr>
-                            <th style="text-align:left;">Meal</th><th>Srv</th><th>P/srv</th><th>C/srv</th><th>F/srv</th><th>Fib</th><th>Cal/srv</th><th>P% cal</th><th></th>
+                            <th style="text-align:left;">Meal</th><th>Srv</th><th>P/srv</th><th>C/srv</th><th>F/srv</th><th>Fib</th><th>Cal/srv</th><th>P% cal</th><th class="meal-actions-cell"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -3355,10 +3367,14 @@
 
             sortedMeals.forEach((meal, index) => {
                 const calories = meal.perServing.calories || (meal.perServing.protein * 4 + meal.perServing.carbs * 4 + meal.perServing.fats * 9);
+                const actionButtons = `
+                            <button class="btn-success btn-sm" onclick="editMeal(${meal.id})" style="margin-right:2px;">Edit</button>
+                            <button class="btn-sm" onclick="duplicateMeal(${meal.id})" style="margin-right:2px;">Dup</button>
+                            <button class="btn-danger btn-sm" onclick="deleteMeal(${meal.id})">Del</button>`;
 
                 tableHTML += `
                     <tr>
-                        <td style="font-weight:600;">${esc(meal.name)}</td>
+                        <td class="meal-name-cell" style="font-weight:600;">${esc(meal.name)}<div class="meal-actions-inline">${actionButtons}</div></td>
                         <td style="text-align:center; color:var(--text-muted);">${meal.totalServings}</td>
                         <td class="protein-col">${meal.perServing.protein.toFixed(1)}g</td>
                         <td class="carbs-col">${meal.perServing.carbs.toFixed(1)}g</td>
@@ -3366,11 +3382,7 @@
                         <td style="text-align:center; color:var(--text-muted);">${meal.perServing.fiber.toFixed(1)}g</td>
                         <td class="cal-col">${calories.toFixed(0)}</td>
                         <td class="protein-col">${calories > 0 ? Math.round(meal.perServing.protein * 4 / calories * 100) : 0}%</td>
-                        <td style="text-align:center;">
-                            <button class="btn-success btn-sm" onclick="editMeal(${meal.id})" style="margin-right:2px;">Edit</button>
-                            <button class="btn-sm" onclick="duplicateMeal(${meal.id})" style="margin-right:2px;">Dup</button>
-                            <button class="btn-danger btn-sm" onclick="deleteMeal(${meal.id})">Del</button>
-                        </td>
+                        <td class="meal-actions-cell" style="text-align:center;">${actionButtons}</td>
                     </tr>
                 `;
             });
