@@ -472,13 +472,13 @@
         /* Saved meals on mobile: wrap names, put actions under the name, fit without side-scrolling */
         @media (max-width: 859px) {
             .saved-meals-table { min-width: 0; font-size: 0.72rem; }
-            .saved-meals-table th, .saved-meals-table td { padding: 8px 3px; }
+            .saved-meals-table th, .saved-meals-table td { padding: 8px 2px; }
             .saved-meals-table th { font-size: 0.6rem; letter-spacing: 0; }
             .saved-meals-table td { white-space: nowrap; }
-            .saved-meals-table .meal-name-cell { white-space: normal; overflow-wrap: anywhere; min-width: 90px; }
+            .saved-meals-table .meal-name-cell { white-space: normal; overflow-wrap: anywhere; min-width: 112px; }
             .saved-meals-table .meal-actions-cell { display: none; }
-            .saved-meals-table .meal-actions-inline { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 6px; }
-            .saved-meals-table .meal-actions-inline .btn-sm { margin: 0 !important; padding: 4px 6px; min-height: 26px; font-size: 0.66rem; width: auto; white-space: nowrap; }
+            .saved-meals-table .meal-actions-inline { display: flex; flex-wrap: nowrap; gap: 3px; margin-top: 6px; }
+            .saved-meals-table .meal-actions-inline .btn-sm { margin: 0 !important; padding: 4px 5px; min-height: 26px; font-size: 0.64rem; width: auto; flex: 0 0 auto; white-space: nowrap; border-width: 1px; }
         }
         thead tr {
             background: rgba(255, 255, 255, 0.25);
