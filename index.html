@@ -7766,22 +7766,39 @@
                 return;
             }
 
-            // Get weights with valid morning weights only
-            const validWeights = weightData
+            // Only the most recent 3 months feed the projection — older trends no longer apply
+            const allWeights = weightData
                 .filter(e => e.morningWeight)
-                .sort((a, b) => new Date(a.date) - new Date(b.date))
-                .map((e, index) => ({ date: e.date, weight: e.morningWeight, index }));
+                .sort((a, b) => new Date(a.date) - new Date(b.date));
+            if (allWeights.length < 2) {
+                document.getElementById('goalProjection').style.display = 'none';
+                return;
+            }
+            const latest = new Date(allWeights[allWeights.length - 1].date + 'T00:00:00');
+            const cutoff = new Date(latest);
+            cutoff.setMonth(cutoff.getMonth() - 3);
+            const cutoffStr = getLocalDateString(cutoff);
+
+            // x = calendar day, so gaps in logging are weighted correctly
+            const validWeights = allWeights
+                .filter(e => e.date >= cutoffStr)
+                .map(e => ({ date: e.date, weight: e.morningWeight, day: weightDayNumber(e.date) }));
 
             if (validWeights.length < 2) {
                 document.getElementById('goalProjection').style.display = 'none';
                 return;
             }
 
-            // Calculate trend line
-            const regression = calculateLinearRegression(validWeights);
-            if (!regression) return;
-
-            const { slope, intercept } = regression;
+            // Least-squares trend line (lb per day)
+            const nPts = validWeights.length;
+            const sx = validWeights.reduce((a, v) => a + v.day, 0);
+            const sy = validWeights.reduce((a, v) => a + v.weight, 0);
+            const sxy = validWeights.reduce((a, v) => a + v.day * v.weight, 0);
+            const sxx = validWeights.reduce((a, v) => a + v.day * v.day, 0);
+            const denom = nPts * sxx - sx * sx;
+            if (denom === 0) return;
+            const slope = (nPts * sxy - sx * sy) / denom;
+            const intercept = (sy - slope * sx) / nPts;
 
             // Get current weight (most recent)
             const currentWeight = validWeights[validWeights.length - 1].weight;
@@ -7797,14 +7814,13 @@
                 document.getElementById('projectedDate').style.color = '#dc2626';
                 document.getElementById('projectedDays').textContent = slope > 0 ? 'Gaining' : 'Losing';
                 document.getElementById('weightToGo').textContent = `${Math.abs(currentWeight - goalWeight).toFixed(1)} lb to go`;
-                document.getElementById('trendRate').textContent = `Trend: ${slope > 0 ? '+' : ''}${slope.toFixed(3)} lb/day (${(slope * 7).toFixed(2)} lb/week)`;
+                document.getElementById('trendRate').textContent = `Trend: ${slope > 0 ? '+' : ''}${slope.toFixed(3)} lb/day (${(slope * 7).toFixed(2)} lb/week, last 3 mo)`;
                 return;
             }
 
             // Calculate days to reach goal
-            // Current predicted weight at last index: intercept + slope * lastIndex
-            const lastIndex = validWeights.length - 1;
-            const currentPredicted = intercept + slope * lastIndex;
+            // Current predicted weight on the latest logged day
+            const currentPredicted = intercept + slope * validWeights[validWeights.length - 1].day;
             const weightDiff = goalWeight - currentPredicted;
             const daysNeeded = Math.abs(weightDiff / slope);
 
@@ -7825,7 +7841,7 @@
             const daysFromNow = Math.round((projectedDate - new Date()) / (1000 * 60 * 60 * 24));
             document.getElementById('projectedDays').textContent = daysFromNow + ' days';
             document.getElementById('weightToGo').textContent = `${Math.abs(currentWeight - goalWeight).toFixed(1)} lb to go`;
-            document.getElementById('trendRate').textContent = `Trend: ${slope > 0 ? '+' : ''}${slope.toFixed(3)} lb/day (${(slope * 7).toFixed(2)} lb/week)`;
+            document.getElementById('trendRate').textContent = `Trend: ${slope > 0 ? '+' : ''}${slope.toFixed(3)} lb/day (${(slope * 7).toFixed(2)} lb/week, last 3 mo)`;
         }
 
         function loadGoalWeight() {
