@@ -6913,12 +6913,24 @@
         // null = show everything.
         let weightView = null;
 
-        function weightChartCount() { return weightData.length; }
+        // The chart's x-axis is calendar days (not entry order), so gaps in logging show as gaps.
+        // The view window (lo/hi) is in days since the earliest logged date.
+        function weightDayNumber(dateStr) {
+            const [y, m, d] = dateStr.split('-').map(Number);
+            return Math.round(Date.UTC(y, m - 1, d) / 86400000);
+        }
+
+        // Number of day positions on the axis (first logged day = 0)
+        function weightChartCount() {
+            if (weightData.length === 0) return 0;
+            const days = weightData.map(e => weightDayNumber(e.date));
+            return Math.max(...days) - Math.min(...days) + 1;
+        }
 
         function setWeightView(lo, hi) {
             const n = weightChartCount();
             if (n < 2) { weightView = null; drawWeightChart(); return; }
-            const minSpan = Math.min(n - 1, 4);              // never zoom tighter than ~5 points
+            const minSpan = Math.min(n - 1, 6);              // never zoom tighter than ~a week
             let span = Math.max(minSpan, Math.min(hi - lo, n - 1));
             lo = Math.max(0, Math.min(lo, n - 1 - span));
             hi = lo + span;
@@ -6942,12 +6954,9 @@
         function weightRangeDays(days) {
             const sorted = [...weightData].sort((a, b) => new Date(a.date) - new Date(b.date));
             if (sorted.length < 2) return;
-            if (!days) { setWeightView(0, sorted.length - 1); return; }
-            const cutoff = new Date(sorted[sorted.length - 1].date + 'T00:00:00');
-            cutoff.setDate(cutoff.getDate() - days);
-            let lo = sorted.findIndex(e => new Date(e.date + 'T00:00:00') >= cutoff);
-            if (lo < 0) lo = 0;
-            setWeightView(lo, sorted.length - 1);
+            const total = weightChartCount();
+            if (!days) { setWeightView(0, total - 1); return; }
+            setWeightView(total - 1 - days, total - 1);
         }
 
         function drawWeightChart() {
@@ -6993,16 +7002,23 @@
                 entry.calories = historyEntry ? historyEntry.calories : null;
             });
 
-            // Visible window (zoom/pan) over the sorted data, in fractional indices
-            const n = sortedData.length;
+            // X position of each entry = calendar day since the first entry (not its index)
+            const day0 = weightDayNumber(sortedData[0].date);
+            sortedData.forEach(entry => { entry.day = weightDayNumber(entry.date) - day0; });
+
+            // Visible window (zoom/pan), in fractional days
+            const n = sortedData[sortedData.length - 1].day + 1;
             let viewLo = 0, viewHi = n - 1;
             if (weightView && n > 1) {
                 viewLo = Math.max(0, Math.min(weightView.lo, n - 1));
                 viewHi = Math.max(viewLo, Math.min(weightView.hi, n - 1));
             }
             const viewSpan = (viewHi - viewLo) || 1;
-            const firstVis = Math.max(0, Math.ceil(viewLo - 1e-9));
-            const lastVis = Math.min(n - 1, Math.floor(viewHi + 1e-9));
+            // Index range of entries inside the window
+            let firstVis = sortedData.findIndex(e => e.day >= viewLo - 1e-9);
+            if (firstVis < 0) firstVis = sortedData.length;
+            let lastVis = -1;
+            sortedData.forEach((e, i) => { if (e.day <= viewHi + 1e-9) lastVis = i; });
 
             // Chart dimensions — responsive padding for mobile
             const isMobile = W < 500;
@@ -7108,8 +7124,8 @@
             };
 
             // Function to get X coordinate for index
-            const getX = (index) => {
-                return padding + ((index - viewLo) / viewSpan) * chartWidth;
+            const getX = (day) => {
+                return padding + ((day - viewLo) / viewSpan) * chartWidth;
             };
 
             // Clip data drawing to the plot area so zoomed lines don't spill over the axes
@@ -7123,7 +7139,7 @@
                 ctx.fillStyle = 'rgba(245, 158, 11, 0.2)';
                 sortedData.forEach((entry, i) => {
                     if (entry.calories) {
-                        const x = getX(i);
+                        const x = getX(entry.day);
                         const y = getCalorieY(entry.calories);
                         const barWidth = chartWidth / (viewSpan + 1) * 0.6;
                         ctx.fillRect(x - barWidth/2, y, barWidth, H - padding - y);
@@ -7144,7 +7160,7 @@
 
                 sortedData.forEach((entry, i) => {
                     if (entry.morningWeight) {
-                        const x = getX(i);
+                        const x = getX(entry.day);
                         const y = getY(entry.morningWeight);
 
                         if (firstPoint) {
@@ -7161,7 +7177,7 @@
                 ctx.fillStyle = '#5b84b1';
                 sortedData.forEach((entry, i) => {
                     if (entry.morningWeight) {
-                        const x = getX(i);
+                        const x = getX(entry.day);
                         const y = getY(entry.morningWeight);
                         ctx.beginPath();
                         ctx.arc(x, y, pointRadius, 0, Math.PI * 2);
@@ -7179,7 +7195,7 @@
 
                 sortedData.forEach((entry, i) => {
                     if (entry.calculated7DayAvg) {
-                        const x = getX(i);
+                        const x = getX(entry.day);
                         const y = getY(entry.calculated7DayAvg);
 
                         if (firstPoint) {
@@ -7196,7 +7212,7 @@
                 ctx.fillStyle = '#4b6584';
                 sortedData.forEach((entry, i) => {
                     if (entry.calculated7DayAvg) {
-                        const x = getX(i);
+                        const x = getX(entry.day);
                         const y = getY(entry.calculated7DayAvg);
                         ctx.beginPath();
                         ctx.arc(x, y, pointRadius, 0, Math.PI * 2);
@@ -7208,11 +7224,18 @@
             // Calculate and draw trend line
             if (showTrendLine) {
                 const validWeights = sortedData
-                    .map((e, index) => ({ weight: e.morningWeight, index }))
+                    .map((e, index) => ({ weight: e.morningWeight, index, day: e.day }))
                     .filter(e => e.weight && e.index >= firstVis && e.index <= lastVis); // fit only the visible period
 
                 if (validWeights.length >= 2) {
-                    const regression = calculateLinearRegression(validWeights);
+                    // Least-squares fit against calendar day so gaps are weighted correctly
+                    const nPts = validWeights.length;
+                    const sx = validWeights.reduce((a, v) => a + v.day, 0);
+                    const sy = validWeights.reduce((a, v) => a + v.weight, 0);
+                    const sxy = validWeights.reduce((a, v) => a + v.day * v.weight, 0);
+                    const sxx = validWeights.reduce((a, v) => a + v.day * v.day, 0);
+                    const denom = nPts * sxx - sx * sx;
+                    const regression = denom !== 0 ? { slope: (nPts * sxy - sx * sy) / denom, intercept: (sy - ((nPts * sxy - sx * sy) / denom) * sx) / nPts } : null;
                     if (regression) {
                         const { slope, intercept } = regression;
 
@@ -7223,13 +7246,12 @@
                         ctx.beginPath();
 
                         // Calculate trend values for first and last points
-                        const firstIndex = 0;
-                        const lastIndex = sortedData.length - 1;
-                        const firstTrendWeight = intercept + slope * validWeights[0].index;
-                        const lastTrendWeight = intercept + slope * validWeights[validWeights.length - 1].index;
+                        const firstDay = validWeights[0].day, lastDay = validWeights[validWeights.length - 1].day;
+                        const firstTrendWeight = intercept + slope * firstDay;
+                        const lastTrendWeight = intercept + slope * lastDay;
 
-                        ctx.moveTo(getX(validWeights[0].index), getY(firstTrendWeight));
-                        ctx.lineTo(getX(validWeights[validWeights.length - 1].index), getY(lastTrendWeight));
+                        ctx.moveTo(getX(firstDay), getY(firstTrendWeight));
+                        ctx.lineTo(getX(lastDay), getY(lastTrendWeight));
                         ctx.stroke();
                         ctx.setLineDash([]);
                     }
@@ -7262,16 +7284,13 @@
             ctx.font = isMobile ? '9px Arial' : '11px Arial';
             ctx.textAlign = 'center';
             const maxLabels = isMobile ? 5 : 10;
-            const labelInterval = Math.max(1, Math.floor((lastVis - firstVis + 1) / maxLabels));
-            
-            sortedData.forEach((entry, i) => {
-                if (i < firstVis || i > lastVis) return;
-                if (i % labelInterval === 0 || i === lastVis) {
-                    const x = getX(i);
-                    const dateLabel = new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                    ctx.fillText(dateLabel, x, H - padding + 20);
-                }
-            });
+            // Evenly spaced calendar ticks across the visible window
+            const labelStep = Math.max(1, Math.ceil(viewSpan / maxLabels));
+            for (let d = Math.ceil(viewLo - 1e-9); d <= viewHi + 1e-9; d += labelStep) {
+                const labelDate = new Date((day0 + d) * 86400000);
+                const dateLabel = labelDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
+                ctx.fillText(dateLabel, getX(d), H - padding + 20);
+            }
 
             // Add interactive hover (store data for tooltip)
             canvas._chartData = sortedData;
@@ -7304,7 +7323,7 @@
                 let closestEntry = null;
 
                 canvas._chartData.forEach((entry, i) => {
-                    const x = canvas._getX(i);
+                    const x = canvas._getX(entry.day);
                     if (x < canvas._padding - 4 || x > canvas._plotRight + 4) return;
 
                     if (canvas._showMorning && entry.morningWeight) {
