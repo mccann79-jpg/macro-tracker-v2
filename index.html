@@ -7062,8 +7062,10 @@
             }
 
             // Weight axis
-            const minWeight = allWeights.length > 0 ? Math.min(...allWeights) - 2 : 0;
-            const maxWeight = allWeights.length > 0 ? Math.max(...allWeights) + 2 : 200;
+            // Include the goal weight so the goal line and its label are never clipped
+            const axisWeights = (goalWeight && allWeights.length > 0) ? allWeights.concat(goalWeight) : allWeights;
+            const minWeight = axisWeights.length > 0 ? Math.min(...axisWeights) - 2 : 0;
+            const maxWeight = axisWeights.length > 0 ? Math.max(...axisWeights) + 2 : 200;
             const weightRange = maxWeight - minWeight;
 
             // Calorie axis (if enabled)
