@@ -2708,7 +2708,13 @@
             { name: "365 Organic Cannellini Beans (No Salt)", servingAmount: 130, servingUnit: "g", protein: 6, carbs: 18, fats: 0.5, fiber: 6, calories: 120, vol: { a: 0.5, u: 'cup', g: 130 } },
             { name: "Pomi Crushed Tomatoes with Garlic", servingAmount: 61, servingUnit: "g", protein: 0, carbs: 4, fats: 0, fiber: 1, calories: 20, vol: { a: 0.25, u: 'cup', g: 61 } },
             { name: "Pumpkin & Spice Mini Muffin (Whole Foods)", servingAmount: 1, servingUnit: "piece", protein: 1, carbs: 11.5, fats: 2.5, fiber: 0.5, calories: 72.5 },
-            { name: "Whole Foods Croissant (Bake at Home)", servingAmount: 1, servingUnit: "piece", protein: 7, carbs: 34, fats: 18, fiber: 1, calories: 330, aliases: ['croissant', 'bake at home croissant', 'whole foods croissant'] }
+            { name: "Whole Foods Croissant (Bake at Home)", servingAmount: 1, servingUnit: "piece", protein: 7, carbs: 34, fats: 18, fiber: 1, calories: 330, aliases: ['croissant', 'bake at home croissant', 'whole foods croissant'] },
+            // Sheet pan chicken thighs & potatoes. Thighs are per 100g as purchased
+            // (bone-in, skin-on, ~72% edible) so the recipe's pound weight can be used directly.
+            { name: "Chicken Thighs (raw, bone-in, skin-on)", servingAmount: 100, servingUnit: "g", protein: 12, carbs: 0, fats: 11, fiber: 0, calories: 152, aliases: ['chicken thighs', 'chicken thigh', 'bone-in chicken thighs'] },
+            { name: "Yukon Gold Potatoes (raw)", servingAmount: 100, servingUnit: "g", protein: 2, carbs: 17.5, fats: 0.1, fiber: 2.1, calories: 77, aliases: ['yukon gold potatoes', 'yukon gold potato', 'potatoes', 'potato'] },
+            { name: "Garlic Powder", servingAmount: 1, servingUnit: "tsp", protein: 0.5, carbs: 2, fats: 0, fiber: 0.3, calories: 10, aliases: ['garlic powder (spice)'] },
+            { name: "Unsalted Butter", servingAmount: 1, servingUnit: "tbsp", protein: 0.1, carbs: 0, fats: 11.5, fiber: 0, calories: 102, aliases: ['butter', 'unsalted butter (cold)'] }
         ];
 
         // Add any RECIPE_SEED food that isn't already present. Names already seeded
@@ -2751,6 +2757,17 @@
                     ["Tomato Paste", 2, "tbsp"], ["Farro (dry)", 0.75, "cup"], ["Low-Sodium Chicken Broth", 4, "cup"],
                     ["Egg", 1, "piece"], ["Panko", 0.5, "cup"], ["Parmesan (grated)", 0.75, "cup"],
                     ["Ground Chicken (raw)", 454, "g"], ["Frozen Peas", 1, "cup"]
+                ]
+            },
+            {
+                // Prep 15 min, total 55 min, yield 4-6 servings (5 used). Salt, pepper and
+                // herbs are omitted (negligible calories); stock stands in for the pan sauce.
+                name: "Sheet Pan Chicken Thighs and Potatoes",
+                totalServings: 5,
+                items: [
+                    ["Chicken Thighs (raw, bone-in, skin-on)", 1361, "g"], ["Yukon Gold Potatoes (raw)", 907, "g"],
+                    ["Olive Oil", 2, "tbsp"], ["Garlic Powder", 1, "tsp"],
+                    ["Low-Sodium Chicken Broth", 0.5, "cup"], ["Unsalted Butter", 1, "tbsp"]
                 ]
             }
         ];
