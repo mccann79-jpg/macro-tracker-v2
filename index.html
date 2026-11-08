@@ -2730,14 +2730,16 @@
         // word (powder, sauce, dried, ...) are skipped so only whole items match.
         const PIECE_KEYWORDS = [
             [/bell pepper|red pepper|green pepper|yellow pepper|orange pepper|sweet pepper/, 119],
-            [/jalape/, 14], [/sweet potato|yam/, 130], [/yukon|gold potato|potato/, 150],
-            [/red onion|yellow onion|white onion|onion/, 110], [/shallot/, 40], [/garlic/, 3],
-            [/cucumber/, 200], [/zucchini|courgette/, 196], [/avocado/, 150], [/tomato/, 123],
-            [/banana/, 118], [/apple/, 182], [/orange|clementine|tangerine/, 140], [/lemon/, 58],
-            [/lime/, 44], [/pear/, 178], [/peach|nectarine/, 150], [/kiwi/, 69], [/mango/, 200],
-            [/\beggs?\b/, 50], [/sausage/, 85], [/carrot/, 61], [/celery/, 40]
+            [/jalape/, 14], [/sweet potato|\byam\b/, 130], [/yukon|gold potato|potato/, 150],
+            [/onion/, 110], [/shallot/, 40], [/garlic/, 3],
+            [/cucumber/, 200], [/zucchini|courgette/, 196], [/avocado/, 150],
+            [/roma tomato/, 62], [/tomato/, 123],
+            [/\bbananas?\b/, 118], [/\bapples?\b/, 182], [/clementine/, 74], [/tangerine/, 88],
+            [/orange/, 140], [/\blemons?\b/, 58], [/\blimes?\b/, 44], [/\bpears?\b/, 178],
+            [/peach|nectarine/, 150], [/\bkiwi/, 69], [/\bmango\b/, 200],
+            [/\beggs?\b/, 50], [/sausage|andouille/, 85], [/carrot/, 61], [/celery/, 40]
         ];
-        const PIECE_EXCLUDE = /egg white|powder|sauce|juice|dried|canned|paste|soup|broth|seasoning|salsa|chips|fries|oil|vinegar|jam|butter|flavor|dressing|pie|cake|bread|muffin|cookie|bar\b|baby|slices|diced|chopped|shredded|frozen|pickle|cherry tomato|grape tomato/;
+        const PIECE_EXCLUDE = /egg white|powder|flakes|sauce|juice|dried|canned|paste|soup|broth|seasoning|salsa|chips|fries|oil|vinegar|jam|butter|flavor|dressing|pie\b|cake|bread|muffin|mcmuffin|burrito|quesadilla|sandwich|bowl|bites|griller|loaded|bagel|cookie|bar\b|baby|slices|diced|chopped|shredded|frozen|pickle|cherry tomato|grape tomato|crushed|peeled|pasata|rotel|banana pepper|prickly|green onion|scallion|chives|spread|sun-dried/;
 
         function applyPieceSeed() {
             let changed = false;
@@ -2745,7 +2747,7 @@
                 if (!food || food.pieceGrams > 0) return; // never overwrite a user-set value
                 const name = (food.name || '').trim().toLowerCase();
                 let g = PIECE_SEED[name];
-                if (!g && !PIECE_EXCLUDE.test(name)) {
+                if (!g && food.servingUnit !== 'serving' && !PIECE_EXCLUDE.test(name)) {
                     const hit = PIECE_KEYWORDS.find(([re]) => re.test(name));
                     if (hit) g = hit[1];
                 }
