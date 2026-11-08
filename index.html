@@ -1136,6 +1136,18 @@
                     <small>e.g. "1 cup weighs 120 g" (or 4.2 oz). Lets you log this food by volume and get accurate weight.</small>
                 </div>
                 <div class="form-group">
+                    <label>1 piece weighs <span style="color:var(--text-muted)">(optional — for logging by piece)</span></label>
+                    <div class="form-row">
+                        <input type="number" id="pieceGrams" step="any" min="0" inputmode="decimal" placeholder="e.g., 120" aria-label="Weight of one piece">
+                        <select id="pieceWeightUnit" aria-label="Piece weight unit">
+                            <option value="g">g</option>
+                            <option value="oz">oz</option>
+                            <option value="lb">lb</option>
+                        </select>
+                    </div>
+                    <small>e.g. "1 piece weighs 120 g". Lets you log this food as 1 piece, 2 pieces, etc. and get accurate macros.</small>
+                </div>
+                <div class="form-group">
                     <label for="calories">Calories <span style="color:var(--text-muted)">(auto if blank)</span></label>
                     <input type="number" inputmode="decimal" id="calories" step="any" min="0" placeholder="(P×4)+(C×4)+(F×9)">
                 </div>
@@ -1291,6 +1303,17 @@
                             <span class="vol-eq-word">weighs</span>
                             <input type="number" id="mealCustomVolEqGrams" step="any" min="0" inputmode="decimal" placeholder="120" aria-label="Weight amount">
                             <select id="mealCustomVolEqWeightUnit" aria-label="Weight unit">
+                                <option value="g">g</option>
+                                <option value="oz">oz</option>
+                                <option value="lb">lb</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>1 piece weighs <span style="color:var(--text-muted)">(optional)</span></label>
+                        <div class="form-row">
+                            <input type="number" id="mealCustomPieceGrams" step="any" min="0" inputmode="decimal" placeholder="e.g., 120" aria-label="Weight of one piece">
+                            <select id="mealCustomPieceWeightUnit" aria-label="Piece weight unit">
                                 <option value="g">g</option>
                                 <option value="oz">oz</option>
                                 <option value="lb">lb</option>
@@ -2111,6 +2134,7 @@
                         ensureFoodIds();
                         applyDensitySeed(); // backfill volume<->weight data
                         applyRecipeSeed();
+                        applyPieceSeed(); // backfill piece weights (after recipe foods are added)
                         applyRecipeMealSeed();
                         localStorage.setItem('foodDatabase', JSON.stringify(foodDatabase));
                         loadedFromCloud = true;
@@ -2228,6 +2252,7 @@
                     foodDatabase = data.foodDatabase;
                     ensureFoodIds();
                     applyDensitySeed(); // backfill volume<->weight data
+                    applyPieceSeed(); // backfill piece weights
                     localStorage.setItem('foodDatabase', JSON.stringify(foodDatabase));
                     renderFoodList();
                     updateFoodSelectors();
@@ -2433,8 +2458,9 @@
             }
 
             ensureFoodIds();
-            applyDensitySeed(); // backfill volume<->weight data on existing foods
+            applyDensitySeed(); // backfill volume<->weight data
             if (applyRecipeSeed() | applyRecipeMealSeed()) syncToFirebase();
+            applyPieceSeed(); // backfill piece weights (after recipe foods are added)
             renderFoodList();
             updateFoodSelectors();
             renderSavedMeals();
@@ -2549,8 +2575,9 @@
         // Grams equivalent of amount+unit for a food with the given density
         // (g/ml). Returns null for count units (piece/serving) which have no
         // generic weight, and falls back to water density when density is unset.
-        function unitToGrams(amount, unit, density) {
+        function unitToGrams(amount, unit, density, pieceGrams) {
             if (WEIGHT_TO_G[unit] != null) return amount * WEIGHT_TO_G[unit];
+            if (unit === 'piece' && pieceGrams > 0) return amount * pieceGrams;
             if (VOLUME_TO_ML[unit] != null) return amount * VOLUME_TO_ML[unit] * (density || 1);
             return null; // piece, serving
         }
@@ -2558,12 +2585,12 @@
         // How many of a food's servings a logged amount represents.
         // Handles same-unit (exact), volume<->weight (via density), and count
         // units, falling back to a plain ratio when categories can't be bridged.
-        function servingMultiplier(amount, unit, servingAmount, servingUnit, density) {
+        function servingMultiplier(amount, unit, servingAmount, servingUnit, density, pieceGrams) {
             if (!servingAmount) return 0;
             if (unit === 'serving') return amount;                     // logged in servings
             if (unit === servingUnit) return amount / servingAmount;   // same unit: exact
-            const a = unitToGrams(amount, unit, density);
-            const s = unitToGrams(servingAmount, servingUnit, density);
+            const a = unitToGrams(amount, unit, density, pieceGrams);
+            const s = unitToGrams(servingAmount, servingUnit, density, pieceGrams);
             if (a != null && s != null && s > 0) return a / s;         // weight/volume bridge
             return amount / servingAmount;                             // fallback (e.g. piece<->g)
         }
@@ -2686,6 +2713,29 @@
             return changed;
         }
 
+        // Weight of one piece (grams) keyed by lowercased food name, backfilled onto
+        // existing foods that don't have one so "1 piece" and grams interconvert.
+        // Typical medium sizes (USDA household weights). Edit any food to adjust.
+        const PIECE_SEED = {
+            'egg': 50, 'banana': 118, 'sweet potato': 130, 'navel orange': 140, 'garlic': 3,
+            'red bell pepper': 119, "gilbert's andouille chicken sausage": 85,
+            'apple': 182, 'avocado': 150, 'orange': 140, 'pear': 178, 'peach': 150, 'lemon': 58, 'lime': 44,
+            'potato': 173, 'yukon gold potatoes (raw)': 148, 'onion (raw)': 110, 'cucumber': 200,
+            'zucchini': 196, 'carrots (raw)': 61, 'tomato': 123, 'bell pepper': 119,
+            'whole foods croissant (bake at home)': 80, 'pumpkin & spice mini muffin (whole foods)': 23.5
+        };
+
+        function applyPieceSeed() {
+            let changed = false;
+            foodDatabase.forEach(food => {
+                if (!food || food.pieceGrams > 0) return; // never overwrite a user-set value
+                const g = PIECE_SEED[(food.name || '').trim().toLowerCase()];
+                if (g > 0) { food.pieceGrams = g; food.pieceWeightUnit = 'g'; changed = true; }
+            });
+            if (changed) localStorage.setItem('foodDatabase', JSON.stringify(foodDatabase));
+            return changed;
+        }
+
         // Ingredients for the farro chicken meatball soup. Added once, and only if
         // no food with the same name (or an alias) is already in My Foods. Nutrition
         // is per the listed serving (USDA reference values).
@@ -2799,7 +2849,7 @@
                 }
                 const tot = { protein: 0, carbs: 0, fats: 0, fiber: 0, calories: 0 };
                 foods.forEach(item => {
-                    const m = servingMultiplier(item.amount, item.unit, item.servingAmount, item.servingUnit, item.density);
+                    const m = servingMultiplier(item.amount, item.unit, item.servingAmount, item.servingUnit, item.density, item.pieceGrams);
                     const cal = item.calories !== undefined ? item.calories : (item.protein * 4 + item.carbs * 4 + item.fats * 9);
                     tot.protein += item.protein * m; tot.carbs += item.carbs * m; tot.fats += item.fats * m;
                     tot.fiber += (item.fiber || 0) * m; tot.calories += cal * m;
@@ -2844,6 +2894,10 @@
                 density = volEqGrams / volEqMl;
             }
 
+            const pieceWUnit = document.getElementById('pieceWeightUnit').value;
+            const pieceG = parseFloat(document.getElementById('pieceGrams').value) * (WEIGHT_TO_G[pieceWUnit] || 1);
+            const hasPiece = pieceG > 0;
+
             const foodData = {
                 name: document.getElementById('foodName').value,
                 servingAmount: servingAmount,
@@ -2858,7 +2912,9 @@
                 volEqAmount: density ? volEqAmount : null,
                 volEqUnit: density ? volEqUnit : null,
                 volEqGrams: density ? volEqGrams : null,
-                volEqWeightUnit: density ? volEqWUnit : null
+                volEqWeightUnit: density ? volEqWUnit : null,
+                pieceGrams: hasPiece ? pieceG : null,
+                pieceWeightUnit: hasPiece ? pieceWUnit : null
             };
 
             if (editingId !== '') {
@@ -2926,6 +2982,16 @@
                 document.getElementById('volEqUnit').value = 'cup';
                 document.getElementById('volEqWeightUnit').value = 'g';
                 document.getElementById('volEqGrams').value = '';
+            }
+
+            // Populate the piece weight if the food has one
+            if (food.pieceGrams > 0) {
+                const pu = food.pieceWeightUnit || 'g';
+                document.getElementById('pieceWeightUnit').value = pu;
+                document.getElementById('pieceGrams').value = +(food.pieceGrams / WEIGHT_TO_G[pu]).toFixed(2);
+            } else {
+                document.getElementById('pieceWeightUnit').value = 'g';
+                document.getElementById('pieceGrams').value = '';
             }
 
             // Only populate calories if it was custom (not auto-calculated)
@@ -2997,6 +3063,7 @@
                     const volGrams = food.volEqGrams != null ? food.volEqGrams : +(food.density * VOLUME_TO_ML.cup).toFixed(1);
                     sub += ` · ${volAmt} ${UNIT_LABELS[volUnit]} ≈ ${volGrams}g`;
                 }
+                if (food.pieceGrams > 0) sub += ` · 1 pc ≈ ${+food.pieceGrams.toFixed(1)}g`;
                 tableHTML += `
                     <tr class="food-row" data-name="${esc(food.name.toLowerCase())}">
                         <td class="food-name-cell">
@@ -3131,6 +3198,9 @@
             const volEqMl = (volEqAmount > 0 && VOLUME_TO_ML[volEqUnit]) ? volEqAmount * VOLUME_TO_ML[volEqUnit] : 0;
             const density = (volEqMl > 0 && volEqGrams > 0) ? volEqGrams / volEqMl : null;
 
+            const pieceWUnit = document.getElementById('mealCustomPieceWeightUnit').value;
+            const pieceG = parseFloat(document.getElementById('mealCustomPieceGrams').value) * (WEIGHT_TO_G[pieceWUnit] || 1);
+
             const food = {
                 id: newId(),
                 name,
@@ -3142,7 +3212,9 @@
                 volEqAmount: density ? volEqAmount : null,
                 volEqUnit: density ? volEqUnit : null,
                 volEqGrams: density ? volEqGrams : null,
-                volEqWeightUnit: density ? volEqWUnit : null
+                volEqWeightUnit: density ? volEqWUnit : null,
+                pieceGrams: pieceG > 0 ? pieceG : null,
+                pieceWeightUnit: pieceG > 0 ? pieceWUnit : null
             };
             foodDatabase.push(food);
             localStorage.setItem('foodDatabase', JSON.stringify(foodDatabase));
@@ -3154,7 +3226,7 @@
             renderMealBuilder();
             calculateMealTotals();
 
-            ['mealCustomName', 'mealCustomServingAmount', 'mealCustomVolEqAmount', 'mealCustomVolEqGrams', 'mealCustomCalories', 'mealCustomProtein', 'mealCustomCarbs', 'mealCustomFats', 'mealCustomFiber'].forEach(id => document.getElementById(id).value = '');
+            ['mealCustomName', 'mealCustomServingAmount', 'mealCustomVolEqAmount', 'mealCustomVolEqGrams', 'mealCustomPieceGrams', 'mealCustomCalories', 'mealCustomProtein', 'mealCustomCarbs', 'mealCustomFats', 'mealCustomFiber'].forEach(id => document.getElementById(id).value = '');
             document.getElementById('mealCustomServingUnit').value = 'serving';
             toggleMealCustomFood();
             showToast(`Saved and added ${name}`, 'success');
@@ -3185,7 +3257,7 @@
 
             tableBody.innerHTML = currentMealBuilder.map((item, index) => {
                 // How many servings of this food the logged amount represents
-                const multiplier = servingMultiplier(item.amount, item.unit, item.servingAmount, item.servingUnit, item.density);
+                const multiplier = servingMultiplier(item.amount, item.unit, item.servingAmount, item.servingUnit, item.density, item.pieceGrams);
                 
                 const protein = (item.protein * multiplier).toFixed(1);
                 const carbs = (item.carbs * multiplier).toFixed(1);
@@ -3247,7 +3319,7 @@
             let totalCalories = 0;
 
             currentMealBuilder.forEach(item => {
-                const multiplier = servingMultiplier(item.amount, item.unit, item.servingAmount, item.servingUnit, item.density);
+                const multiplier = servingMultiplier(item.amount, item.unit, item.servingAmount, item.servingUnit, item.density, item.pieceGrams);
 
                 totalProtein += item.protein * multiplier;
                 totalCarbs += item.carbs * multiplier;
@@ -3307,7 +3379,7 @@
             let totalCalories = 0;
 
             currentMealBuilder.forEach(item => {
-                const multiplier = servingMultiplier(item.amount, item.unit, item.servingAmount, item.servingUnit, item.density);
+                const multiplier = servingMultiplier(item.amount, item.unit, item.servingAmount, item.servingUnit, item.density, item.pieceGrams);
 
                 totalProtein += item.protein * multiplier;
                 totalCarbs += item.carbs * multiplier;
@@ -4190,7 +4262,7 @@
                 // Convert amount to serving multiplier (density-aware)
                 const servingAmount = food.servingAmount || 100;
                 const servingUnit = food.servingUnit || 'g';
-                const multiplier = servingMultiplier(amount, unit, servingAmount, servingUnit, food.density);
+                const multiplier = servingMultiplier(amount, unit, servingAmount, servingUnit, food.density, food.pieceGrams);
                 
                 return {
                     protein: food.protein * multiplier,
@@ -4220,10 +4292,11 @@
         }
         
         // State for target macro unit conversion
-        let targetCalcState = { servingsNeeded: 0, servingAmount: 0, servingUnit: 'g', type: '', name: '', density: null };
+        let targetCalcState = { servingsNeeded: 0, servingAmount: 0, servingUnit: 'g', type: '', name: '', density: null, pieceGrams: null };
         
         function calculateFromTargetMacro() {
             let density = null;
+            let pieceGrams = null;
             const name = document.getElementById('selectedItemName').value;
             const type = document.getElementById('selectedItemType').value;
             const targetValue = parseFloat(document.getElementById('targetMacroValue').value) || 0;
@@ -4264,6 +4337,7 @@
                 servingAmount = food.servingAmount || 100;
                 servingUnit = food.servingUnit || 'g';
                 density = food.density || null;
+                pieceGrams = food.pieceGrams || null;
             }
             
             // Calculate how many servings needed to hit target
@@ -4279,7 +4353,7 @@
             const amountNeeded = servingsNeeded * servingAmount;
             
             // Store state for unit conversion
-            targetCalcState = { servingsNeeded, servingAmount, servingUnit, type, name, density };
+            targetCalcState = { servingsNeeded, servingAmount, servingUnit, type, name, density, pieceGrams };
             
             // Set the unit selector to the food's native unit
             const unitSelect = document.getElementById('targetUnitSelect');
@@ -4313,15 +4387,15 @@
             if (!targetCalcState.servingsNeeded) return;
             
             const newUnit = document.getElementById('targetUnitSelect').value;
-            const { servingsNeeded, servingAmount, servingUnit, density } = targetCalcState;
+            const { servingsNeeded, servingAmount, servingUnit, density, pieceGrams } = targetCalcState;
 
             // Amount in the food's native unit
             const nativeAmount = servingsNeeded * servingAmount;
 
             // Convert from native unit to new unit (density-aware; falls back to
             // the water-density table for count units that have no gram value)
-            const nativeInGrams = unitToGrams(nativeAmount, servingUnit, density);
-            const newUnitInGrams = unitToGrams(1, newUnit, density);
+            const nativeInGrams = unitToGrams(nativeAmount, servingUnit, density, pieceGrams);
+            const newUnitInGrams = unitToGrams(1, newUnit, density, pieceGrams);
             let convertedAmount;
             if (nativeInGrams != null && newUnitInGrams != null && newUnitInGrams > 0) {
                 convertedAmount = nativeInGrams / newUnitInGrams;
@@ -4436,7 +4510,7 @@
                 const food = foodDatabase.find(f => f.name === name);
                 if (!food) { showToast('Food not found', 'error'); return; }
 
-                const multiplier = servingMultiplier(amount, unit, food.servingAmount, food.servingUnit, food.density);
+                const multiplier = servingMultiplier(amount, unit, food.servingAmount, food.servingUnit, food.density, food.pieceGrams);
 
                 todaysMeals.push({
                     id: newId(),
@@ -4557,7 +4631,7 @@
             const unit = document.getElementById('foodUnitForDay').value;
 
             // Convert to multiplier for macros (density-aware)
-            const multiplier = servingMultiplier(amount, unit, food.servingAmount, food.servingUnit, food.density);
+            const multiplier = servingMultiplier(amount, unit, food.servingAmount, food.servingUnit, food.density, food.pieceGrams);
 
             todaysMeals.push({
                 id: newId(),
@@ -4642,7 +4716,7 @@
                 const food = item.custom ? null : foodDatabase.find(f => f.name === foodName);
                 if (food) {
                     const unit = item.unit || food.servingUnit || 'g';
-                    const multiplier = servingMultiplier(amount, unit, food.servingAmount, food.servingUnit, food.density);
+                    const multiplier = servingMultiplier(amount, unit, food.servingAmount, food.servingUnit, food.density, food.pieceGrams);
                     
                     item.amount = amount;
                     item.macros = {
@@ -4685,7 +4759,7 @@
                 const food = item.custom ? null : foodDatabase.find(f => f.name === foodName);
                 if (food) {
                     const amount = item.amount || 1;
-                    const multiplier = servingMultiplier(amount, newUnit, food.servingAmount, food.servingUnit, food.density);
+                    const multiplier = servingMultiplier(amount, newUnit, food.servingAmount, food.servingUnit, food.density, food.pieceGrams);
                     
                     item.unit = newUnit;
                     item.macros = {
@@ -5112,7 +5186,7 @@
                 return;
             }
 
-            const headers = ['id', 'name', 'servingAmount', 'servingUnit', 'protein', 'carbs', 'fats', 'fiber', 'calories', 'customCalories', 'density', 'volEqAmount', 'volEqUnit', 'volEqGrams'];
+            const headers = ['id', 'name', 'servingAmount', 'servingUnit', 'protein', 'carbs', 'fats', 'fiber', 'calories', 'customCalories', 'density', 'volEqAmount', 'volEqUnit', 'volEqGrams', 'pieceGrams'];
             const csvRows = [
                 headers.join(','),
                 ...foods.map(f => {
@@ -5196,7 +5270,7 @@
                                 food[h] = parseInt(val) || Date.now() + i;
                             } else if (['servingAmount', 'protein', 'carbs', 'fats', 'fiber', 'calories'].includes(h)) {
                                 food[h] = parseFloat(val) || 0;
-                            } else if (['density', 'volEqAmount', 'volEqGrams'].includes(h)) {
+                            } else if (['density', 'volEqAmount', 'volEqGrams', 'pieceGrams'].includes(h)) {
                                 food[h] = parseFloat(val) || null;
                             } else if (h === 'customCalories') {
                                 food[h] = val === 'true' || val === '1';
