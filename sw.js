@@ -1,4 +1,4 @@
-const CACHE_NAME = 'macro-tracker-v7';
+const CACHE_NAME = 'macro-tracker-v8';
 
 // Install - cache core files
 self.addEventListener('install', event => {
