@@ -237,6 +237,8 @@
         /* ===== FORMS ===== */
         .form-group { margin-bottom: 14px; }
         .form-group:has(.autocomplete-dropdown) { position: relative; z-index: 10; }
+        .saved-meals-table th.sortable { cursor: pointer; user-select: none; white-space: nowrap; }
+        .saved-meals-table th.sortable:hover, .saved-meals-table th.sorted { color: var(--text-primary); }
         .vol-eq {
             display: grid;
             grid-template-columns: 1fr 1.2fr auto 1fr 1.1fr;
@@ -3461,6 +3463,31 @@
             }
         }
 
+        // Sortable saved-meals table. Clicking a header sorts by it; clicking again
+        // reverses. Choice is remembered per browser.
+        const MEAL_SORT_VALUE = {
+            name: m => m.name.toLowerCase(),
+            srv: m => m.totalServings || 0,
+            p: m => m.perServing.protein || 0,
+            c: m => m.perServing.carbs || 0,
+            f: m => m.perServing.fats || 0,
+            fib: m => m.perServing.fiber || 0,
+            cal: m => mealCalories(m),
+            pct: m => { const c = mealCalories(m); return c > 0 ? m.perServing.protein * 4 / c : 0; }
+        };
+        function mealCalories(m) {
+            return m.perServing.calories || (m.perServing.protein * 4 + m.perServing.carbs * 4 + m.perServing.fats * 9);
+        }
+        let mealSort = { key: 'name', dir: 'asc' };
+        try { const saved = JSON.parse(localStorage.getItem('mealSort')); if (saved && MEAL_SORT_VALUE[saved.key]) mealSort = saved; } catch (e) {}
+
+        function sortMealsBy(key) {
+            if (mealSort.key === key) mealSort.dir = mealSort.dir === 'asc' ? 'desc' : 'asc';
+            else mealSort = { key, dir: key === 'name' ? 'asc' : 'desc' }; // numbers start high-to-low
+            try { localStorage.setItem('mealSort', JSON.stringify(mealSort)); } catch (e) {}
+            renderSavedMeals();
+        }
+
         function renderSavedMeals() {
             const listDiv = document.getElementById('savedMealsList');
             const query = (document.getElementById('searchSavedMeals')?.value || '').toLowerCase().trim();
@@ -3470,8 +3497,14 @@
                 return;
             }
 
-            // Filter and sort alphabetically by name
-            let sortedMeals = [...savedMeals].sort((a, b) => a.name.localeCompare(b.name));
+            // Filter, then sort by the chosen column (name as tiebreaker)
+            const valueOf = MEAL_SORT_VALUE[mealSort.key] || MEAL_SORT_VALUE.name;
+            const dirMul = mealSort.dir === 'desc' ? -1 : 1;
+            let sortedMeals = [...savedMeals].sort((a, b) => {
+                const va = valueOf(a), vb = valueOf(b);
+                const cmp = typeof va === 'string' ? va.localeCompare(vb) : va - vb;
+                return cmp * dirMul || a.name.localeCompare(b.name);
+            });
             if (query) {
                 sortedMeals = sortedMeals.filter(m => m.name.toLowerCase().includes(query));
             }
@@ -3486,7 +3519,11 @@
                 <table class="saved-meals-table">
                     <thead>
                         <tr>
-                            <th style="text-align:left;">Meal</th><th>Srv</th><th>P/srv</th><th>C/srv</th><th>F/srv</th><th>Fib</th><th>Cal/srv</th><th>P% cal</th><th class="meal-actions-cell"></th>
+                            ${[['name', 'Meal'], ['srv', 'Srv'], ['p', 'P/srv'], ['c', 'C/srv'], ['f', 'F/srv'], ['fib', 'Fib'], ['cal', 'Cal/srv'], ['pct', 'P% cal']].map(([key, label]) => {
+                                const active = mealSort.key === key;
+                                const arrow = active ? (mealSort.dir === 'asc' ? ' ▲' : ' ▼') : '';
+                                return `<th class="sortable${active ? ' sorted' : ''}" ${key === 'name' ? 'style="text-align:left;"' : ''} role="button" tabindex="0" aria-sort="${active ? (mealSort.dir === 'asc' ? 'ascending' : 'descending') : 'none'}" onclick="sortMealsBy('${key}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();sortMealsBy('${key}')}">${label}${arrow}</th>`;
+                            }).join('')}<th class="meal-actions-cell"></th>
                         </tr>
                     </thead>
                     <tbody>
