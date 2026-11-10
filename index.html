@@ -519,6 +519,8 @@
         .food-name { font-weight: 600; font-size: 0.9rem; line-height: 1.25; }
         .food-sub { font-weight: 400; font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; line-height: 1.3; }
         .food-actions { white-space: nowrap !important; text-align: right !important; }
+        .food-table th.sortable { cursor: pointer; user-select: none; white-space: nowrap; }
+        .food-table th.sorted { color: var(--text); }
         .icon-btn {
             width: 34px; height: 34px;
             background: transparent; border: 1px solid var(--border);
@@ -3052,6 +3054,17 @@
             }
         }
 
+        let foodSort = { key: 'name', dir: 1 };
+        function setFoodSort(key) {
+            if (foodSort.key === key) {
+                foodSort.dir = -foodSort.dir;
+            } else {
+                // Numeric columns default to highest first, name to A-Z
+                foodSort = { key, dir: key === 'name' ? 1 : -1 };
+            }
+            renderFoodList();
+        }
+
         function renderFoodList() {
             const listDiv = document.getElementById('foodList');
             const countEl = document.getElementById('foodCount');
@@ -3062,15 +3075,35 @@
                 return;
             }
 
-            // Sort alphabetically by name
-            const sortedFoods = [...foodDatabase].sort((a, b) => a.name.localeCompare(b.name));
+            const calOf = f => f.calories !== undefined ? f.calories : (f.protein * 4 + f.carbs * 4 + f.fats * 9);
+            const pctOf = f => { const c = calOf(f); return c > 0 ? (f.protein * 4 / c) * 100 : 0; };
+            const keyFns = {
+                name: f => f.name.toLowerCase(),
+                protein: f => +f.protein || 0,
+                carbs: f => +f.carbs || 0,
+                fats: f => +f.fats || 0,
+                cal: calOf,
+                pct: pctOf
+            };
+            const { key: sortKey, dir: sortDir } = foodSort;
+            const keyFn = keyFns[sortKey] || keyFns.name;
+            const sortedFoods = [...foodDatabase].sort((a, b) => {
+                const ka = keyFn(a), kb = keyFn(b);
+                const r = typeof ka === 'string' ? ka.localeCompare(kb) : ka - kb;
+                return (r || a.name.localeCompare(b.name)) * sortDir;
+            });
+            const th = (key, label, style) => {
+                const active = sortKey === key;
+                const arrow = active ? (sortDir === 1 ? ' ▲' : ' ▼') : '';
+                return `<th class="sortable${active ? ' sorted' : ''}" style="${style || ''}" onclick="setFoodSort('${key}')">${label}${arrow}</th>`;
+            };
 
             let tableHTML = `
                 <table class="food-table">
                     <thead>
                         <tr>
-                            <th style="text-align:left;">Food</th>
-                            <th>P</th><th>C</th><th>F</th><th>Cal</th><th></th>
+                            ${th('name', 'Food', 'text-align:left;')}
+                            ${th('protein', 'P')}${th('carbs', 'C')}${th('fats', 'F')}${th('cal', 'Cal')}${th('pct', 'P%')}<th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -3097,6 +3130,7 @@
                         <td class="carbs-col">${food.carbs}</td>
                         <td class="fats-col">${food.fats}</td>
                         <td class="cal-col">${calories.toFixed(0)}</td>
+                        <td class="protein-col">${pctOf(food).toFixed(0)}%</td>
                         <td class="food-actions">
                             <button class="icon-btn" aria-label="Edit ${esc(food.name)}" onclick="editFood(${jsArg(food.id)})">✎</button>
                             <button class="icon-btn danger" aria-label="Delete ${esc(food.name)}" onclick="deleteFood(${jsArg(food.id)})">✕</button>
