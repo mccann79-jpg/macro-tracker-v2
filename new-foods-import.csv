@@ -1,0 +1,4 @@
+name,servingAmount,servingUnit,protein,carbs,fats,fiber,calories,customCalories,pieceGrams
+Gilbert's Andouille Chicken Sausage,71,g,12,1,5,0,100,true,71
+Zespri SunGold Kiwifruit,162,g,2,26,0,2,100,true,81
+Amy's Chunky Tomato Bisque (Light in Sodium),411,g,5,37,7,4,230,true,
