@@ -7,8 +7,12 @@
    - `pieceGrams` only for countable items (1 tortilla, 1 kiwi); leave blank otherwise.
    - Check the CSV first; don't add duplicates (import matches by name, case-insensitive, and updates).
 3. Commit and push. Push to `main` only when the user says so.
-4. Editing the CSV does NOT add the food to the app. Foods live in the user's Firebase
-   (keyed by their 4-digit PIN) and localStorage. The user must tap Food Database -> Import
-   in the app and pick the CSV (it upserts by name). Always tell them this explicitly.
-   Writing to Firebase directly needs their PIN and a read-merge-write
-   (`set()` replaces the whole object), so ask before doing that.
+4. Import it yourself, never hand the user a CSV to import:
+   `python3 import-foods.py` (PIN defaults to 6625; `--dry-run` previews).
+   It upserts by name into the user's Firebase foodDatabase via REST, touching only
+   foodDatabase/_counts/_lastSync, backs up the cloud record to `backups_<pin>/pre-import-<ts>`,
+   and verifies the foods landed. Open apps pick it up live.
+   Requires the host `macro-tracker-v2-default-rtdb.firebaseio.com` in the environment's
+   allowed network hosts (already added to the Default environment; if the request gets a
+   403 proxy error, re-add it with update_environment).
+5. Tell the user it's done and in the app. Re-running is safe (upsert by name).
